@@ -17,11 +17,13 @@
   [r initial]
   (iterate (partial logistic r) initial))
 
+;; FIXME The period is not the size of the set, because there may be
+;; an initial sequence before the recurrence begins.
 (defn find-cycle
   "Loops through the values in sequence xs, looking for the first 
   value that has already appeared in the sequence.  If such a value
   is found, a pair containing the value and the period of the number
-  of preceding values (the cycle length) is returned.  If the end
+  of preceding values (the period) is returned.  If the end
   of the sequence is encountered with no repeats, nil is returned.
   (Note that the test for recurrence uses a clojure set, which uses
   the function hash to determine identity.  This means that numbers
@@ -32,7 +34,7 @@
   (loop [ys xs, seen #{}]
     (let [y (first ys)]
       (cond (empty? ys) nil
-            (seen y)    [y (count seen)]
+            (seen y)    [y (count seen)] ; FIXME
             :else (recur (rest ys) (conj seen y))))))
 
 
