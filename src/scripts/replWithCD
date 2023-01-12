@@ -1,0 +1,4 @@
+#!/bin/sh
+set -x
+cd ~/cloj/dynoprob
+exec lein repl "$@"

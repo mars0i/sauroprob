@@ -13,4 +13,7 @@
                  [metasoarous/oz "1.6.0-alpha36"] ; As of 1/12/2023 site says "Please use 1.6.0-alpha36 for the most recent stable version of Oz. "
                  [cljplot "0.0.2a-SNAPSHOT"]
                 ]
-  :repl-options {:init-ns dynoprob.core})
+  :source-paths ["src/clj"]
+)
+
+ ;; :repl-options {:init-ns dynoprob.core})
