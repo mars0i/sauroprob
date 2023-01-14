@@ -39,14 +39,37 @@
           (recur (rest ys) (inc i) (assoc seen y i)))))))
 
 (comment
-  (def xs4 (logistic-vals 4 0.5))
-  (def xs4 (logistic-vals 4 0.501))
-  (take 10 xs4)
-  (find-cycle xs4)
-  (def xs (concat [7] (range 5) (range 5 1 -1)))
-  (find-cycle xs)
   (find-cycle (range 1000))
 
-  (def xs4 (logistic-vals 4 0.76))
-  (take 50 xs4)
+  (def xs (concat [7] (range 5) (range 5 1 -1)))
+  (find-cycle xs)
+
+  (def xs4 (logistic-vals 4 0.5))
+  (def xs4 (logistic-vals 4 0.501))
+  (def xs4 (logistic-vals 4 0.25))
+  (def xs4 (logistic-vals 4 0.75))
+  (def xs4 (logistic-vals 4 0.750000001))
+  (def xs4 (logistic-vals 4 0.0000001))
+  (take 5 xs4)
+  (find-cycle (take 1000000 xs4))
+
+  (def xs3 (logistic-vals 3 0.75))
+  (def xs3 (logistic-vals 3 2/3))
+  (take 20 xs3)
+  (find-cycle (take 1000000 xs3))
+
+  (def xs2 (logistic-vals 2 0.1))
+  (def xs2 (logistic-vals 2 0.5))
+  (def xs2 (logistic-vals 2 0.9))    ; cycles on 0.5
+  (def xs2 (logistic-vals 2 0.99))   ; cycles on slightly less than 0.5
+  (def xs2 (logistic-vals 2 0.9999)) ; cycles on 0.5
+  (def xs2 (logistic-vals 2 0.1))    ; cycles on 0.5
+  (def xs2 (logistic-vals 2 0.01))   ; cycles on slightly less than 0.5
+  (def xs2 (logistic-vals 2 0.001))  ; cycles on 0.5
+  (def xs2 (logistic-vals 2 9/10))   ; DON't DO THIS.
+  (def xs2 (logistic-vals 2 1/2))
+  (take 3 xs2)
+  (take 20 xs2)
+  (find-cycle (take 1000000 xs2))
+
 ) 
