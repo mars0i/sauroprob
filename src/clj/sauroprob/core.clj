@@ -1,4 +1,4 @@
-(ns dynoprob.core)
+(ns sauroprob.core)
 
 (defn logistic
   "The logistic function with parameter r."

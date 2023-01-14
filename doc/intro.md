@@ -1,3 +1,3 @@
-# Introduction to dynoprob
+# Introduction to sauroprob
 
 TODO: write [great documentation](http://jacobian.org/writing/what-to-write/)
