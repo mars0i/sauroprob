@@ -1,4 +1,7 @@
-(ns sauroprob.core)
+(ns sauroprob.core
+  (:require [fitdistr.core :as fitc]
+            [fitdistr.distributions :as fitd]))
+
 
 (defn logistic
   "The logistic function with parameter r."
@@ -71,5 +74,15 @@
   (take 3 xs2)
   (take 20 xs2)
   (find-cycle (take 1000000 xs2))
+
+  (def xs4 (logistic-vals 4 0.3))
+  ;; I don't think this is likely to be what I want:
+  (fitc/fit :ks :logistic (take 10000 xs4))
+
+  fitc/infer
+  fitc/bootstrap
+
+  ;; List possible distributions:
+  (sort (keys (methods fitd/distribution-data)))
 
 ) 
