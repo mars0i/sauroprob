@@ -1,5 +1,5 @@
 #!/bin/sh
 set -x
 cd ~/cloj/sauroprob
-exec clj -A:nrepl-server "$@"  # uses nepl-server alias I defined in deps.edn
+exec clj -M:nrepl-server "$@"  # uses nepl-server alias I defined in deps.edn
 
