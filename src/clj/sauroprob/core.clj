@@ -21,7 +21,7 @@
   "Loops through the values in sequence xs, looking for the first value
   that has already appeared in the sequence.  If the value is found, a
   map is returned, otherwise nil if no cycles are found.  The map has
-  keys :val for the number that cycles, :period for the period of the
+  keys :value for the number that cycles, :period for the period of the
   cycle, and :starts-at for the zero-based index of the value that
   starts the cycle. Note that the test for recurrence uses a clojure
   map, which uses the function 'hash' to determine identity.  This means
@@ -35,7 +35,7 @@
       (let [y (first ys)
             prev-idx (seen y)]
         (if prev-idx 
-          {:val y :period (- i prev-idx) :starts-at prev-idx}  ; old version: [y (- i prev-idx) prev-idx]
+          {:value y :period (- i prev-idx) :starts-at prev-idx}  ; old version: [y (- i prev-idx) prev-idx]
           (recur (rest ys) (inc i) (assoc seen y i)))))))
 
 (comment
