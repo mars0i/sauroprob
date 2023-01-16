@@ -1,6 +1,10 @@
 (ns sauroprob.core
   (:require [fitdistr.core :as fitc]
-            [fitdistr.distributions :as fitd]))
+            [fitdistr.distributions :as fitd]
+            ;[clojure.math.numeric-tower :as m]
+            [oz.core :as oz]
+            [aerial.hanami.common :as hc]
+            [aerial.hanami.templates :as ht]))
 
 
 (defn logistic
@@ -40,6 +44,26 @@
         (if prev-idx 
           {:value y :period (- i prev-idx) :starts-at prev-idx}  ; old version: [y (- i prev-idx) prev-idx]
           (recur (rest ys) (inc i) (assoc seen y i)))))))
+
+;; By John Collins at https://stackoverflow.com/a/68476365/1455243
+(defn irange
+  "Inclusive range function: end element is included."
+  ([start end step]
+   (take-while (if (pos? step) #(<= % end) #(>= % end)) (iterate #(+ % step) start)))
+  ([start end]
+   (irange start end 1))
+  ([end]
+   (irange 0 end))
+  ([] (range)))
+
+(defn vl-data-fy
+  [label x-min x-max ys]
+  (let [num-ys (count ys)
+        x-range (- x-max x-min)
+        x-increment (/ x-range num-ys)
+        xs (irange x-min x-max x-increment)]
+    (map (fn [x y] {"x" x, "y" y, "label" label}) xs ys)))
+
 
 (comment
   (find-cycle (range 1000))
@@ -82,7 +106,20 @@
   fitc/infer
   fitc/bootstrap
 
+
   ;; List possible distributions:
   (sort (keys (methods fitd/distribution-data)))
+
+  (oz/start-server!)
+  (def vl-data (map (fn [x y] {"x" x, "y" y, "label" "yow"})
+                    (range 10)
+                    (map (fn [x] (* x x)) (range 10))))
+  (def vl-spec (hc/xform ht/line-chart :DATA vl-data))
+  (oz/view! vl-spec)
+
+  (def vl-spec (hc/xform ht/point-chart
+                         :DATA (vl-data-fy "yow" 0.0 1.0 (take 1000 xs4))))
+  (oz/view! vl-spec)
+
 
 ) 
