@@ -12,7 +12,10 @@
         metasoarous/oz {:mvn/version "1.6.0-alpha36"}} ; noticed 1/12/2023 site says "Please use 1.6.0-alpha36 for the most recent stable version of Oz. "
 
  :aliases {:nrepl-server {:extra-deps {nrepl/nrepl {:mvn/version "1.0.0"}}
-                          :main-opts  ["-m" "nrepl.cmdline"]}}
+                          :main-opts  ["-m" "nrepl.cmdline"]}
+           ;; For debugging, try running 'clj -M:nrepl-deps -m nrepl.cmdline':
+           :nrepl-deps {:extra-deps {nrepl/nrepl {:mvn/version "1.0.0"}}}
+          }
 
 }
 
