@@ -2,4 +2,4 @@
 set -x
 cd ~/cloj/sauroprob
 exec clj -M:nrepl-server "$@"  # uses nepl-server alias I defined in deps.edn
-
+# More info here: https://nrepl.org/nrepl/usage/server.html
