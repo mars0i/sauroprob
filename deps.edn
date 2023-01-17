@@ -2,8 +2,15 @@
 
 {:paths ["src/clj"] 
 
+ ;; Note: Moved the nrepl dependence to main deps rather than an extra-deps,
+ ;; which didn't work on MBA (not with Java 1.8, Java 17, or Java 19).
+ ;; It's supposed to work, but I get the error:
+ ;;    Execution error (FileNotFoundException) at clojure.main/main (main.java:40).
+ ;;    Could not locate nrepl/cmdline__init.class, nrepl/cmdline.clj or nrepl/cmdline.cljc on classpath.
+ ;; Blowing away .m2 doesn't help either. (Saw that mentioned in slack.)
  :deps {org.clojure/clojure {:mvn/version "1.11.1"}
         org.clojure/math.numeric-tower {:mvn/version "0.0.5"}
+        nrepl/nrepl {:mvn/version "1.0.0"} ; see note above
         ;generateme/fastmath {:mvn/version "2.1.8"} ; or 2.1.9-SNAPSHOT
         generateme/fitdistr {:mvn/version "1.0.4"}
         cljplot/cljplot {:mvn/version "0.0.2a-SNAPSHOT"} ; also by generateme
@@ -11,11 +18,8 @@
         techascent/tech.viz {:mvn/version "6.00-beta-16-4"}
         metasoarous/oz {:mvn/version "1.6.0-alpha36"}} ; noticed 1/12/2023 site says "Please use 1.6.0-alpha36 for the most recent stable version of Oz. "
 
- :aliases {:nrepl-server {:extra-deps {nrepl/nrepl {:mvn/version "1.0.0"}}
+ :aliases {:nrepl-server {;:extra-deps {nrepl/nrepl {:mvn/version "1.0.0"}} ; see note above
                           :main-opts  ["-m" "nrepl.cmdline"]}
-           ;; For debugging, try running 'clj -M:nrepl-deps -m nrepl.cmdline':
-           :nrepl-deps {:extra-deps {nrepl/nrepl {:mvn/version "1.0.0"}}}
-          }
-
+          } ; end of :aliases val
 }
 
