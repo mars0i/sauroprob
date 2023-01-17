@@ -159,11 +159,32 @@
   (def vl-spec (hc/xform ht/line-chart :DATA vl-data))
   (oz/view! vl-spec)
 
+  (def mu 2.5)
+
+  (def p-mu (/ (- mu 1) mu))
+
+  (logistic mu 0.45)
+  (n-comp (logistic mu) 1 0.45)
+  (n-comp (logistic mu) 2 0.45)
 
   ;; Plot an iterated logistic map as a function from x to f(x)
-  (def vl-spec (hc/xform ht/line-chart ; or point-chart
-                         :DATA (vl-fn-ify "yow" 0.0 1.001 0.001
-                                          (n-comp (logistic 3.5) 5))))
+  (def vl-spec 
+    (hc/xform ht/layer-chart
+              {:LAYER
+               [
+                (hc/xform ht/line-chart 
+                          :DATA (vl-fn-ify (str "mu=" mu ", iter 1")
+                                           0.0 1.001 0.001 (n-comp (logistic mu) 1))
+                          :COLOR "label")
+                (hc/xform ht/line-chart 
+                          :DATA (vl-fn-ify (str "mu=" mu ", iter 2")
+                                           0.0 1.001 0.001 (n-comp (logistic mu) 2))
+                          :COLOR "label")
+                (hc/xform ht/line-chart
+                          :DATA [{"x" 0, "y" 0, "label" "y=x"} {"x" 1, "y" 1, "label" "y=x"}]
+                          :COLOR "label")
+                ]}))
+
   (oz/view! vl-spec)
 
 ) 
