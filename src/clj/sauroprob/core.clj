@@ -151,12 +151,14 @@
 
   (oz/start-server!)
   ;; Plot an iterated logistic map as a function from x to f(x)
-  (def mu 3.8)
+  (def mu 2.9)
   (oz/view! vl-spec)
   (def vl-spec 
-    (let [init-x 0.38
+    (let [init-x 0.5
           f (logistic mu)
-          f2 (n-comp f 2)]
+          f2 (n-comp f 2)
+          f3 (n-comp f 3)
+          f4 (n-comp f 4)]
       (hc/xform ht/layer-chart
                 {:LAYER
                  [
@@ -168,66 +170,43 @@
                                 :DATA (vl-iter-segments "mapping 1" f init-x)
                                 :COLOR "label")
                       (assoc-in [:encoding :order :field] "ord") ; walk through lines in order not L-R
-                      ;(assoc-in [:encoding :order :type] "ordinal") ; gets rid of warning on :order
                       (assoc-in [:mark :strokeDash] [4 2])
-                      (assoc-in [:mark :strokeWidth] 1.25))
+                      (assoc-in [:mark :strokeWidth] 0.75))
                   ;; FIXME:
                   (-> (hc/xform ht/line-chart 
                                 :DATA (vl-iter-segments "mapping 2" f (f init-x))
                                 :COLOR "label")
                       (assoc-in [:encoding :order :field] "ord") ; walk through lines in order not L-R
-                      ;(assoc-in [:encoding :order :type] "ordinal") ; gets rid of warning on :order
                       (assoc-in [:mark :strokeDash] [4 2])
-                      (assoc-in [:mark :strokeWidth] 1.25))
+                      (assoc-in [:mark :strokeWidth] 0.75))
                   (-> (hc/xform ht/line-chart 
                                 :DATA (vl-iter-segments "mapping 3" f (f2 init-x))
                                 :COLOR "label")
                       (assoc-in [:encoding :order :field] "ord") ; walk through lines in order not L-R
-                      ;(assoc-in [:encoding :order :type] "ordinal") ; gets rid of warning on :order
                       (assoc-in [:mark :strokeDash] [4 2])
-                      (assoc-in [:mark :strokeWidth] 1.25))
+                      (assoc-in [:mark :strokeWidth] 0.75))
+                  (-> (hc/xform ht/line-chart 
+                                :DATA (vl-iter-segments "mapping 4" f (f3 init-x))
+                                :COLOR "label")
+                      (assoc-in [:encoding :order :field] "ord") ; walk through lines in order not L-R
+                      (assoc-in [:mark :strokeDash] [4 2])
+                      (assoc-in [:mark :strokeWidth] 0.75))
+                  (-> (hc/xform ht/line-chart 
+                                :DATA (vl-iter-segments "mapping 5" f (f4 init-x))
+                                :COLOR "label")
+                      (assoc-in [:encoding :order :field] "ord") ; walk through lines in order not L-R
+                      (assoc-in [:mark :strokeDash] [4 2])
+                      (assoc-in [:mark :strokeWidth] 0.75))
                   (hc/xform ht/line-chart 
                             :DATA (vl-fn-ify (str "mu=" mu ", iter 2")
                                              0.0 1.001 0.001 f2)
                             :COLOR "label")
-                  (hc/xform ht/line-chart
-                            :DATA [{"x" 0, "y" 0, "label" "y=x"} {"x" 1, "y" 1, "label" "y=x"}]
-                            :COLOR "label")
-
+                  (-> (hc/xform ht/line-chart
+                                :DATA [{"x" 0, "y" 0, "label" "y=x"} {"x" 1, "y" 1, "label" "y=x"}]
+                                :COLOR "label")
+                      (assoc-in [:mark :strokeWidth] 1.0))
                   ]})))
 
 
-  (oz/view! foo)
-  (def foo
-    {:width 400,
-     :background "floralwhite",
-     :layer
-     [
-      {:encoding
-       {:y {:field "y", :type "quantitative"},
-        :color {:field "label", :type "nominal"},
-        :x {:field "x", :type "quantitative"},
-        :tooltip
-        [{:field "x", :type "quantitative"}
-         {:field "y", :type "quantitative"}]},
-       :mark {:type "line", :strokeDash [4 2], :strokeWidth 1.25},
-       :width 400,
-       :background "floralwhite",
-       :height 300,
-       :data
-       {:values
-        [
-         {"x" 0.62762699696, "y" 0.62762699696, "label" "mapping 2"}
-         {"x" 0.68324, "y" 0.62762699696, "label" "mapping 2"}
-         {"x" 0.68324, "y" 0.68324, "label" "mapping 2"}
-         ]}}
-      ],
-     :height 300})
 
-  (sort [
-         [0.68324, 0.68324]
-         [0.68324, 0.62762699696]
-         [0.62762699696, 0.62762699696]
-         ])
-
-  ) 
+) 
