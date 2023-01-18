@@ -89,6 +89,10 @@
   ([] (range)))
 
 (defn vl-data-ify
+  "Given a sequence ys of results of a function, returns a sequence
+  of Vega-Lite points with ys as y coordinates, and x coordinates
+  evenly spaced between x-min and x-max.  label can be used to identify
+  these as distinct points in Vega-Lite."
   [label x-min x-max ys]
   (let [num-ys (count ys)
         x-range (- x-max x-min)
@@ -97,11 +101,28 @@
     (map (fn [x y] {"x" x, "y" y, "label" label}) xs ys)))
 
 (defn vl-fn-ify
+  "Given a function f, returns a sequence of Vega-Lite points with x
+  coordinates running from x-min to x-max, inclusive, in steps of size
+  x-increment.  The y coordinates are results of applying f to the x
+  coordinates. label can be used to identify these as distinct points in
+  Vega-Lite."
   [label x-min x-max x-increment f]
   (let [x-range (- x-max x-min)
         xs (irange x-min x-max x-increment)
         ys (map f xs)]
     (map (fn [x y] {"x" x, "y" y, "label" label}) xs ys)))
+
+(defn vl-iter-segments
+  "Returns a sequence of three Vega-Lite points representing two 
+  connected line segments.  The first goes from the line y=x vertically
+  to the plot for f.  The second then goes horizontally to y=x."
+  [label f x]
+  (let [x' (f x)]
+    [{"x" x, "y" x, "label" label}
+     {"x" x, "y" x', "label" label}
+     {"x" x', "y" x', "label" label}]))
+
+
 
 (comment
   (find-cycle (range 1000))
@@ -169,21 +190,35 @@
 
   ;; Plot an iterated logistic map as a function from x to f(x)
   (def vl-spec 
-    (hc/xform ht/layer-chart
-              {:LAYER
-               [
-                (hc/xform ht/line-chart 
-                          :DATA (vl-fn-ify (str "mu=" mu ", iter 1")
-                                           0.0 1.001 0.001 (n-comp (logistic mu) 1))
-                          :COLOR "label")
-                (hc/xform ht/line-chart 
-                          :DATA (vl-fn-ify (str "mu=" mu ", iter 2")
-                                           0.0 1.001 0.001 (n-comp (logistic mu) 2))
-                          :COLOR "label")
-                (hc/xform ht/line-chart
-                          :DATA [{"x" 0, "y" 0, "label" "y=x"} {"x" 1, "y" 1, "label" "y=x"}]
-                          :COLOR "label")
-                ]}))
+    (let [init-x 0.52
+          f (logistic mu)
+          f2 (n-comp f 2)]
+      (hc/xform ht/layer-chart
+                {:LAYER
+                 [
+                  (hc/xform ht/line-chart 
+                            :DATA (vl-fn-ify (str "mu=" mu ", iter 1")
+                                             0.0 1.001 0.001 f)
+                            :COLOR "label")
+                  (hc/xform ht/line-chart 
+                            :DATA (vl-iter-segments "mapping" f init-x)
+                            :COLOR "label")
+                  ;; FIXME:
+                  (hc/xform ht/line-chart 
+                            :DATA (vl-iter-segments "mapping" f (f init-x))
+                            :COLOR "label")
+                  ;(hc/xform ht/line-chart 
+                  ;          :DATA (vl-iter-segments "mapping" f (f2 init-x))
+                  ;         :COLOR "label")
+                  ;(hc/xform ht/line-chart 
+                  ;          :DATA (vl-fn-ify (str "mu=" mu ", iter 2")
+                  ;                           0.0 1.001 0.001 f2)
+                  ;          :COLOR "label")
+                  (hc/xform ht/line-chart
+                            :DATA [{"x" 0, "y" 0, "label" "y=x"} {"x" 1, "y" 1, "label" "y=x"}]
+                            :COLOR "label")
+
+                  ]})))
 
   (oz/view! vl-spec)
 
