@@ -1,3 +1,4 @@
+Old version on MBA:
 {:version "1.10.1.478"
  :config-files ["/usr/local/Cellar/clojure/1.10.1.478/deps.edn" "/Users/marshall/.clojure/deps.edn" "deps.edn" ]
  :config-user "/Users/marshall/.clojure/deps.edn"
@@ -12,3 +13,17 @@
  :jvm-aliases ""
  :main-aliases ""
  :all-aliases ""}
+
+
+Old version on MBP:
+{:version "1.11.1.1208"
+ :config-files ["/usr/local/Cellar/clojure/1.11.1.1208/deps.edn" "/Users/mabrams/.clojure/deps.edn" "deps.edn" ]
+ :config-user "/Users/mabrams/.clojure/deps.edn"
+ :config-project "deps.edn"
+ :install-dir "/usr/local/Cellar/clojure/1.11.1.1208"
+ :config-dir "/Users/mabrams/.clojure"
+ :cache-dir ".cpcache"
+ :force false
+ :repro false
+ :main-aliases ""
+ :repl-aliases ""}
