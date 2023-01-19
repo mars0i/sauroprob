@@ -150,7 +150,7 @@
          xs
          (if distinguish?
            (map #(str " " %) (irange 1 iters))
-           (repeat "")))))
+           (repeat "s"))))) ; the "s" makes "mapping" into "mappings"
 
 
 (comment
