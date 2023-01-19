@@ -148,10 +148,15 @@
 
   (def p-mu (/ (- mu 1) mu))
 
+  ((n-comp (logistic 3) 2) 1/2)
+
+  3 1/2 (1 - 1/2) = 3/4
+  3 3/4 (1 - 3/4) = 3 3/4 1/4 = 9/16
+
 
   (oz/start-server!)
   ;; Plot an iterated logistic map as a function from x to f(x)
-  (def mu 2.9)
+  (def mu 1.5)
   (oz/view! vl-spec)
   (def vl-spec 
     (let [init-x 0.5
@@ -164,7 +169,7 @@
                 {:LAYER
                  [
                   (hc/xform ht/line-chart 
-                            :DATA (vl-fn-ify (str "mu=" mu ", iter 1")
+                            :DATA (vl-fn-ify (str "μ=" mu ", iter 1")
                                              0.0 1.001 0.001 f)
                             :COLOR "label")
                   (-> (hc/xform ht/line-chart 
@@ -205,7 +210,7 @@
                       (assoc-in [:mark :strokeDash] [2 2])
                       (assoc-in [:mark :strokeWidth] 0.75))
                   (hc/xform ht/line-chart 
-                            :DATA (vl-fn-ify (str "mu=" mu ", iter 2")
+                            :DATA (vl-fn-ify (str "μ=" mu ", iter 2")
                                              0.0 1.001 0.001 f2)
                             :COLOR "label")
                   (-> (hc/xform ht/line-chart
