@@ -158,7 +158,8 @@
           f (logistic mu)
           f2 (n-comp f 2)
           f3 (n-comp f 3)
-          f4 (n-comp f 4)]
+          f4 (n-comp f 4)
+          f5 (n-comp f 5)]
       (hc/xform ht/layer-chart
                 {:LAYER
                  [
@@ -170,32 +171,38 @@
                                 :DATA (vl-iter-segments "mapping 1" f init-x)
                                 :COLOR "label")
                       (assoc-in [:encoding :order :field] "ord") ; walk through lines in order not L-R
-                      (assoc-in [:mark :strokeDash] [4 2])
+                      (assoc-in [:mark :strokeDash] [2 2])
                       (assoc-in [:mark :strokeWidth] 0.75))
                   ;; FIXME:
                   (-> (hc/xform ht/line-chart 
                                 :DATA (vl-iter-segments "mapping 2" f (f init-x))
                                 :COLOR "label")
                       (assoc-in [:encoding :order :field] "ord") ; walk through lines in order not L-R
-                      (assoc-in [:mark :strokeDash] [4 2])
+                      (assoc-in [:mark :strokeDash] [2 2])
                       (assoc-in [:mark :strokeWidth] 0.75))
                   (-> (hc/xform ht/line-chart 
                                 :DATA (vl-iter-segments "mapping 3" f (f2 init-x))
                                 :COLOR "label")
                       (assoc-in [:encoding :order :field] "ord") ; walk through lines in order not L-R
-                      (assoc-in [:mark :strokeDash] [4 2])
+                      (assoc-in [:mark :strokeDash] [2 2])
                       (assoc-in [:mark :strokeWidth] 0.75))
                   (-> (hc/xform ht/line-chart 
                                 :DATA (vl-iter-segments "mapping 4" f (f3 init-x))
                                 :COLOR "label")
                       (assoc-in [:encoding :order :field] "ord") ; walk through lines in order not L-R
-                      (assoc-in [:mark :strokeDash] [4 2])
+                      (assoc-in [:mark :strokeDash] [2 2])
                       (assoc-in [:mark :strokeWidth] 0.75))
                   (-> (hc/xform ht/line-chart 
                                 :DATA (vl-iter-segments "mapping 5" f (f4 init-x))
                                 :COLOR "label")
                       (assoc-in [:encoding :order :field] "ord") ; walk through lines in order not L-R
-                      (assoc-in [:mark :strokeDash] [4 2])
+                      (assoc-in [:mark :strokeDash] [2 2])
+                      (assoc-in [:mark :strokeWidth] 0.75))
+                  (-> (hc/xform ht/line-chart 
+                                :DATA (vl-iter-segments "mapping 6" f (f5 init-x))
+                                :COLOR "label")
+                      (assoc-in [:encoding :order :field] "ord") ; walk through lines in order not L-R
+                      (assoc-in [:mark :strokeDash] [2 2])
                       (assoc-in [:mark :strokeWidth] 0.75))
                   (hc/xform ht/line-chart 
                             :DATA (vl-fn-ify (str "mu=" mu ", iter 2")
