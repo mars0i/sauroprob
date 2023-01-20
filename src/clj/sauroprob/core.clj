@@ -122,10 +122,6 @@
      {"x" x, "y" x', "label" label, "ord" 1}     ;  default. Need to order points for lines
      {"x" x', "y" x', "label" label, "ord" 2}])) ;  that go right to left, to avoid bad lines.
 
-(defn yo [x & [colors?]]
-  [x colors?])
-(yo 25)
-
 (defn vl-iter-line
   "Returns a Vega-Lite line spec containing two line segments which 
   together represent the mapping from x to x'=(f x).  The points will
@@ -135,7 +131,7 @@
                 :DATA (vl-iter-segments (str "mapping" label-suffix) f x)
                 :COLOR "label"
                 :SIZE 1.0      ; line thickness
-                :MSDASH [2 2]) ; dashed [stroke length, space between]
+                :MSDASH [1 1]) ; dashed [stroke length, space between]
       (assoc-in [:encoding :order :field] "ord"))) ; walk through lines in order not L-R
 
 (defn vl-iter-lines
@@ -179,14 +175,12 @@
 
   ((n-comp (logistic 3) 2) 1/2)
 
-  3 1/2 (1 - 1/2) = 3/4
-  3 3/4 (1 - 3/4) = 3 3/4 1/4 = 9/16
-
-
   (oz/start-server!)
   ;; Plot an iterated logistic map as a function from x to f(x)
+  (def mu 2.0)
+  (oz/view! vl-spec)
   (def vl-spec 
-    (let [init-x 0.95
+    (let [init-x 0.98
           f (logistic mu)]
       (hc/xform ht/layer-chart
                 {:LAYER
@@ -203,9 +197,7 @@
                               :DATA (vl-fn-ify (str "μ=" mu ", iter 2")
                                                0.0 1.001 0.001 (n-comp f 2))
                               :COLOR "label")]
-                   (vl-iter-lines f init-x 5))})))
-  (oz/view! vl-spec)
-  (def mu 2.5)
+                   (vl-iter-lines (n-comp f 1) init-x 8 false))})))
 
   (def old-vl-spec 
     (let [init-x 0.5
