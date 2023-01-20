@@ -177,10 +177,10 @@
 
   (oz/start-server!)
   ;; Plot an iterated logistic map as a function from x to f(x)
-  (def mu 3.0)
+  (def mu 2.0)
   (oz/view! vl-spec)
   (def vl-spec 
-    (let [init-x 0.36
+    (let [init-x 0.98
           f (logistic mu)]
       (hc/xform ht/layer-chart
                 {:LAYER
@@ -197,7 +197,7 @@
                               :DATA (vl-fn-ify (str "μ=" mu ", iter 2")
                                                0.0 1.001 0.001 (n-comp f 2))
                               :COLOR "label")]
-                   (vl-iter-lines (n-comp f 1) init-x 5 true))})))
+                   (vl-iter-lines (n-comp f 1) init-x 8 false))})))
 
   (def old-vl-spec 
     (let [init-x 0.5
