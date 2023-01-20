@@ -197,7 +197,7 @@
                               :DATA (vl-fn-ify (str "μ=" mu ", iter 2")
                                                0.0 1.001 0.001 (n-comp f 2))
                               :COLOR "label")]
-                   (vl-iter-lines (n-comp f 1) init-x 500 false))})))
+                   (vl-iter-lines (n-comp f 1) init-x 80 false))})))
   (oz/view! vl-spec)
 
 ) 
