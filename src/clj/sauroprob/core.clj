@@ -130,7 +130,7 @@
   (-> (hc/xform ht/line-chart 
                 :DATA (vl-iter-segments (str "mapping" label-suffix) f x)
                 :COLOR "label"
-                :SIZE 0.7      ; line thickness
+                :SIZE 1.0      ; line thickness
                 :MSDASH [1 1]) ; dashed [stroke length, space between]
       (assoc-in [:encoding :order :field] "ord"))) ; walk through lines in order not L-R
 
@@ -223,7 +223,7 @@
 
   (oz/start-server!)
   ;; Plot an iterated logistic map as a function from x to f(x)
-  (def mu 2.99)
+  (def mu 2.9)
   (def init-x 0.99)
   (oz/view! vl-spec)
   (def vl-spec 
@@ -243,11 +243,12 @@
                               :DATA (vl-fn-ify (str "F" (u-sup-char 2) " μ=" mu ", x=" init-x)
                                                0.0 1.001 0.001 (n-comp f 2))
                               :COLOR "label")
-                    (hc/xform ht/line-chart 
-                              :DATA (vl-fn-ify (str "F" (u-sup-char 3) " μ=" mu ", x=" init-x)
-                                               0.0 1.001 0.001 (n-comp f 3))
-                              :COLOR "label")]
-                   (vl-iter-lines (n-comp f 1) init-x 80 false))})))
+                    ;(hc/xform ht/line-chart 
+                    ;          :DATA (vl-fn-ify (str "F" (u-sup-char 3) " μ=" mu ", x=" init-x)
+                    ;                           0.0 1.001 0.001 (n-comp f 3))
+                    ;          :COLOR "label")
+                    ]
+                   (vl-iter-lines (n-comp f 1) init-x 50 false))})))
   (oz/view! vl-spec)
 
 ) 
