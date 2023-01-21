@@ -148,6 +148,44 @@
            (map #(str " " %) (irange 1 iters))
            (repeat "s"))))) ; the "s" makes "mapping" into "mappings"
 
+(defn u-sub-char
+  "If n is a single-digit integer in [0, ..., 9], returns the
+  Unicode supscript character for n.  Otherwise returns nil."
+  [n]
+  (if (and (integer? n)
+           (not (neg? n))
+           (>= n 0)
+           (<= n 9))
+    (char (+ 0x2080 n))
+    nil))
+
+(yow "what")
+
+
+;; Unicode supports a limited number of supscript and superscript characters,
+;; including single-digit integers.  The superscripts are inconsistent because
+;; some are inherited from an earlier character encoding.
+(defn u-sup-char
+  "If n is a single-digit integer in [0, ..., 9], returns the
+  Unicode superscript character for n.  Otherwise returns nil."
+  [n]
+  (when (integer? n)
+    (cond (= n 0) \u2070  ; superscript/subscript block
+          (= n 1) \u00B9  ; Latin-1 supplement block
+          (= n 2) \u00B2  ; Latin-1 supplement block
+          (= n 3) \u00B3  ; Latin-1 supplement block
+          (and (>= n 4) (<= n 9)) (char (+ 0x2070 n)) ; superscript/subscript block
+          :else nil)))
+
+(comment
+  (map #(str "F" (u-sub-char %)) (concat (range 11) [0.2 -3])) ; last 3 s/b empty since nil
+  (map #(str "F" (u-sup-char %)) (concat (range 11) [0.2 -3])) ; last 3 s/b empty since nil
+)
+
+;;TODO Make string versions of above that take arbitrary positive integers
+;; and return strings of superscript or subscript characters.
+
+
 
 (comment
 
@@ -175,13 +213,21 @@
 
   ((n-comp (logistic 3) 2) 1/2)
 
+  (class \u2073)
+
+  (str "F" (char 0x2073))
+
+  (zero? 0.0)
+  (= 0 0)
+
+
   (oz/start-server!)
   ;; Plot an iterated logistic map as a function from x to f(x)
-  (def mu 2.999)
+  (def mu 2.99)
+  (def init-x 0.99)
   (oz/view! vl-spec)
   (def vl-spec 
-    (let [init-x 0.99
-          f (logistic mu)]
+    (let [f (logistic mu)]
       (hc/xform ht/layer-chart
                 {:LAYER
                  (concat 
@@ -190,12 +236,16 @@
                               :COLOR "label"
                               :SIZE 1.0)
                     (hc/xform ht/line-chart 
-                              :DATA (vl-fn-ify (str "μ=" mu ", iter 1")
+                              :DATA (vl-fn-ify (str "F" (u-sup-char 1) " μ=" mu ", x=" init-x)
                                                0.0 1.001 0.001 f)
                               :COLOR "label")
                     (hc/xform ht/line-chart 
-                              :DATA (vl-fn-ify (str "μ=" mu ", iter 2")
+                              :DATA (vl-fn-ify (str "F" (u-sup-char 2) " μ=" mu ", x=" init-x)
                                                0.0 1.001 0.001 (n-comp f 2))
+                              :COLOR "label")
+                    (hc/xform ht/line-chart 
+                              :DATA (vl-fn-ify (str "F" (u-sup-char 3) " μ=" mu ", x=" init-x)
+                                               0.0 1.001 0.001 (n-comp f 3))
                               :COLOR "label")]
                    (vl-iter-lines (n-comp f 1) init-x 80 false))})))
   (oz/view! vl-spec)
