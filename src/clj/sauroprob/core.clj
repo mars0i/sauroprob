@@ -1,7 +1,8 @@
 (ns sauroprob.core
   (:require [fitdistr.core :as fitc]
             [fitdistr.distributions :as fitd]
-            [clojure.math.numeric-tower :as m]
+            ;[clojure.math.numeric-tower :as m]
+            [clojure.math :as m] ; new in Clojure 1.11 
             [oz.core :as oz]
             [aerial.hanami.common :as hc]
             [aerial.hanami.templates :as ht]))
@@ -159,8 +160,6 @@
     (char (+ 0x2080 n))
     nil))
 
-(yow "what")
-
 
 ;; Unicode supports a limited number of supscript and superscript characters,
 ;; including single-digit integers.  The superscripts are inconsistent because
@@ -186,6 +185,16 @@
 ;; and return strings of superscript or subscript characters.
 
 
+;; https://stackoverflow.com/a/73829330/1455243
+(defn round-to
+  "Rounds 'x' to 'places' decimal places"
+  [x places]
+  (->> x
+       bigdec
+       (#(.setScale % places java.math.RoundingMode/HALF_UP))
+       .doubleValue))
+
+(comment (round-to 32.12545 3) )
 
 (comment
 
@@ -221,9 +230,9 @@
   (= 0 0)
 
   (def logistic-data
-    (mapcat (fn [mu]
-              (vl-fn-ify (subs (str mu) 0 3)
-                         0.0 1.001 0.01 (logistic mu)))
+    (mapcat (fn [x]
+              (let [mu (round-to x 1)] ; strip float slop created by range
+                (vl-fn-ify mu 0.0 1.001 0.01 (logistic mu))))
             (range 1.0 3.1 0.1))) ; don't use integers--some will mess up subs
 
   (def vl-spec2
@@ -236,6 +245,7 @@
                               :SIZE 1.0)
                     (hc/xform ht/line-chart 
                               :DATA logistic-data
+                              :TRANSFORM [{:filter {:field "label" :equal 2.5}}]
                               :COLOR "label")])}))
   (oz/view! vl-spec2)
                  
@@ -270,9 +280,9 @@
                    (vl-iter-lines (n-comp f 1) init-x 50 false))})))
   (oz/view! vl-spec)
 
-  (oz/view! yo)
+  (oz/view! yocars)
   ;; From https://behrica.github.io/vl-galery/convert:
-  (def yo
+  (def yocars
     {:$schema "https://vega.github.io/schema/vega-lite/v5.json"
      :data {:url "https://raw.githubusercontent.com/vega/vega/main/docs/data/cars.json"}
      :description "Drag the sliders to highlight points."
