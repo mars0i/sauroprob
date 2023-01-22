@@ -236,19 +236,23 @@
             (range 1.0 3.1 0.1))) ; don't use integers--some will mess up subs
 
   (def vl-spec2
-      (hc/xform ht/layer-chart
+    (hc/xform ht/layer-chart
                 {:LAYER 
                  (concat 
                    [(hc/xform ht/line-chart
                               :DATA [{"x" 0, "y" 0, "label" "y=x"} {"x" 1, "y" 1, "label" "y=x"}]
                               :COLOR "label"
                               :SIZE 1.0)
-                    (hc/xform ht/line-chart 
+                    (-> (hc/xform ht/line-chart 
                               :DATA logistic-data
-                              :TRANSFORM [{:filter {:field "label" :equal 2.5}}]
-                              :COLOR "label")])}))
+                              :TRANSFORM [{:filter {:field "label" :equal "mu"}}] ; or 2.5
+                              :COLOR "label")
+                        (assoc :params {:bind {:mu {:input "range" :min 1.0 :max 3.0 :step 0.1}}
+                                        :name "mu" :value 3.5
+                                        :select {:fields [:mu] :type "quantitative"}}))])}))
+                       
   (oz/view! vl-spec2)
-                 
+
 
   (oz/start-server!)
   ;; Plot an iterated logistic map as a function from x to f(x)
@@ -294,7 +298,7 @@
                          :y {:field "Miles_per_Gallon" :type "quantitative"}}
               :mark "circle"
               :params [{:bind {:Cylinders {:input "range" :max 8 :min 3 :step 1}
-                               :Year {:input "range" :max 1981 :min 1969 :step 2}}
+                               :Year {:input "range" :max 1981 :min 1969 :step 1}}
                         :name "CylYr"
                         :select {:fields ["Cylinders" "Year"] :type "point"}
                         :value [{:Cylinders 4 :Year 1977}]}]}
