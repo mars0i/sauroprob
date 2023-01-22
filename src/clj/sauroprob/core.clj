@@ -1,7 +1,7 @@
 (ns sauroprob.core
   (:require [fitdistr.core :as fitc]
             [fitdistr.distributions :as fitd]
-            ;[clojure.math.numeric-tower :as m]
+            [clojure.math.numeric-tower :as m]
             [oz.core :as oz]
             [aerial.hanami.common :as hc]
             [aerial.hanami.templates :as ht]))
@@ -220,6 +220,25 @@
   (zero? 0.0)
   (= 0 0)
 
+  (def logistic-data
+    (mapcat (fn [mu]
+              (vl-fn-ify (subs (str mu) 0 3)
+                         0.0 1.001 0.01 (logistic mu)))
+            (range 1.0 3.1 0.1))) ; don't use integers--some will mess up subs
+
+  (def vl-spec2
+      (hc/xform ht/layer-chart
+                {:LAYER 
+                 (concat 
+                   [(hc/xform ht/line-chart
+                              :DATA [{"x" 0, "y" 0, "label" "y=x"} {"x" 1, "y" 1, "label" "y=x"}]
+                              :COLOR "label"
+                              :SIZE 1.0)
+                    (hc/xform ht/line-chart 
+                              :DATA logistic-data
+                              :COLOR "label")])}))
+  (oz/view! vl-spec2)
+                 
 
   (oz/start-server!)
   ;; Plot an iterated logistic map as a function from x to f(x)
@@ -250,5 +269,31 @@
                     ]
                    (vl-iter-lines (n-comp f 1) init-x 50 false))})))
   (oz/view! vl-spec)
+
+  (oz/view! yo)
+  ;; From https://behrica.github.io/vl-galery/convert:
+  (def yo
+    {:$schema "https://vega.github.io/schema/vega-lite/v5.json"
+     :data {:url "https://raw.githubusercontent.com/vega/vega/main/docs/data/cars.json"}
+     :description "Drag the sliders to highlight points."
+     :layer [{:encoding {:color {:condition {:field "Origin"
+                                             :param "CylYr"
+                                             :type "nominal"}
+                                 :value "grey"}
+                         :x {:field "Horsepower" :type "quantitative"}
+                         :y {:field "Miles_per_Gallon" :type "quantitative"}}
+              :mark "circle"
+              :params [{:bind {:Cylinders {:input "range" :max 8 :min 3 :step 1}
+                               :Year {:input "range" :max 1981 :min 1969 :step 2}}
+                        :name "CylYr"
+                        :select {:fields ["Cylinders" "Year"] :type "point"}
+                        :value [{:Cylinders 4 :Year 1977}]}]}
+             {:encoding {:color {:field "Origin" :type "nominal"}
+                         :size {:value 100}
+                         :x {:field "Horsepower" :type "quantitative"}
+                         :y {:field "Miles_per_Gallon" :type "quantitative"}}
+              :mark "circle"
+              :transform [{:filter {:param "CylYr"}}]}]
+     :transform [{:as "Year" :calculate "year(datum.Year)"}]})
 
 ) 
