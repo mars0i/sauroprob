@@ -216,7 +216,6 @@
                 (vl-fn-ify mu 0.0 1.001 0.01 (logistic mu))))
             (range 1.0 3.1 0.1))) ; don't use integers--some will mess up subs
 
-  (oz/view! vl-spec2)
 
   ;; THIS WORKS.
   ;; Proof of concept with slider controlling the mu value of plots.
@@ -226,118 +225,42 @@
   ;;       add a slider for number of iterations of mappings.
   ;;       add in addl mu's (curr 1.0 thru 3.0).
   (def vl-spec2
-              (-> 
-                (hc/xform ht/line-chart 
+    (-> 
+      (hc/xform ht/line-chart 
+                :DATA logistic-data
+                :TRANSFORM [{:filter {:field "label" :equal {:expr "MuSliderVal"}}}] ; :equal "mu_slider_val" doesn't work
+                :COLOR "label")
+      ;; The "params" key should be at the same level as "data".
+      (assoc :params [{:name "MuSliderVal" ; name of slider variable
+                       :value 2.5            ; default value
+                       :bind {:input "range" ; "range" makes it a slider
+                              :min 1.0 :max 3.0 :step 0.1}}]) ; slider config
+      ) 
+    )
+  (oz/view! vl-spec2)
+
+
+  (def vl-spec3
+    (hc/xform ht/layer-chart
+              {:LAYER
+               [(hc/xform ht/line-chart
+                          :DATA [{"x" 0, "y" 0, "label" "y=x"} {"x" 1, "y" 1, "label" "y=x"}]
+                          :COLOR "label"
+                          :SIZE 1.0)
+                (-> 
+                  (hc/xform ht/line-chart 
                             :DATA logistic-data
                             :TRANSFORM [{:filter {:field "label" :equal {:expr "MuSliderVal"}}}] ; :equal "mu_slider_val" doesn't work
                             :COLOR "label")
                   ;; The "params" key should be at the same level as "data".
                   (assoc :params [{:name "MuSliderVal" ; name of slider variable
-                                  :value 2.5            ; default value
-                                  :bind {:input "range" ; "range" makes it a slider
-                                         :min 1.0 :max 3.0 :step 0.1}}]) ; slider config
-              ) 
-  )
-  (oz/view! vl-spec2)
-
-  (def vl-spec2-stuffthatdidntwork
-    (-> 
-      (hc/xform ht/line-chart 
-                :DATA logistic-data
-                ;:TRANSFORM [{:filter {:field "label" :equal 2.0}}] ; :equal "mu_slider_val" doesn't work
-                ;:TRANSFORM [{:filter {:field "label" :equal "MuSliderVal"}}] ; :equal "mu_slider_val" doesn't work
-                ;:TRANSFORM [{:filter {:param "MuSliderVal"}}] ; :equal "mu_slider_val" doesn't work
-                :TRANSFORM [{:filter {:field "label" :equal {:expr "MuSliderVal"}}}] ; :equal "mu_slider_val" doesn't work
-                ;:TRANSFORM [{:filter {:field "label" :equal {:param "MuSliderVal"}}}] ; :equal "mu_slider_val" doesn't work
-                ;:TRANSFORM [{:filter {:param "label"}}] ; :equal "mu_slider_val" doesn't work
-                ;:TRANSFORM [{:filter  "label == MuSliderVal"}] ; :equal "mu_slider_val" doesn't work
-                :COLOR "label")
-      ;; The "params" key should be at the same level as "data".
-      (assoc :params [{:name "MuSliderVal" ; name of slider variable
-                       :value 2.2            ; default value
-                       :bind {:input "range" ; "range" makes it a slider
-                              :min 1.0 :max 3.0 :step 0.1}}]) ; slider config
-      ;(assoc :params [{:name "mu_slider" ; name of slider variable
-      ;                :value [{:label 2.5}]           ; default value
-      ;                :bind {:label
-      ;                       {:input "range" ; "range" makes it a slider
-      ;                        :min 1.0 :max 3.0 :step 0.1}}}])
-      ) 
-    )
+                                   :value 2.5            ; default value
+                                   :bind {:input "range" ; "range" makes it a slider
+                                          :min 1.0 :max 3.0 :step 0.1}}])) ; slider config
+                ]}))
+  (oz/view! vl-spec3)
 
 
-
-  (oz/view! yocars)
-  ;; From https://behrica.github.io/vl-galery/convert:
-  (def yocars
-    {:$schema "https://vega.github.io/schema/vega-lite/v5.json"
-     :data {:url "https://raw.githubusercontent.com/vega/vega/main/docs/data/cars.json"}
-     :description "Drag the sliders to highlight points."
-     :layer [{:encoding {:color {:condition {:field "Origin"
-                                             :param "CylYr"
-                                             :type "nominal"}
-                                 :value "grey"}
-                         :x {:field "Horsepower" :type "quantitative"}
-                         :y {:field "Miles_per_Gallon" :type "quantitative"}}
-              :mark "circle"
-              :params [{:bind {:Cylinders {:input "range" :max 8 :min 3 :step 1}
-                               :Year {:input "range" :max 1981 :min 1969 :step 1}}
-                        :name "CylYr"
-                        :select {:fields ["Cylinders" "Year"] :type "point"}
-                        :value [{:Cylinders 4 :Year 1977}]}]}
-             {:encoding {:color {:field "Origin" :type "nominal"}
-                         :size {:value 100}
-                         :x {:field "Horsepower" :type "quantitative"}
-                         :y {:field "Miles_per_Gallon" :type "quantitative"}}
-              :mark "circle"
-              :transform [{:filter {:param "CylYr"}}]}]
-     :transform [{:as "Year" :calculate "year(datum.Year)"}]})
-
-  (oz/start-server!)
-  ;; Plot an iterated logistic map as a function from x to f(x)
-  (def mu 2.9)
-  (def init-x 0.99)
-  (oz/view! vl-spec)
-  (def vl-spec 
-    (let [f (logistic mu)]
-      (hc/xform ht/layer-chart
-                {:LAYER
-                 (concat 
-                  (assoc :params [{:name "mu_slider_val" ; name of slider variable
-                                  :value 2.5            ; default value
-                                  :bind {:input "range" ; "range" makes it a slider
-                                         :min 1.0 :max 3.0 :step 0.1}}])
-                  ) ; slider config
-  )
-  (oz/view! vl-spec2)
-
-  (oz/view! yocars)
-  ;; From https://behrica.github.io/vl-galery/convert:
-  (def yocars
-    {:$schema "https://vega.github.io/schema/vega-lite/v5.json"
-     :data {:url "https://raw.githubusercontent.com/vega/vega/main/docs/data/cars.json"}
-     :description "Drag the sliders to highlight points."
-     :layer [{:encoding {:color {:condition {:field "Origin"
-                                             :param "CylYr"
-                                             :type "nominal"}
-                                 :value "grey"}
-                         :x {:field "Horsepower" :type "quantitative"}
-                         :y {:field "Miles_per_Gallon" :type "quantitative"}}
-              :mark "circle"
-              :params [{:bind {:Cylinders {:input "range" :max 8 :min 3 :step 1}
-                               :Year {:input "range" :max 1981 :min 1969 :step 1}}
-                        :name "CylYr"
-                        :select {:fields ["Cylinders" "Year"] :type "point"}
-                        :value [{:Cylinders 4 :Year 1977}]}]}
-             {:encoding {:color {:field "Origin" :type "nominal"}
-                         :size {:value 100}
-                         :x {:field "Horsepower" :type "quantitative"}
-                         :y {:field "Miles_per_Gallon" :type "quantitative"}}
-              :mark "circle"
-              :transform [{:filter {:param "CylYr"}}]}]
-     :transform [{:as "Year" :calculate "year(datum.Year)"}]})
-
-  (oz/start-server!)
   ;; Plot an iterated logistic map as a function from x to f(x)
   (def mu 2.9)
   (def init-x 0.99)
