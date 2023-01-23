@@ -3,6 +3,7 @@
             [fitdistr.distributions :as fitd]
             ;[clojure.math.numeric-tower :as m]
             [clojure.math :as m] ; new in Clojure 1.11 
+            [clojure.data.json :as json]
             [oz.core :as oz]
             [aerial.hanami.common :as hc]
             [aerial.hanami.templates :as ht]))
@@ -214,7 +215,7 @@
     (mapcat (fn [x]
               (let [mu (round-to x 1)] ; strip float slop created by range
                 (vl-fn-ify mu 0.0 1.001 0.01 (logistic mu))))
-            (range 1.0 3.1 0.1))) ; don't use integers--some will mess up subs
+            (range 1.0 4.1 0.1))) ; don't use integers--some will mess up subs
 
 
   ;; THIS WORKS.
@@ -234,31 +235,37 @@
       (assoc :params [{:name "MuSliderVal" ; name of slider variable
                        :value 2.5            ; default value
                        :bind {:input "range" ; "range" makes it a slider
-                              :min 1.0 :max 3.0 :step 0.1}}]) ; slider config
+                              :min 1.0 :max 4.0 :step 0.1}}]) ; slider config
       ) 
     )
   (oz/view! vl-spec2)
 
 
   (def vl-spec3
-    (hc/xform ht/layer-chart
-              {:LAYER
-               [(hc/xform ht/line-chart
-                          :DATA [{"x" 0, "y" 0, "label" "y=x"} {"x" 1, "y" 1, "label" "y=x"}]
-                          :COLOR "label"
-                          :SIZE 1.0)
-                (-> 
-                  (hc/xform ht/line-chart 
-                            :DATA logistic-data
-                            :TRANSFORM [{:filter {:field "label" :equal {:expr "MuSliderVal"}}}] ; :equal "mu_slider_val" doesn't work
-                            :COLOR "label")
-                  ;; The "params" key should be at the same level as "data".
-                  (assoc :params [{:name "MuSliderVal" ; name of slider variable
-                                   :value 2.5            ; default value
-                                   :bind {:input "range" ; "range" makes it a slider
-                                          :min 1.0 :max 3.0 :step 0.1}}])) ; slider config
-                ]}))
+    (-> (hc/xform ht/layer-chart
+                  {:LAYER
+                   ;; Note because the y=x line is unaffected by sliders, etc., it fixes the 
+                   ;; dimensions of the axes; otherwise we'd need to fix that by other means.
+                   [(hc/xform ht/line-chart
+                              :DATA [{"x" 0, "y" 0, "label" "y=x"} {"x" 1, "y" 1, "label" "y=x"}]
+                              :COLOR "label"
+                              :SIZE 1.0)
+                    (hc/xform ht/line-chart 
+                              :DATA logistic-data
+                              :TRANSFORM [{:filter {:field "label" :equal {:expr "MuSliderVal"}}}]
+                              :COLOR "label")
+                    ]})
+        ;; The "params" key has to be at the top level (if there are layers, outside the layers vector)
+        (assoc :params [{:name "MuSliderVal" ; name of slider variable
+                         :value 2.5            ; default value
+                         :bind {:input "range" ; "range" makes it a slider
+                                :min 1.0 :max 4.0 :step 0.1}}]) ; slider config
+        ))
   (oz/view! vl-spec3)
+
+  (println (json/write-str vl-spec3))
+  (use 'clojure.pprint)
+  (pprint (json/write-str vl-spec3))
 
 
   ;; Plot an iterated logistic map as a function from x to f(x)

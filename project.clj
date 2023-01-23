@@ -5,6 +5,7 @@
             :url "https://www.eclipse.org/legal/epl-2.0/"}
   :dependencies [[org.clojure/clojure "1.11.1"]
                  [org.clojure/math.numeric-tower "0.0.5"]
+                 [org.clojure/data.json "2.4.0"]
                  [generateme/fastmath "2.1.8"] ; or 2.1.9-SNAPSHOT
                  [aerial.hanami "0.17.0"]
                  [techascent/tech.viz "6.00-beta-16-4"]
