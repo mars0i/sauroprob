@@ -40,11 +40,11 @@
 
 
 (defn logistic
-  "The logistic function with parameter r applied to x.  If x is
+  "The logistic function with parameter mu applied to x.  If x is
   missing, returns the function with parameter r."
-  ([r] (partial logistic r))
-  ([r x]
-   (* r x (- 1 x))))
+  ([mu] (partial logistic mu))
+  ([mu x]
+   (* mu x (- 1 x))))
 
 (def logistic-4
   "([x])
@@ -142,6 +142,19 @@
   There will be iters line specs, beginning with the one for (f init-x),
   then (f (f init-x)), and so on.  If distinguish? is present and is
   truthy, each pair of segments will have a different color."
+  ([f init-x iters] (vl-iter-lines f init-x iters "mapping"))
+  ([f init-x iters label]
+   (let [xs (take iters (iterate f init-x))]
+     (map (partial vl-iter-line f)
+          xs
+          (repeat "s")))))
+
+(defn vl-iter-lines*
+  "Returns a sequence of Vega-Lite line specs, each containing two line
+  segments, which together represent the mapping from x to x'=(f x).
+  There will be iters line specs, beginning with the one for (f init-x),
+  then (f (f init-x)), and so on.  If distinguish? is present and is
+  truthy, each pair of segments will have a different color."
   [f init-x iters & [distinguish?]]
   (let [xs (take iters (iterate f init-x))]
     (map (partial vl-iter-line f)
@@ -212,10 +225,20 @@
   (def p-mu (/ (- mu 1) mu))
 
   (def logistic-data
-    (mapcat (fn [x]
-              (let [mu (round-to x 1)] ; strip float slop created by range
+    (mapcat (fn [m]
+              (let [mu (round-to m 1)] ; strip float slop created by range
                 (vl-fn-ify mu 0.0 1.001 0.01 (logistic mu))))
             (range 1.0 4.1 0.1))) ; don't use integers--some will mess up subs
+
+  (defn make-mapping-data 
+    "Return Vega-Lite data representing a series of mapping \"L\" lines
+    for a logistic map.  Start from x value init-x, and returns iters 
+    pairs of line segments."
+    [init-x iters]
+    (apply concat
+           (for [m (range 1.0 4.1 0.1)
+                 :let [mu (round-to m 1)]] ; strip float slop created by range
+             (vl-iter-lines (logistic mu) init-x iters (str "μ=m")))))
 
 
   ;; THIS WORKS.
@@ -249,11 +272,15 @@
                    [(hc/xform ht/line-chart
                               :DATA [{"x" 0, "y" 0, "label" "y=x"} {"x" 1, "y" 1, "label" "y=x"}]
                               :COLOR "label"
-                              :SIZE 1.0)
+                              :SIZE 1.0
+                              :WIDTH 400
+                              :HEIGHT 400)
                     (hc/xform ht/line-chart 
                               :DATA logistic-data
                               :TRANSFORM [{:filter {:field "label" :equal {:expr "MuSliderVal"}}}]
-                              :COLOR "label")
+                              :COLOR "label"
+                              :WIDTH 400
+                              :HEIGHT 400)
                     ]})
         ;; The "params" key has to be at the top level (if there are layers, outside the layers vector)
         (assoc :params [{:name "MuSliderVal" ; name of slider variable
@@ -262,6 +289,32 @@
                                 :min 1.0 :max 4.0 :step 0.1}}]) ; slider config
         ))
   (oz/view! vl-spec3)
+
+  (def vl-spec4
+    (-> (hc/xform ht/layer-chart
+                  {:LAYER
+                   ;; Note because the y=x line is unaffected by sliders, etc., it fixes the 
+                   ;; dimensions of the axes; otherwise we'd need to fix that by other means.
+                   [(hc/xform ht/line-chart
+                              :DATA [{"x" 0, "y" 0, "label" "y=x"} {"x" 1, "y" 1, "label" "y=x"}]
+                              :COLOR "label"
+                              :SIZE 1.0
+                              :WIDTH 400
+                              :HEIGHT 400)
+                    (hc/xform ht/line-chart 
+                              :DATA logistic-data
+                              :TRANSFORM [{:filter {:field "label" :equal {:expr "MuSliderVal"}}}]
+                              :COLOR "label"
+                              :WIDTH 400
+                              :HEIGHT 400)
+                    ]})
+        ;; The "params" key has to be at the top level (if there are layers, outside the layers vector)
+        (assoc :params [{:name "MuSliderVal" ; name of slider variable
+                         :value 2.5            ; default value
+                         :bind {:input "range" ; "range" makes it a slider
+                                :min 1.0 :max 4.0 :step 0.1}}]) ; slider config
+        ))
+  (oz/view! vl-spec4)
 
   (println (json/write-str vl-spec3))
   (use 'clojure.pprint)
