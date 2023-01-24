@@ -118,19 +118,19 @@
   "Returns a sequence of three Vega-Lite points representing two 
   connected line segments.  The first goes from the line y=x vertically
   to the plot for f.  The second then goes horizontally to y=x."
-  [label f x]
+  [f param x label]
   (let [x' (f x)]
-    [{"x" x, "y" x, "label" label, "ord" 0}      ; Vega-Lite sorts points from left to right by
-     {"x" x, "y" x', "label" label, "ord" 1}     ;  default. Need to order points for lines
-     {"x" x', "y" x', "label" label, "ord" 2}])) ;  that go right to left, to avoid bad lines.
+    [{"x" x, "y" x,   "param" param, "label" label, "ord" 0}   ; Vega-Lite sorts points from left to right by
+     {"x" x, "y" x',  "param" param, "label" label, "ord" 1}   ;  default. Need to order points for lines
+     {"x" x', "y" x', "param" param, "label" label, "ord" 2}])) ;  that go right to left, to avoid bad lines.
 
 (defn vl-iter-line
   "Returns a Vega-Lite line spec containing two line segments which 
   together represent the mapping from x to x'=(f x).  The points will
   be labeled \"mapping\" + label-suffix."
-  [f x label-suffix]
+  [f param x label-suffix]
   (-> (hc/xform ht/line-chart 
-                :DATA (vl-iter-segments (str "mapping" label-suffix) f x)
+                :DATA (vl-iter-segments f param x (str "mapping" label-suffix))
                 :COLOR "label"
                 :SIZE 1.0      ; line thickness
                 :MSDASH [1 1]) ; dashed [stroke length, space between]
@@ -142,10 +142,11 @@
   There will be iters line specs, beginning with the one for (f init-x),
   then (f (f init-x)), and so on.  If distinguish? is present and is
   truthy, each pair of segments will have a different color."
-  ([f init-x iters] (vl-iter-lines f init-x iters "mapping"))
-  ([f init-x iters label]
+  ([f param init-x iters]
+   (vl-iter-lines param f init-x iters "mapping"))
+  ([f param init-x iters label]
    (let [xs (take iters (iterate f init-x))]
-     (map (partial vl-iter-line f)
+     (map (partial vl-iter-line f param)
           xs
           (repeat "s")))))
 
@@ -230,6 +231,7 @@
                 (vl-fn-ify mu 0.0 1.001 0.01 (logistic mu))))
             (range 1.0 4.1 0.1))) ; don't use integers--some will mess up subs
 
+  ;; TODO in progress
   (defn make-mapping-data 
     "Return Vega-Lite data representing a series of mapping \"L\" lines
     for a logistic map.  Start from x value init-x, and returns iters 
@@ -238,7 +240,7 @@
     (apply concat
            (for [m (range 1.0 4.1 0.1)
                  :let [mu (round-to m 1)]] ; strip float slop created by range
-             (vl-iter-lines (logistic mu) init-x iters (str "μ=m")))))
+             (vl-iter-lines (logistic mu) mu init-x iters (str "μ=m")))))
 
 
   ;; THIS WORKS.
@@ -317,12 +319,12 @@
   (oz/view! vl-spec4)
 
   (println (json/write-str vl-spec3))
-  (use 'clojure.pprint)
-  (pprint (json/write-str vl-spec3))
+  (with-out-str (json/pprint vl-spec3))
+
 
 
   ;; Plot an iterated logistic map as a function from x to f(x)
-  (def mu 2.9)
+  (def mu 2.5)
   (def init-x 0.99)
   (oz/view! vl-spec)
   (def vl-spec 
@@ -347,7 +349,7 @@
                     ;                           0.0 1.001 0.001 (n-comp f 3))
                     ;          :COLOR "label")
                     ]
-                   (vl-iter-lines (n-comp f 1) init-x 50 false))})))
+                   (vl-iter-lines (n-comp f 1) mu init-x 50 (str "μ=" mu)))})))
   (oz/view! vl-spec)
 
 
