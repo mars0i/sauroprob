@@ -268,6 +268,24 @@
     )
   (oz/view! vl-spec2)
 
+  ;; Example of a completely non-working version (because the slider code
+  ;; is not at the top level):
+  (def vl-spec2bad
+    (-> (hc/xform ht/layer-chart
+                  {:LAYER
+                   [(-> 
+      (hc/xform ht/line-chart 
+                :DATA logistic-data
+                :TRANSFORM [{:filter {:field "label" :equal {:expr "MuSliderVal"}}}] ; :equal "mu_slider_val" doesn't work
+                :COLOR "label")
+      ;; The "params" key should be at the same level as "data".
+      (assoc :params [{:name "MuSliderVal" ; name of slider variable
+                       :value 2.5            ; default value
+                       :bind {:input "range" ; "range" makes it a slider
+                              :min 1.0 :max 4.0 :step 0.1}}]) ; slider config
+      )]})))
+  (oz/view! vl-spec2bad)
+
 
   (def vl-spec3
     (-> (hc/xform ht/layer-chart
