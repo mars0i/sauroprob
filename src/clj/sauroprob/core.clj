@@ -108,29 +108,29 @@
   x-increment.  The y coordinates are results of applying f to the x
   coordinates. label can be used to identify these as distinct points in
   Vega-Lite."
-  [label x-min x-max x-increment f]
+  [label x-min x-max x-increment f-param f]
   (let [x-range (- x-max x-min)
         xs (irange x-min x-max x-increment)
         ys (map f xs)]
-    (map (fn [x y] {"x" x, "y" y, "label" label}) xs ys)))
+    (map (fn [x y] {"x" x, "y" y, "f-param" f-param, "label" label}) xs ys)))
 
 (defn vl-iter-segments
   "Returns a sequence of three Vega-Lite points representing two 
   connected line segments.  The first goes from the line y=x vertically
   to the plot for f.  The second then goes horizontally to y=x."
-  [f param x label]
+  [f f-param x label]
   (let [x' (f x)]
-    [{"x" x, "y" x,   "param" param, "label" label, "ord" 0}   ; Vega-Lite sorts points from left to right by
-     {"x" x, "y" x',  "param" param, "label" label, "ord" 1}   ;  default. Need to order points for lines
-     {"x" x', "y" x', "param" param, "label" label, "ord" 2}])) ;  that go right to left, to avoid bad lines.
+    [{"x" x, "y" x,   "f-param" f-param, "label" label, "ord" 0}   ; Vega-Lite sorts points from left to right by
+     {"x" x, "y" x',  "f-param" f-param, "label" label, "ord" 1}   ;  default. Need to order points for lines
+     {"x" x', "y" x', "f-param" f-param, "label" label, "ord" 2}])) ;  that go right to left, to avoid bad lines.
 
 (defn vl-iter-line
   "Returns a Vega-Lite line spec containing two line segments which 
   together represent the mapping from x to x'=(f x).  The points will
   be labeled \"mapping\" + label-suffix."
-  [f param x label-suffix]
+  [f f-param x label-suffix]
   (-> (hc/xform ht/line-chart 
-                :DATA (vl-iter-segments f param x (str "mapping" label-suffix))
+                :DATA (vl-iter-segments f f-param x (str "mapping" label-suffix))
                 :COLOR "label"
                 :SIZE 1.0      ; line thickness
                 :MSDASH [1 1]) ; dashed [stroke length, space between]
@@ -142,11 +142,11 @@
   There will be iters line specs, beginning with the one for (f init-x),
   then (f (f init-x)), and so on.  If distinguish? is present and is
   truthy, each pair of segments will have a different color."
-  ([f param init-x iters]
-   (vl-iter-lines param f init-x iters "mapping"))
-  ([f param init-x iters label]
+  ([f f-param init-x iters]
+   (vl-iter-lines f-param f init-x iters "mapping"))
+  ([f f-param init-x iters label]
    (let [xs (take iters (iterate f init-x))]
-     (map (partial vl-iter-line f param)
+     (map (partial vl-iter-line f f-param)
           xs
           (repeat "s")))))
 
@@ -228,7 +228,7 @@
   (def logistic-data
     (mapcat (fn [m]
               (let [mu (round-to m 1)] ; strip float slop created by range
-                (vl-fn-ify mu 0.0 1.001 0.01 (logistic mu))))
+                (vl-fn-ify mu 0.0 1.001 0.01 mu (logistic mu))))
             (range 1.0 4.1 0.1))) ; don't use integers--some will mess up subs
 
   ;; TODO in progress
@@ -237,11 +237,13 @@
     for a logistic map.  Start from x value init-x, and returns iters 
     pairs of line segments."
     [init-x iters]
-    (apply concat
-           (for [m (range 1.0 4.1 0.1)
-                 :let [mu (round-to m 1)]] ; strip float slop created by range
-             (vl-iter-lines (logistic mu) mu init-x iters (str "μ=m")))))
+    (mapcat (fn [m]
+              (let [mu (round-to m 1)] ; strip float slop created by range
+                (vl-iter-lines (logistic mu) mu init-x iters (str "μ=" mu))))
+            (range 1.0 4.1 0.1))) ; don't use integers--some will mess up subs
 
+  (def init-x 0.99)
+  (def mapping-data (make-mapping-data init-x 10))
 
   ;; THIS WORKS.
   ;; Proof of concept with slider controlling the mu value of plots.
@@ -305,7 +307,7 @@
                               :HEIGHT 400)
                     (hc/xform ht/line-chart 
                               :DATA logistic-data
-                              :TRANSFORM [{:filter {:field "label" :equal {:expr "MuSliderVal"}}}]
+                              :TRANSFORM [{:filter {:field "f-param" :equal {:expr "MuSliderVal"}}}]
                               :COLOR "label"
                               :WIDTH 400
                               :HEIGHT 400)
