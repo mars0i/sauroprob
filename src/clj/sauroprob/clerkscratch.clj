@@ -40,6 +40,42 @@
 
 (clerk/vl vl-spec3)
 
+(def vl-spec4
+  (-> (hc/xform ht/layer-chart
+                {:LAYER
+                 ;; Note because the y=x line is unaffected by sliders, etc., it fixes the 
+                 ;; dimensions of the axes; otherwise we'd need to fix that by other means.
+                 [(hc/xform ht/line-chart
+                            :DATA [{"x" 0, "y" 0, "label" "y=x"} {"x" 1, "y" 1, "label" "y=x"}]
+                            :COLOR "label"
+                            :SIZE 1.0
+                            :WIDTH 400
+                            :HEIGHT 400)
+                  (hc/xform ht/line-chart 
+                            :DATA logistic-data
+                            :TRANSFORM [{:filter {:field "label" :equal {:expr "MuSliderVal"}}}]
+                            :COLOR "label"
+                            :WIDTH 400
+                            :HEIGHT 400)
+                  (-> (hc/xform ht/line-chart 
+                            :DATA (vl-iter-lines (logistic 2.5) 2.5 0.99 10 "yow") ; TEMP KLUDGE for testing
+                            ;:TRANSFORM [{:filter {:field "label" :equal {:expr "MuSliderVal"}}}]
+                            :COLOR "label"
+                            :MSDASH [1 2] ; dashed [stroke length, space between]
+                            :WIDTH 400
+                            :HEIGHT 400)
+                      (assoc-in [:encoding :order :field] "ord"))
+                  ]})
+      ;; The "params" key has to be at the top level (if there are layers, outside the layers vector)
+      (assoc :params [{:name "MuSliderVal" ; name of slider variable
+                       :value 2.5            ; default value
+                       :bind {:input "range" ; "range" makes it a slider
+                              :min 1.0 :max 4.0 :step 0.1}}]) ; slider config
+      ))
+
+(clerk/vl vl-spec4)
+
+
 ;; Example of a completely non-working version (because the slider code
 ;; is not at the top level):
 (def vl-spec2bad
@@ -57,4 +93,4 @@
                                             :min 1.0 :max 4.0 :step 0.1}}]))]})))
 
 
-(clerk/vl vl-spec2bad)
+; (clerk/vl vl-spec2bad)
