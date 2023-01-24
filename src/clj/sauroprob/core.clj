@@ -231,7 +231,8 @@
                 (vl-fn-ify mu 0.0 1.001 0.01 mu (logistic mu))))
             (range 1.0 4.1 0.1))) ; don't use integers--some will mess up subs
 
-  ;; TODO in progress
+  ;; TODO Using vl-iter-lines is too high level--that includes Hanami stuff.
+  ;; But I want to do that in the local spec.
   (defn make-mapping-data 
     "Return Vega-Lite data representing a series of mapping \"L\" lines
     for a logistic map.  Start from x value init-x, and returns iters 
@@ -243,7 +244,7 @@
             (range 1.0 4.1 0.1))) ; don't use integers--some will mess up subs
 
   (def init-x 0.99)
-  (def mapping-data (make-mapping-data init-x 10))
+  (def mapping-data (make-mapping-data init-x 10))  ; TODO see comment at make-mapping-data
 
   ;; THIS WORKS.
   ;; Proof of concept with slider controlling the mu value of plots.
@@ -311,6 +312,7 @@
                               :COLOR "label"
                               :WIDTH 400
                               :HEIGHT 400)
+                    mapping-data ; TODO see comment at make-mapping-data
                     ]})
         ;; The "params" key has to be at the top level (if there are layers, outside the layers vector)
         (assoc :params [{:name "MuSliderVal" ; name of slider variable
