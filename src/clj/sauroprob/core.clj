@@ -114,7 +114,33 @@
         ys (map f xs)]
     (map (fn [x y] {"x" x, "y" y, "f-param" f-param, "label" label}) xs ys)))
 
-(defn vl-iter-segments
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Construct mapping lines as a single ordered VL sequence
+
+(defn vl-iter-lines
+  [f f-param init-x iters label]
+  (loop [n iters
+         x init-x
+         order 0
+         segments [{"x" x, "y" x, "f-param" f-param, "label" label, "ord" 0}]]
+    (if (zero? n)
+      segments
+      (let [next-x (f x)
+            pt2 {"x" x,      "y" next-x, "f-param" f-param, "label" label, "ord" (+ order 1)}
+            pt3 {"x" next-x, "y" next-x, "f-param" f-param, "label" label, "ord" (+ order 2)}]
+        (recur next-x
+               (+ order 2)
+               (cons pt3 (cons pt2 segments))
+               (dec n))))))
+
+(comment
+  (vl-iter-lines  (logistic 2.5) 2.5 0.8 5 "yow")
+)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Construct mapping lines as chart elements
+
+(defn vl-iter-segment-pair
   "Returns a sequence of three Vega-Lite points representing two 
   connected line segments.  The first goes from the line y=x vertically
   to the plot for f.  The second then goes horizontally to y=x."
@@ -124,33 +150,33 @@
      {"x" x, "y" x',  "f-param" f-param, "label" label, "ord" 1}   ;  default. Need to order points for lines
      {"x" x', "y" x', "f-param" f-param, "label" label, "ord" 2}])) ;  that go right to left, to avoid bad lines.
 
-(defn vl-iter-line
+(defn vl-iter-line-chart
   "Returns a Vega-Lite line spec containing two line segments which 
   together represent the mapping from x to x'=(f x).  The points will
   be labeled \"mapping\" + label-suffix."
   [f f-param x label-suffix]
   (-> (hc/xform ht/line-chart 
-                :DATA (vl-iter-segments f f-param x (str "mapping" label-suffix))
+                :DATA (vl-iter-segment-pair f f-param x (str "mapping" label-suffix))
                 :COLOR "label"
                 :SIZE 1.0      ; line thickness
                 :MSDASH [1 1]) ; dashed [stroke length, space between]
       (assoc-in [:encoding :order :field] "ord"))) ; walk through lines in order not L-R
 
-(defn vl-iter-lines
+(defn vl-iter-lines-charts
   "Returns a sequence of Vega-Lite line specs, each containing two line
   segments, which together represent the mapping from x to x'=(f x).
   There will be iters line specs, beginning with the one for (f init-x),
   then (f (f init-x)), and so on.  If distinguish? is present and is
   truthy, each pair of segments will have a different color."
   ([f f-param init-x iters]
-   (vl-iter-lines f-param f init-x iters "mapping"))
+   (vl-iter-lines-charts f-param f init-x iters "mapping"))
   ([f f-param init-x iters label]
    (let [xs (take iters (iterate f init-x))]
-     (map (partial vl-iter-line f f-param)
+     (map (partial vl-iter-line-chart f f-param)
           xs
           (repeat "s")))))
 
-(defn vl-iter-lines*
+(defn vl-iter-lines-charts*
   "Returns a sequence of Vega-Lite line specs, each containing two line
   segments, which together represent the mapping from x to x'=(f x).
   There will be iters line specs, beginning with the one for (f init-x),
@@ -158,11 +184,13 @@
   truthy, each pair of segments will have a different color."
   [f init-x iters & [distinguish?]]
   (let [xs (take iters (iterate f init-x))]
-    (map (partial vl-iter-line f)
+    (map (partial vl-iter-line-chart f)
          xs
          (if distinguish?
            (map #(str " " %) (irange 1 iters))
            (repeat "s"))))) ; the "s" makes "mapping" into "mappings"
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn u-sub-char
   "If n is a single-digit integer in [0, ..., 9], returns the
@@ -240,7 +268,7 @@
     [init-x iters]
     (mapcat (fn [m]
               (let [mu (round-to m 1)] ; strip float slop created by range
-                (vl-iter-lines (logistic mu) mu init-x iters (str "μ=" mu))))
+                (vl-iter-lines-charts (logistic mu) mu init-x iters (str "μ=" mu))))
             (range 1.0 4.1 0.1))) ; don't use integers--some will mess up subs
 
   (def init-x 0.99)
@@ -371,7 +399,7 @@
                     ;                           0.0 1.001 0.001 (n-comp f 3))
                     ;          :COLOR "label")
                     ]
-                   (vl-iter-lines (n-comp f 1) mu init-x 50 (str "μ=" mu)))})))
+                   (vl-iter-lines-charts (n-comp f 1) mu init-x 50 (str "μ=" mu)))})))
   (oz/view! vl-spec)
 
 

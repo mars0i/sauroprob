@@ -9,8 +9,7 @@
                  [generateme/fastmath "2.1.8"] ; or 2.1.9-SNAPSHOT
                  [aerial.hanami "0.17.0"]
                  [techascent/tech.viz "6.00-beta-16-4"]
-                 ;[io.github.nextjournal/clerk "0.5.346"]
-                 ;[metasoarous/oz "2.0.0-alpha5"]
+                 [io.github.nextjournal/clerk "0.12.707"]
                  [metasoarous/oz "1.6.0-alpha36"] ; As of 1/12/2023 site says "Please use 1.6.0-alpha36 for the most recent stable version of Oz. "
                  [cljplot "0.0.2a-SNAPSHOT"]
                 ]
