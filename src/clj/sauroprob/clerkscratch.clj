@@ -5,11 +5,18 @@
             [nextjournal.clerk :as clerk]))
 
 (comment (clerk/serve! {:browse? true}) )
+(comment (clerk/show! "src/clj/sauroprob/clerkscratch.clj"))
 
 (def logistic-data
   (mapcat (fn [m]
             (let [mu (round-to m 1)] ; strip float slop created by range
               (vl-fn-ify mu 0.0 1.001 0.01 mu (logistic mu))))
+          (range 1.0 4.1 0.1))) ; don't use integers--some will mess up subs
+
+(def map-lines-data
+  (mapcat (fn [m]
+            (let [mu (round-to m 1)] ; strip float slop created by range
+              (vl-iter-lines (logistic mu) mu 0.99 10 "map")))
           (range 1.0 4.1 0.1))) ; don't use integers--some will mess up subs
 
 
@@ -58,7 +65,7 @@
                             :WIDTH 400
                             :HEIGHT 400)
                   (-> (hc/xform ht/line-chart 
-                            :DATA (vl-iter-lines (logistic 2.5) 2.5 0.99 10 "yow") ; TEMP KLUDGE for testing
+                            :DATA map-lines-data ;(vl-iter-lines (logistic 2.5) 2.5 0.99 10 "yow") ; TEMP KLUDGE for testing
                             ;:TRANSFORM [{:filter {:field "label" :equal {:expr "MuSliderVal"}}}]
                             :COLOR "label"
                             :MSDASH [1 2] ; dashed [stroke length, space between]
