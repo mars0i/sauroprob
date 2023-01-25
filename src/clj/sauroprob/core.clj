@@ -3,10 +3,11 @@
             [fitdistr.distributions :as fitd]
             ;[clojure.math.numeric-tower :as m]
             [clojure.math :as m] ; new in Clojure 1.11 
-            [clojure.data.json :as json]
             [oz.core :as oz]
             [aerial.hanami.common :as hc]
-            [aerial.hanami.templates :as ht]))
+            [aerial.hanami.templates :as ht]
+            [utils.json :as json]
+            ))
 
 
 ;; Can be used with partial to produce the composition of f with itself,
@@ -313,6 +314,7 @@
                               :min 1.0 :max 4.0 :step 0.1}}]) ; slider config
       )]})))
   (oz/view! vl-spec2bad)
+  (oz/view! vl-spec2)
 
 
   (def vl-spec3
@@ -341,6 +343,8 @@
         ))
   (oz/view! vl-spec3)
 
+  (json/edn2json-file "yo.json" vl-spec3)
+
   (def vl-spec4
     (-> (hc/xform ht/layer-chart
                   {:LAYER
@@ -367,9 +371,6 @@
                                 :min 1.0 :max 4.0 :step 0.1}}]) ; slider config
         ))
   (oz/view! vl-spec4)
-
-  (println (json/write-str vl-spec3))
-  (with-out-str (json/pprint vl-spec3))
 
 
 
