@@ -129,10 +129,10 @@
       (let [next-x (f x)
             pt2 {"x" x,      "y" next-x, "f-param" f-param, "label" label, "ord" (+ order 1)}
             pt3 {"x" next-x, "y" next-x, "f-param" f-param, "label" label, "ord" (+ order 2)}]
-        (recur next-x
+        (recur (dec n)
+               next-x
                (+ order 2)
-               (cons pt3 (cons pt2 segments))
-               (dec n))))))
+               (cons pt3 (cons pt2 segments)))))))
 
 (comment
   (vl-iter-lines  (logistic 2.5) 2.5 0.8 5 "yow")
