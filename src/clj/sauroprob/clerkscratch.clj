@@ -5,20 +5,20 @@
             [aerial.hanami.templates :as ht]
             [nextjournal.clerk :as clerk]))
 
-(comment (clerk/serve! {:browse? true}))
+(comment (clerk/serve! {:browse? true :watch-paths ["src/clj/sauroprob"]}))
 (comment (clerk/show! "src/clj/sauroprob/clerkscratch.clj"))
 
 (def logistic-data
   (mapcat (fn [m]
             (let [mu (round-to m 1)] ; strip float slop created by range
               (vl-fn-ify mu 0.0 1.001 0.01 mu (logistic mu))))
-          (range 1.0 4.5 0.1))) ; don't use integers--some will mess up subs
+          (range 0.1 4.5 0.1))) ; don't use integers--some will mess up subs
 
 (def map-lines-data
   (mapcat (fn [m]
             (let [mu (round-to m 1)] ; strip float slop created by range
               (vl-iter-lines (logistic mu) mu 0.75 20 "map")))
-          (range 1.0 4.5 0.1))) ; don't use integers--some will mess up subs
+          (range 0.1 4.5 0.1))) ; don't use integers--some will mess up subs
 
 (def vl-spec4
   (-> (hc/xform ht/layer-chart
@@ -27,6 +27,7 @@
                  ;; dimensions of the axes; otherwise we'd need to fix that by other means.
                  [(hc/xform ht/line-chart
                             :DATA [{"x" 0, "y" 0, "label" "y=x"} {"x" 1, "y" 1, "label" "y=x"}]
+                            ;:DATA [{"x" -1, "y" -1, "label" "y=x"} {"x" 2, "y" 2, "label" "y=x"}]
                             :COLOR "label"
                             :SIZE 1.0
                             :WIDTH 400
@@ -50,7 +51,7 @@
       (assoc :params [{:name "MuSliderVal" ; name of slider variable
                        :value 2.5            ; default value
                        :bind {:input "range" ; "range" makes it a slider
-                              :min 1.0 :max 4.0 :step 0.1}}]) ; slider config
+                              :min 0.1 :max 4.0 :step 0.1}}]) ; slider config
                               ;; My data goes beyond 4.0, but the setup is not right
                               ;; for more than 4.0, so I'm restricting the slider
                               ;; for now.
