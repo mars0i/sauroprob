@@ -389,11 +389,11 @@
                               :SIZE 1.0)
                     (hc/xform ht/line-chart 
                               :DATA (vl-fn-ify (str "F" (u-sup-char 1) " μ=" mu ", x=" init-x)
-                                               0.0 1.001 0.001 f)
+                                               0.0 1.001 0.001 init-x f)
                               :COLOR "label")
                     (hc/xform ht/line-chart 
                               :DATA (vl-fn-ify (str "F" (u-sup-char 2) " μ=" mu ", x=" init-x)
-                                               0.0 1.001 0.001 (n-comp f 2))
+                                               0.0 1.001 0.001 init-x (n-comp f 2))
                               :COLOR "label")
                     ;(hc/xform ht/line-chart 
                     ;          :DATA (vl-fn-ify (str "F" (u-sup-char 3) " μ=" mu ", x=" init-x)
