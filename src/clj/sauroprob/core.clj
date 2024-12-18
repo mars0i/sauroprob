@@ -159,8 +159,8 @@
   (-> (hc/xform ht/line-chart 
                 :DATA (vl-iter-segment-pair f f-param x (str "mapping" label-suffix))
                 :COLOR "label"
-                :SIZE 1.0      ; line thickness
-                :MSDASH [1 1]) ; dashed [stroke length, space between]
+                :SIZE 1.25      ; line thickness
+                :MSDASH [5 3]) ; dashed [stroke length, space between]
       (assoc-in [:encoding :order :field] "ord"))) ; walk through lines in order not L-R
 
 (defn vl-iter-lines-charts
