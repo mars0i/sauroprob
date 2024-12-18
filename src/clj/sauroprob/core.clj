@@ -11,26 +11,6 @@
             [utils.math :as um]
             ))
 
-(defn logistic
-  "The logistic function with parameter mu applied to x.  If x is
-  missing, returns the function with parameter mu."
-  ([mu] (partial logistic mu))
-  ([mu x]
-   (* mu x (- 1 x))))
-
-;; (aka "parabola gadget" in Myrvold's _Beyond Chance and Credence_)
-(def logistic-4
-  "([x])
-   Applies a logistic function with parameter r=4 to x."
-  (partial logistic 4))
-
-(defn logistic-vals
-  "Returns a lazy sequence of values resulting from iterating a 
-  logistic function with parameter r, beginning with given initial
-  state."
-  [r initial]
-  (iterate (partial logistic r) initial))
-
 (defn find-cycle
   "Loops through the values in sequence xs, looking for the first value
   that has already appeared in the sequence.  If the value is found, a
@@ -52,6 +32,42 @@
           {:value y :period (- i prev-idx) :starts-at prev-idx}  ; old version: [y (- i prev-idx) prev-idx]
           (recur (rest ys) (inc i) (assoc seen y i)))))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Logistic functions and Hanami/Vega-lite plotting
+;;
+;; There are two kinds of plots of logistic functions supported below.
+;;
+;; One kind of plot is simply a plot of a function in the normal sense, but
+;; you canp lot the original logist function, or n compositions of it with itself.
+;;
+;; The other kind of plot gives a "path" starting from an initial value
+;; through iterations of the function on the value, the result of
+;; application of that function, another application, etc. This is one
+;; by showing a line from x at y=0 up to f(x), then right or left to y=x
+;; [so that the x value there is the same as the old f(x)], and then 
+;; up, or down, to the f curve [since that shows how x=f(x) is mapped
+;; by f to f(f(x))], and so on.
+
+(defn logistic
+  "The logistic function with parameter mu applied to x.  If x is
+  missing, returns the function with parameter mu."
+  ([mu] (partial logistic mu))
+  ([mu x]
+   (* mu x (- 1 x))))
+
+;; (aka "parabola gadget" in Myrvold's _Beyond Chance and Credence_)
+(def logistic-4
+  "([x])
+   Applies a logistic function with parameter r=4 to x."
+  (partial logistic 4))
+
+(defn logistic-vals
+  "Returns a lazy sequence of values resulting from iterating a 
+  logistic function with parameter r, beginning with given initial
+  state."
+  [r initial]
+  (iterate (partial logistic r) initial))
+
 (defn vl-data-ify
   "Given a sequence ys of results of a function, returns a sequence
   of Vega-Lite points with ys as y coordinates, and x coordinates
@@ -69,7 +85,7 @@
   coordinates running from x-min to x-max, inclusive, in steps of size
   x-increment.  The y coordinates are results of applying f to the x
   coordinates. label can be used to identify these as distinct points in
-  Vega-Lite."
+  Vega-Lite.  This can be used to plot f."
   [label x-min x-max x-increment f-param f]
   (let [x-range (- x-max x-min)
         xs (msc/irange x-min x-max x-increment)
