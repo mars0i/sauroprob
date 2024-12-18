@@ -42,7 +42,7 @@
 
 (defn logistic
   "The logistic function with parameter mu applied to x.  If x is
-  missing, returns the function with parameter r."
+  missing, returns the function with parameter mu."
   ([mu] (partial logistic mu))
   ([mu x]
    (* mu x (- 1 x))))
