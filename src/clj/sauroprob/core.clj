@@ -1,44 +1,15 @@
 (ns sauroprob.core
-  (:require [fitdistr.core :as fitc]
-            [fitdistr.distributions :as fitd]
+  (:require 
             ;[clojure.math.numeric-tower :as m]
             [clojure.math :as m] ; new in Clojure 1.11 
             [oz.core :as oz]
             [aerial.hanami.common :as hc]
             [aerial.hanami.templates :as ht]
             [utils.json :as json]
+            [utils.string :as st]
+            [utils.misc :as msc]
+            [utils.math :as um]
             ))
-
-
-;; Can be used with partial to produce the composition of f with itself,
-;; n times. Applying the resulting function is only very slightly slower
-;; than running with all three arguments.
-(defn n-comp
-  "Applies f to x, and then applies f to the result, performing n
-  applications of f. Like 'iterate', but without constructing a lazy
-  sequence of intermediate values.  With two arguments, uses 'partial'
-  to produce a function that performs the same iteration."
-  ([f n] (partial n-comp f n))
-  ([f n x]
-   (loop [i n, y x]
-     (if (pos? i)
-       (recur (dec i), (f y))
-       y))))
-
-(comment 
-  ;; Alternate version of n-comp:
-
-  ;; Blows stack beyond about 19K iterations.
-  (defn n-comp-bad
-    [f n]
-    (apply comp (repeat n f)))
-
-  ;; Doesn't blow the stack, but incredibly slow.
-  (defn n-comp-slow
-    [f n x]
-    (last (take n (iterate f x))))
-)
-
 
 (defn logistic
   "The logistic function with parameter mu applied to x.  If x is
@@ -47,6 +18,7 @@
   ([mu x]
    (* mu x (- 1 x))))
 
+;; (aka "parabola gadget" in Myrvold's _Beyond Chance and Credence_)
 (def logistic-4
   "([x])
    Applies a logistic function with parameter r=4 to x."
@@ -80,17 +52,6 @@
           {:value y :period (- i prev-idx) :starts-at prev-idx}  ; old version: [y (- i prev-idx) prev-idx]
           (recur (rest ys) (inc i) (assoc seen y i)))))))
 
-;; By John Collins at https://stackoverflow.com/a/68476365/1455243
-(defn irange
-  "Inclusive range function: end element is included."
-  ([start end step]
-   (take-while (if (pos? step) #(<= % end) #(>= % end)) (iterate #(+ % step) start)))
-  ([start end]
-   (irange start end 1))
-  ([end]
-   (irange 0 end))
-  ([] (range)))
-
 (defn vl-data-ify
   "Given a sequence ys of results of a function, returns a sequence
   of Vega-Lite points with ys as y coordinates, and x coordinates
@@ -100,7 +61,7 @@
   (let [num-ys (count ys)
         x-range (- x-max x-min)
         x-increment (/ x-range num-ys)
-        xs (irange x-min x-max x-increment)]
+        xs (msc/irange x-min x-max x-increment)]
     (map (fn [x y] {"x" x, "y" y, "label" label}) xs ys)))
 
 (defn vl-fn-ify
@@ -111,32 +72,9 @@
   Vega-Lite."
   [label x-min x-max x-increment f-param f]
   (let [x-range (- x-max x-min)
-        xs (irange x-min x-max x-increment)
+        xs (msc/irange x-min x-max x-increment)
         ys (map f xs)]
     (map (fn [x y] {"x" x, "y" y, "f-param" f-param, "label" label}) xs ys)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Construct mapping lines as a single ordered VL sequence
-
-(defn vl-iter-lines
-  [f f-param init-x iters label]
-  (loop [n iters
-         x init-x
-         order 0
-         segments [{"x" x, "y" x, "f-param" f-param, "label" label, "ord" 0}]]
-    (if (zero? n)
-      segments
-      (let [next-x (f x)
-            pt2 {"x" x,      "y" next-x, "f-param" f-param, "label" label, "ord" (+ order 1)}
-            pt3 {"x" next-x, "y" next-x, "f-param" f-param, "label" label, "ord" (+ order 2)}]
-        (recur (dec n)
-               next-x
-               (+ order 2)
-               (cons pt3 (cons pt2 segments)))))))
-
-(comment
-  (vl-iter-lines  (logistic 2.5) 2.5 0.8 5 "yow")
-)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Construct mapping lines as chart elements
@@ -188,75 +126,20 @@
     (map (partial vl-iter-line-chart f)
          xs
          (if distinguish?
-           (map #(str " " %) (irange 1 iters))
+           (map #(str " " %) (msc/irange 1 iters))
            (repeat "s"))))) ; the "s" makes "mapping" into "mappings"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn u-sub-char
-  "If n is a single-digit integer in [0, ..., 9], returns the
-  Unicode supscript character for n.  Otherwise returns nil."
-  [n]
-  (if (and (integer? n)
-           (not (neg? n))
-           (>= n 0)
-           (<= n 9))
-    (char (+ 0x2080 n))
-    nil))
-
-
-;; Unicode supports a limited number of supscript and superscript characters,
-;; including single-digit integers.  The superscripts are inconsistent because
-;; some are inherited from an earlier character encoding.
-(defn u-sup-char
-  "If n is a single-digit integer in [0, ..., 9], returns the
-  Unicode superscript character for n.  Otherwise returns nil."
-  [n]
-  (when (integer? n)
-    (cond (= n 0) \u2070  ; superscript/subscript block
-          (= n 1) \u00B9  ; Latin-1 supplement block
-          (= n 2) \u00B2  ; Latin-1 supplement block
-          (= n 3) \u00B3  ; Latin-1 supplement block
-          (and (>= n 4) (<= n 9)) (char (+ 0x2070 n)) ; superscript/subscript block
-          :else nil)))
-
-(comment
-  (map #(str "F" (u-sub-char %)) (concat (range 11) [0.2 -3])) ; last 3 s/b empty since nil
-  (map #(str "F" (u-sup-char %)) (concat (range 11) [0.2 -3])) ; last 3 s/b empty since nil
-)
-
-;;TODO Make string versions of above that take arbitrary positive integers
-;; and return strings of superscript or subscript characters.
-
-
-;; https://stackoverflow.com/a/73829330/1455243
-(defn round-to
-  "Rounds 'x' to 'places' decimal places"
-  [x places]
-  (->> x
-       bigdec
-       (#(.setScale % places java.math.RoundingMode/HALF_UP))
-       .doubleValue))
-
-(comment (round-to 32.12545 3) )
 
 (comment
   (oz/start-server!)
 
-  (def xs4 (logistic-vals 4 0.3))
-  ;; I don't think this is likely to be what I want:
-  (fitc/fit :ks :logistic (take 10000 xs4))
-  fitc/infer
-  fitc/bootstrap
-
-  ;; List possible distributions:
-  (sort (keys (methods fitd/distribution-data)))
-
-  (def p-mu (/ (- mu 1) mu))
+  ;(def p-mu (/ (- mu 1) mu))
 
   (def logistic-data
     (mapcat (fn [m]
-              (let [mu (round-to m 1)] ; strip float slop created by range
+              (let [mu (um/round-to m 1)] ; strip float slop created by range
                 (vl-fn-ify mu 0.0 1.001 0.01 mu (logistic mu))))
             (range 1.0 4.1 0.1))) ; don't use integers--some will mess up subs
 
@@ -268,11 +151,11 @@
     pairs of line segments."
     [init-x iters]
     (mapcat (fn [m]
-              (let [mu (round-to m 1)] ; strip float slop created by range
+              (let [mu (um/round-to m 1)] ; strip float slop created by range
                 (vl-iter-lines-charts (logistic mu) mu init-x iters (str "μ=" mu))))
             (range 1.0 4.1 0.1))) ; don't use integers--some will mess up subs
 
-  (def init-x 0.99)
+  (def init-x 0.02)
   (def mapping-data (make-mapping-data init-x 10))  ; TODO see comment at make-mapping-data
 
   ;; THIS WORKS.
@@ -375,34 +258,89 @@
 
 
   ;; Plot an iterated logistic map as a function from x to f(x)
-  (def mu 2.5)
-  (def init-x 0.99)
+  (def mu 4)
+  (def init-x 0.2)
   (oz/view! vl-spec)
-  (def vl-spec 
+  (def vl-spec
     (let [f (logistic mu)]
       (hc/xform ht/layer-chart
                 {:LAYER
                  (concat 
-                   [(hc/xform ht/line-chart
+                   [(hc/xform ht/line-chart ; y=x diagonal line
                               :DATA [{"x" 0, "y" 0, "label" "y=x"} {"x" 1, "y" 1, "label" "y=x"}]
                               :COLOR "label"
                               :SIZE 1.0)
-                    (hc/xform ht/line-chart 
-                              :DATA (vl-fn-ify (str "F" (u-sup-char 1) " μ=" mu ", x=" init-x)
+                    (hc/xform ht/line-chart ; plot logistic function
+                              :DATA (vl-fn-ify (str "F" (st/u-sup-char 1) " μ=" mu ", x=" init-x)
                                                0.0 1.001 0.001 init-x f)
                               :COLOR "label")
-                    (hc/xform ht/line-chart 
-                              :DATA (vl-fn-ify (str "F" (u-sup-char 2) " μ=" mu ", x=" init-x)
-                                               0.0 1.001 0.001 init-x (n-comp f 2))
+                    (hc/xform ht/line-chart ; plot f^2, logistic of logistic
+                              :DATA (vl-fn-ify (str "F" (st/u-sup-char 2) " μ=" mu ", x=" init-x)
+                                               0.0 1.001 0.001 init-x (msc/n-comp f 2))
                               :COLOR "label")
-                    ;(hc/xform ht/line-chart 
-                    ;          :DATA (vl-fn-ify (str "F" (u-sup-char 3) " μ=" mu ", x=" init-x)
-                    ;                           0.0 1.001 0.001 (n-comp f 3))
-                    ;          :COLOR "label")
+                    (hc/xform ht/line-chart ; plot f^3
+                              :DATA (vl-fn-ify (str "F" (st/u-sup-char 3) " μ=" mu ", x=" init-x)
+                                               0.0 1.001 0.001 init-x (msc/n-comp f 3))
+                              :COLOR "label")
                     ]
-                   (vl-iter-lines-charts (n-comp f 1) mu init-x 50 (str "μ=" mu)))})))
+                   ;; plot lines showing iteration through logistic function starting from init-x:
+                   (vl-iter-lines-charts (msc/n-comp f 1) mu init-x 20 (str "μ=" mu)))})))
   (oz/view! vl-spec)
 
 
 
 ) 
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; CRUFT
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Construct mapping lines as a single ordered VL sequence
+
+(comment
+
+(defn vl-iter-lines
+  [f f-param init-x iters label]
+  (loop [n iters
+         x init-x
+         order 0
+         segments [{"x" x, "y" x, "f-param" f-param, "label" label, "ord" 0}]]
+    (if (zero? n)
+      segments
+      (let [next-x (f x)
+            pt2 {"x" x,      "y" next-x, "f-param" f-param, "label" label, "ord" (+ order 1)}
+            pt3 {"x" next-x, "y" next-x, "f-param" f-param, "label" label, "ord" (+ order 2)}]
+        (recur (dec n)
+               next-x
+               (+ order 2)
+               (cons pt3 (cons pt2 segments)))))))
+
+(comment
+  (vl-iter-lines  (logistic 2.5) 2.5 0.8 5 "yow")
+)
+)
+
+
+(comment
+  (require '[fitdistr.core :as fitc])
+  (require '[fitdistr.distributions :as fitd])
+  (def xs4 (logistic-vals 4 0.3))
+  ;; I don't think this is likely to be what I want:
+  (fitc/fit :ks :logistic (take 10000 xs4))
+  fitc/infer
+  fitc/bootstrap
+
+  ;; List possible distributions:
+  (sort (keys (methods fitd/distribution-data)))
+  (require '[fitdistr.core :as fitc])
+  (require '[fitdistr.distributions :as fitd])
+  (def xs4 (logistic-vals 4 0.3))
+  ;; I don't think this is likely to be what I want:
+  (fitc/fit :ks :logistic (take 10000 xs4))
+  fitc/infer
+  fitc/bootstrap
+
+  ;; List possible distributions:
+  (sort (keys (methods fitd/distribution-data)))
+)
