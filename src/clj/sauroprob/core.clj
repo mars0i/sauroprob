@@ -11,62 +11,8 @@
             [utils.math :as um]
             ))
 
-(defn find-cycle
-  "Loops through the values in sequence xs, looking for the first value
-  that has already appeared in the sequence.  If the value is found, a
-  map is returned, otherwise nil if no cycles are found.  The map has
-  keys :value for the number that cycles, :period for the period of the
-  cycle, and :starts-at for the zero-based index of the value that
-  starts the cycle. Note that the test for recurrence uses a clojure
-  map, which uses the function 'hash' to determine identity.  This means
-  that numbers that appear to be equal but that are of different numeric
-  data types may or may not be treated as identical.  The user should
-  insure that elements in the sequence are all of the same type."
-  [xs]
-  (loop [ys xs, i 0, seen {}]  ; seen is "inverted vector": look up by val, returns index
-    (if (empty? ys)
-      nil
-      (let [y (first ys)
-            prev-idx (seen y)]
-        (if prev-idx 
-          {:value y :period (- i prev-idx) :starts-at prev-idx}  ; old version: [y (- i prev-idx) prev-idx]
-          (recur (rest ys) (inc i) (assoc seen y i)))))))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Logistic functions and Hanami/Vega-lite plotting
-;;
-;; There are two kinds of plots of logistic functions supported below.
-;;
-;; One kind of plot is simply a plot of a function in the normal sense, but
-;; you canp lot the original logist function, or n compositions of it with itself.
-;;
-;; The other kind of plot gives a "path" starting from an initial value
-;; through iterations of the function on the value, the result of
-;; application of that function, another application, etc. This is one
-;; by showing a line from x at y=0 up to f(x), then right or left to y=x
-;; [so that the x value there is the same as the old f(x)], and then 
-;; up, or down, to the f curve [since that shows how x=f(x) is mapped
-;; by f to f(f(x))], and so on.
-
-(defn logistic
-  "The logistic function with parameter mu applied to x.  If x is
-  missing, returns the function with parameter mu."
-  ([mu] (partial logistic mu))
-  ([mu x]
-   (* mu x (- 1 x))))
-
-;; (aka "parabola gadget" in Myrvold's _Beyond Chance and Credence_)
-(def logistic-4
-  "([x])
-   Applies a logistic function with parameter r=4 to x."
-  (partial logistic 4))
-
-(defn logistic-vals
-  "Returns a lazy sequence of values resulting from iterating a 
-  logistic function with parameter r, beginning with given initial
-  state."
-  [r initial]
-  (iterate (partial logistic r) initial))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Hanami/Vega-lite plotting tools
 
 (defn vl-data-ify
   "Given a sequence ys of results of a function, returns a sequence
@@ -91,6 +37,7 @@
         xs (msc/irange x-min x-max x-increment)
         ys (map f xs)]
     (map (fn [x y] {"x" x, "y" y, "f-param" f-param, "label" label}) xs ys)))
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Construct mapping lines as chart elements
@@ -145,6 +92,31 @@
            (map #(str " " %) (msc/irange 1 iters))
            (repeat "s"))))) ; the "s" makes "mapping" into "mappings"
 
+(defn vl-spec [fun param init-x num-iterations]
+  (let [f (fun param)]
+    (hc/xform ht/layer-chart
+              {:LAYER
+               (concat 
+                 [(hc/xform ht/line-chart ; y=x diagonal line
+                            :DATA [{"x" 0, "y" 0, "label" "y=x"} {"x" 1, "y" 1, "label" "y=x"}]
+                            :COLOR "label"
+                            :SIZE 1.0)
+                  (hc/xform ht/line-chart ; plot logistic function
+                            :DATA (vl-fn-ify (str "F" (st/u-sup-char 1) " r=" param ", x=" init-x)
+                                             0.0 1.001 0.001 init-x f)
+                            :COLOR "label")
+                  ;(hc/xform ht/line-chart ; plot f^2, logistic of logistic
+                  ;          :DATA (vl-fn-ify (str "F" (st/u-sup-char 2) " r=" param ", x=" init-x)
+                  ;                           0.0 1.001 0.001 init-x (msc/n-comp f 2))
+                  ;         :COLOR "label")
+                  ;(hc/xform ht/line-chart ; plot f^3
+                  ;          :DATA (vl-fn-ify (str "F" (st/u-sup-char 3) " r=" param ", x=" init-x)
+                  ;                           0.0 1.001 0.001 init-x (msc/n-comp f 3))
+                  ;          :COLOR "label")
+                  ]
+                 ;; plot lines showing iteration through logistic function starting from init-x:
+                 (vl-iter-lines-charts (msc/n-comp f 1) param init-x num-iterations (str "r=" param)))})))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
@@ -156,7 +128,7 @@
   (def logistic-data
     (mapcat (fn [m]
               (let [mu (um/round-to m 1)] ; strip float slop created by range
-                (vl-fn-ify mu 0.0 1.001 0.01 mu (logistic mu))))
+                (vl-fn-ify mu 0.0 1.001 0.01 mu (um/logistic mu))))
             (range 1.0 4.1 0.1))) ; don't use integers--some will mess up subs
 
   ;; TODO Using vl-iter-lines is too high level--that includes Hanami stuff.
@@ -168,7 +140,7 @@
     [init-x iters]
     (mapcat (fn [m]
               (let [mu (um/round-to m 1)] ; strip float slop created by range
-                (vl-iter-lines-charts (logistic mu) mu init-x iters (str "μ=" mu))))
+                (vl-iter-lines-charts (um/logistic mu) mu init-x iters (str "μ=" mu))))
             (range 1.0 4.1 0.1))) ; don't use integers--some will mess up subs
 
   (def init-x 0.02)
@@ -276,9 +248,10 @@
   ;; Plot an iterated logistic map as a function from x to f(x)
   (def mu 4)
   (def init-x 0.2)
-  (oz/view! vl-spec)
-  (def vl-spec
-    (let [f (logistic mu)]
+  (def num-iterations 7)
+  (oz/view! logistic-vl-spec)
+  (def logistic-vl-spec
+    (let [f (um/logistic mu)]
       (hc/xform ht/layer-chart
                 {:LAYER
                  (concat 
@@ -290,23 +263,24 @@
                               :DATA (vl-fn-ify (str "F" (st/u-sup-char 1) " μ=" mu ", x=" init-x)
                                                0.0 1.001 0.001 init-x f)
                               :COLOR "label")
-                    (hc/xform ht/line-chart ; plot f^2, logistic of logistic
-                              :DATA (vl-fn-ify (str "F" (st/u-sup-char 2) " μ=" mu ", x=" init-x)
-                                               0.0 1.001 0.001 init-x (msc/n-comp f 2))
-                              :COLOR "label")
-                    (hc/xform ht/line-chart ; plot f^3
-                              :DATA (vl-fn-ify (str "F" (st/u-sup-char 3) " μ=" mu ", x=" init-x)
-                                               0.0 1.001 0.001 init-x (msc/n-comp f 3))
-                              :COLOR "label")
+                    ;(hc/xform ht/line-chart ; plot f^2, logistic of logistic
+                    ;          :DATA (vl-fn-ify (str "F" (st/u-sup-char 2) " μ=" mu ", x=" init-x)
+                    ;                           0.0 1.001 0.001 init-x (msc/n-comp f 2))
+                    ;         :COLOR "label")
+                    ;(hc/xform ht/line-chart ; plot f^3
+                    ;          :DATA (vl-fn-ify (str "F" (st/u-sup-char 3) " μ=" mu ", x=" init-x)
+                    ;                           0.0 1.001 0.001 init-x (msc/n-comp f 3))
+                    ;          :COLOR "label")
                     ]
                    ;; plot lines showing iteration through logistic function starting from init-x:
-                   (vl-iter-lines-charts (msc/n-comp f 1) mu init-x 20 (str "μ=" mu)))})))
-  (oz/view! vl-spec)
+                   (vl-iter-lines-charts (msc/n-comp f 1) mu init-x num-iterations (str "μ=" mu)))})))
+  (oz/view! logistic-vl-spec)
 
 
+(def moranspec (vl-spec um/moran1950 1 0.1 5))
 
-) 
 
+)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; CRUFT
@@ -333,7 +307,7 @@
                (cons pt3 (cons pt2 segments)))))))
 
 (comment
-  (vl-iter-lines  (logistic 2.5) 2.5 0.8 5 "yow")
+  (vl-iter-lines  (um/logistic 2.5) 2.5 0.8 5 "yow")
 )
 )
 
@@ -341,7 +315,7 @@
 (comment
   (require '[fitdistr.core :as fitc])
   (require '[fitdistr.distributions :as fitd])
-  (def xs4 (logistic-vals 4 0.3))
+  (def xs4 (um/logistic-vals 4 0.3))
   ;; I don't think this is likely to be what I want:
   (fitc/fit :ks :logistic (take 10000 xs4))
   fitc/infer
@@ -351,7 +325,7 @@
   (sort (keys (methods fitd/distribution-data)))
   (require '[fitdistr.core :as fitc])
   (require '[fitdistr.distributions :as fitd])
-  (def xs4 (logistic-vals 4 0.3))
+  (def xs4 (um/logistic-vals 4 0.3))
   ;; I don't think this is likely to be what I want:
   (fitc/fit :ks :logistic (take 10000 xs4))
   fitc/infer
