@@ -83,12 +83,11 @@
   [r initial]
   (iter-vals logistic r initial))
 
-(defn moran1950 [r x]
+(defn moran1950
   "Function from May and Oster 1976 _American Naturalist_ \"Bifurcations 
   and Dynamic Complexity in Simple Ecological Models\", table 1 equation 1,
   attributed to Moran 1950 and others. Here rather than using N for 
   absolute population size, and K for carrying capacity, we use equation
   (3) on p. 577 (but for capitalization), using x=N/K, or N=Kx."
   ([r] (partial moran1950 r))
-  ([r x]
-   (* x (m/exp (* r (- 1 x))))))
+  ([r x] (* x (m/exp (* r (- 1 x))))))
