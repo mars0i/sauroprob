@@ -92,30 +92,35 @@
            (map #(str " " %) (msc/irange 1 iters))
            (repeat "s"))))) ; the "s" makes "mapping" into "mappings"
 
-(defn vl-spec [fun param init-x num-iterations]
-  (let [f (fun param)]
+;; TODO Separate out the function plot, add param to specify whether
+;; and how many f^n to plot after plotting f.
+(defn make-vl-spec 
+  "ADD DOCSTRING"
+  ([f param init-x num-iterations] (make-vl-spec 0.0 1.001 f param init-x num-iterations))
+  ([x-min x-max f param init-x num-iterations]
+  (let [paramed-f (f param)]
     (hc/xform ht/layer-chart
               {:LAYER
                (concat 
                  [(hc/xform ht/line-chart ; y=x diagonal line
-                            :DATA [{"x" 0, "y" 0, "label" "y=x"} {"x" 1, "y" 1, "label" "y=x"}]
+                            :DATA [{"x" x-min, "y" x-min, "label" "y=x"} {"x" x-max, "y" x-max, "label" "y=x"}]
                             :COLOR "label"
                             :SIZE 1.0)
-                  (hc/xform ht/line-chart ; plot logistic function
+                  (hc/xform ht/line-chart ; plot the function
                             :DATA (vl-fn-ify (str "F" (st/u-sup-char 1) " r=" param ", x=" init-x)
-                                             0.0 1.001 0.001 init-x f)
+                                             x-min x-max 0.001 init-x paramed-f)
                             :COLOR "label")
                   ;(hc/xform ht/line-chart ; plot f^2, logistic of logistic
                   ;          :DATA (vl-fn-ify (str "F" (st/u-sup-char 2) " r=" param ", x=" init-x)
-                  ;                           0.0 1.001 0.001 init-x (msc/n-comp f 2))
+                  ;                           x-min x-max 0.001 init-x (msc/n-comp paramed-f 2))
                   ;         :COLOR "label")
                   ;(hc/xform ht/line-chart ; plot f^3
                   ;          :DATA (vl-fn-ify (str "F" (st/u-sup-char 3) " r=" param ", x=" init-x)
-                  ;                           0.0 1.001 0.001 init-x (msc/n-comp f 3))
+                  ;                           x-min x-max 0.001 init-x (msc/n-comp paramed-f 3))
                   ;          :COLOR "label")
                   ]
                  ;; plot lines showing iteration through logistic function starting from init-x:
-                 (vl-iter-lines-charts (msc/n-comp f 1) param init-x num-iterations (str "r=" param)))})))
+                 (vl-iter-lines-charts (msc/n-comp paramed-f 1) param init-x num-iterations (str "r=" param)))}))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -276,8 +281,14 @@
                    (vl-iter-lines-charts (msc/n-comp f 1) mu init-x num-iterations (str "μ=" mu)))})))
   (oz/view! logistic-vl-spec)
 
+(def vl-spec (make-vl-spec um/logistic 4 0.1 5))
+(oz/view! vl-spec)
+(oz/view! (make-vl-spec um/logistic 2.8 0.99 100))
 
-(def moranspec (vl-spec um/moran1950 1 0.1 5))
+
+(def moranspec (make-vl-spec 0.0 2.5 um/moran1950 2.5 0.1 10))
+(oz/view! moranspec)
+(oz/view! (make-vl-spec 0.0 3.0 um/moran1950 3.0 1.01 10))
 
 
 )
