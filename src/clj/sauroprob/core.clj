@@ -38,6 +38,18 @@
         ys (map f xs)]
     (map (fn [x y] {"x" x, "y" y, "f-param" f-param, "label" label}) xs ys)))
 
+;; For more info, see discussion at:
+;; https://clojurians.zulipchat.com/#narrow/stream/210075-saite-dev/topic/concat.20template/near/279290717
+(def grid-chart
+  "Template for Vega-Lite \"concat\": multi-view charts.  Lays out
+  a series of plots in rows and columns from left to right and top 
+  to bottom.  The value of :COLUMNS specifies the number of columns."
+  (-> ht/view-base
+      (dissoc :encoding)
+      (assoc :concat :CONCAT 
+             :columns :COLUMNS 
+             :resolve :RESOLVE
+             :config ht/default-config)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Construct mapping lines as chart elements
@@ -285,11 +297,30 @@
 (oz/view! vl-spec)
 (oz/view! (make-vl-spec um/logistic 2.8 0.99 100))
 
-
 (def moranspec (make-vl-spec 0.0 2.5 um/moran1950 2.5 0.1 10))
 (oz/view! moranspec)
-(oz/view! (make-vl-spec 0.0 3.0 um/moran1950 3.0 1.01 10))
 
+;; two moran1950 plots
+(def two-specs [(make-vl-spec 0.0 3.0 um/moran1950 2.0 0.01 9)
+                (make-vl-spec 0.0 3.0 um/moran1950 3.0 0.01 9)])
+(def grid-spec (hc/xform grid-chart :COLUMNS 2 :CONCAT two-specs))
+(oz/view! grid-spec)
+
+;; Four moran1959 plots
+(def four-specs [(make-vl-spec 0.0 3.0 um/moran1950 1.5 0.01 10)
+                 (make-vl-spec 0.0 3.0 um/moran1950 2.0 0.01 10)
+                 (make-vl-spec 0.0 3.0 um/moran1950 2.5 0.01 10)
+                 (make-vl-spec 0.0 3.0 um/moran1950 3.0 0.01 10)])
+(def grid-spec (hc/xform grid-chart :COLUMNS 2 :ROWS 2 :CONCAT four-specs))
+(oz/view! grid-spec)
+
+;; Four logistic plots
+(def four-specs [(make-vl-spec 0.0 1.0 um/logistic 2.0 0.01 10)
+                 (make-vl-spec 0.0 1.0 um/logistic 3.0 0.01 10)
+                 (make-vl-spec 0.0 1.0 um/logistic 4.0 0.01 10)
+                 (make-vl-spec 0.0 1.2 um/logistic 4.5 0.01 10)]) ; note different x-max
+(def grid-spec (hc/xform grid-chart :COLUMNS 2 :ROWS 2 :CONCAT four-specs))
+(oz/view! grid-spec)
 
 )
 
