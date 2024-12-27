@@ -139,86 +139,38 @@
 
 (comment
   (oz/start-server!)
-(def vl-spec (make-vl-spec um/logistic 4 0.1 5))
-(oz/view! vl-spec)
-(oz/view! (make-vl-spec um/logistic 2.8 0.99 100))
 
-(def moranspec (make-vl-spec 0.0 2.5 um/moran1950 2.5 0.1 10))
-(oz/view! moranspec)
+  (def vl-spec (make-vl-spec um/logistic 4 0.1 5))
+  (oz/view! vl-spec)
+  (oz/view! (make-vl-spec um/logistic 2.8 0.99 100))
 
-;; two moran1950 plots
-(def two-specs [(make-vl-spec 0.0 3.0 um/moran1950 2.0 0.01 9)
-                (make-vl-spec 0.0 3.0 um/moran1950 3.0 0.01 9)])
-(def grid-spec (hc/xform grid-chart :COLUMNS 2 :CONCAT two-specs))
-(oz/view! grid-spec)
+  (def moranspec (make-vl-spec 0.0 2.5 um/moran1950 2.5 0.1 10))
+  (oz/view! moranspec)
 
-;; Four moran1959 plots
-(def four-specs [(make-vl-spec 0.0 3.0 um/moran1950 1.5 0.01 10)
-                 (make-vl-spec 0.0 3.0 um/moran1950 2.0 0.01 10)
-                 (make-vl-spec 0.0 3.0 um/moran1950 2.5 0.01 10)
-                 (make-vl-spec 0.0 3.0 um/moran1950 3.0 0.01 10)])
-(def grid-spec (hc/xform grid-chart :COLUMNS 2 :ROWS 2 :CONCAT four-specs))
-(oz/view! grid-spec)
+  ;; two moran1950 plots
+  (def two-specs [(make-vl-spec 0.0 3.0 um/moran1950 2.0 0.01 9)
+                  (make-vl-spec 0.0 3.0 um/moran1950 3.0 0.01 9)])
+  (def grid-spec (hc/xform grid-chart :COLUMNS 2 :CONCAT two-specs))
+  (oz/view! grid-spec)
 
-;; Four logistic plots
-(def four-specs [(make-vl-spec 0.0 1.0 um/logistic 2.0 0.01 10)
-                 (make-vl-spec 0.0 1.0 um/logistic 3.0 0.01 10)
-                 (make-vl-spec 0.0 1.0 um/logistic 4.0 0.01 10)
-                 (make-vl-spec 0.0 1.2 um/logistic 4.5 0.01 10)]) ; note different x-max
-(def grid-spec (hc/xform grid-chart :COLUMNS 2 :ROWS 2 :CONCAT four-specs))
-(oz/view! grid-spec)
+  ;; Four moran1959 plots
+  (def four-moran-specs [(make-vl-spec 0.0 3.0 um/moran1950 1.5 0.01 10)
+                         (make-vl-spec 0.0 3.0 um/moran1950 2.0 0.01 10)
+                         (make-vl-spec 0.0 3.0 um/moran1950 2.5 0.01 10)
+                         (make-vl-spec 0.0 3.0 um/moran1950 3.0 0.01 10)])
+  (def grid-spec (hc/xform grid-chart :COLUMNS 2 :ROWS 2 :CONCAT four-moran-specs))
+  (oz/view! grid-spec)
 
-)
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; CRUFT
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Construct mapping lines as a single ordered VL sequence
-
-(comment
-
-(defn vl-iter-lines
-  [f f-param init-x iters label]
-  (loop [n iters
-         x init-x
-         order 0
-         segments [{"x" x, "y" x, "f-param" f-param, "label" label, "ord" 0}]]
-    (if (zero? n)
-      segments
-      (let [next-x (f x)
-            pt2 {"x" x,      "y" next-x, "f-param" f-param, "label" label, "ord" (+ order 1)}
-            pt3 {"x" next-x, "y" next-x, "f-param" f-param, "label" label, "ord" (+ order 2)}]
-        (recur (dec n)
-               next-x
-               (+ order 2)
-               (cons pt3 (cons pt2 segments)))))))
-
-(comment
-  (vl-iter-lines  (um/logistic 2.5) 2.5 0.8 5 "yow")
-)
-)
+  ;; Four logistic plots
+  (def four-logistic-specs [(make-vl-spec 0.0 1.0 um/logistic 2.0 0.01 10)
+                            (make-vl-spec 0.0 1.0 um/logistic 3.0 0.01 10)
+                            (make-vl-spec 0.0 1.0 um/logistic 4.0 0.01 10)
+                            (make-vl-spec 0.0 1.2 um/logistic 4.5 0.01 10)]) ; note different x-max
+  (def grid-spec (hc/xform grid-chart :COLUMNS 2 :ROWS 2 :CONCAT four-logistic-specs))
+  (oz/view! grid-spec)
 
 
-(comment
-  (require '[fitdistr.core :as fitc])
-  (require '[fitdistr.distributions :as fitd])
-  (def xs4 (um/logistic-vals 4 0.3))
-  ;; I don't think this is likely to be what I want:
-  (fitc/fit :ks :logistic (take 10000 xs4))
-  fitc/infer
-  fitc/bootstrap
+  (def grid-spec (hc/xform grid-chart :COLUMNS 2 :ROWS 4 :CONCAT (concat four-moran-specs four-logistic-specs)))
+  (oz/view! grid-spec)
 
-  ;; List possible distributions:
-  (sort (keys (methods fitd/distribution-data)))
-  (require '[fitdistr.core :as fitc])
-  (require '[fitdistr.distributions :as fitd])
-  (def xs4 (um/logistic-vals 4 0.3))
-  ;; I don't think this is likely to be what I want:
-  (fitc/fit :ks :logistic (take 10000 xs4))
-  fitc/infer
-  fitc/bootstrap
-
-  ;; List possible distributions:
-  (sort (keys (methods fitd/distribution-data)))
 )
