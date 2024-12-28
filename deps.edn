@@ -5,7 +5,7 @@
  :deps {org.clojure/clojure {:mvn/version "1.12.0"}
         org.clojure/data.json {:mvn/version "2.4.0"}
         ;generateme/fastmath {:mvn/version "2.1.8"} ; or 2.1.9-SNAPSHOT
-        generateme/fitdistr {:mvn/version "1.0.4"}
+        ;generateme/fitdistr {:mvn/version "1.0.4"}
         cljplot/cljplot {:mvn/version "0.0.2a-SNAPSHOT"} ; also by generateme
         aerial.hanami/aerial.hanami {:mvn/version "0.20.1"}
         techascent/tech.viz {:mvn/version "6.00-beta-16-4"}
