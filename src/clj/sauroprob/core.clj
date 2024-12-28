@@ -72,8 +72,8 @@
   (-> (hc/xform ht/line-chart 
                 :DATA (vl-iter-segment-pair f f-param x (str "mapping" label-suffix))
                 :COLOR "label"
-                :SIZE 1.25      ; line thickness
-                :MSDASH [5 3]) ; dashed [stroke length, space between]
+                :SIZE 1.5      ; line thickness
+                :MSDASH [5 2]) ; dashed [stroke length, space between]
       (assoc-in [:encoding :order :field] "ord"))) ; walk through lines in order not L-R
 
 (defn vl-iter-lines-charts
@@ -106,6 +106,11 @@
 
 ;; TODO Separate out the function plot, add param to specify whether
 ;; and how many f^n to plot after plotting f.
+;; TODO Add diagonal y = -x + c, where c is such that the line will
+;; pass through the fixed point.  (It will be easiest to add c by
+;; hand, as a parameter value.)  This is the line such that if the
+;; the if the function is less steep at the fixed point than this
+;; line, then the fixed point is stable; otherwise it's unstable.
 (defn make-vl-spec 
   "ADD DOCSTRING"
   ([f param init-x num-iterations] (make-vl-spec 0.0 1.001 f param init-x num-iterations))
@@ -114,7 +119,7 @@
     (hc/xform ht/layer-chart
               {:LAYER
                (concat 
-                 [(hc/xform ht/line-chart ; y=x diagonal line
+                 [(hc/xform ht/line-chart ; y=x diagonal line that's used in mapping to next value
                             :DATA [{"x" x-min, "y" x-min, "label" "y=x"} {"x" x-max, "y" x-max, "label" "y=x"}]
                             :COLOR "label"
                             :SIZE 1.0)
@@ -173,4 +178,19 @@
   (def grid-spec (hc/xform grid-chart :COLUMNS 2 :ROWS 4 :CONCAT (concat four-moran-specs four-logistic-specs)))
   (oz/view! grid-spec)
 
+
+  (def some-specs [(make-vl-spec 0.0 3.0 um/moran1950 1.25 0.01 10)
+                   (make-vl-spec 0.0 4.5 um/moran1950 1.5 0.01 10)
+                   (make-vl-spec 0.0 4.5 um/moran1950 2.0 0.01 10)
+                   (make-vl-spec 0.0 4.5 um/moran1950 2.5 0.01 10)
+                   (make-vl-spec 0.0 4.5 um/moran1950 3.0 0.01 10)
+                   (make-vl-spec 0.0 4.5 um/moran1950 3.5 0.01 10)
+                   (make-vl-spec 0.0 4.5 um/moran1950 3.75 0.01 10)
+                   (make-vl-spec 0.0 1.0 um/logistic 1.5 0.01 10)
+                   (make-vl-spec 0.0 1.0 um/logistic 2.0 0.01 10)
+                   (make-vl-spec 0.0 1.0 um/logistic 3.0 0.01 10)
+                   (make-vl-spec 0.0 1.0 um/logistic 4.0 0.01 10)
+                   (make-vl-spec 0.0 1.2 um/logistic 4.5 0.01 10)]) ; note different x-max
+  (def grid-spec (hc/xform grid-chart :COLUMNS 3 :ROWS 4 :CONCAT some-specs))
+  (oz/view! grid-spec)
 )
