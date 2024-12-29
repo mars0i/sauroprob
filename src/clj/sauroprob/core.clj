@@ -18,19 +18,6 @@
 (comment
   (oz/start-server!)
 
-  (def vl-spec (sh/make-vl-spec um/logistic 4 0.1 5))
-  (oz/view! vl-spec)
-  (oz/view! (sh/make-vl-spec um/logistic 2.8 0.99 100))
-
-  (def moranspec (sh/make-vl-spec 0.0 2.5 um/moran1950 2.5 0.1 10))
-  (oz/view! moranspec)
-
-  ;; two moran1950 plots
-  (def two-specs [(sh/make-vl-spec 0.0 3.0 um/moran1950 2.0 0.01 9)
-                  (sh/make-vl-spec 0.0 3.0 um/moran1950 3.0 0.01 9)])
-  (def grid-spec (hc/xform sh/grid-chart :COLUMNS 2 :CONCAT two-specs))
-  (oz/view! grid-spec)
-
   ;; Four moran1959 plots
   (def four-moran-specs [(sh/make-vl-spec 0.0 3.0 um/moran1950 1.5 0.01 10)
                          (sh/make-vl-spec 0.0 3.0 um/moran1950 2.0 0.01 10)
