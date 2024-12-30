@@ -33,11 +33,11 @@
   x-increment.  The y coordinates are results of applying f to the x
   coordinates. label can be used to identify these as distinct points in
   Vega-Lite.  This can be used to plot f."
-  [label x-min x-max x-increment f-param f]
+  [label x-min x-max x-increment f]
   (let [x-range (- x-max x-min)
         xs (msc/irange x-min x-max x-increment)
         ys (map f xs)]
-    (map (fn [x y] {"x" x, "y" y, "f-param" f-param, "label" label}) xs ys)))
+    (map (fn [x y] {"x" x, "y" y, "label" label}) xs ys)))
 
 ;; For more info, see discussion at:
 ;; https://clojurians.zulipchat.com/#narrow/stream/210075-saite-dev/topic/concat.20template/near/279290717
@@ -108,6 +108,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; All-in-one function(s) to plot logistic maps, etc.
 
+(defn make-one-fn-vl-spec 
+  "ADD DOCSTRING"
+  [x-min x-max f param num-compositions]
+   (let [paramed-f (f param)]
+     (hc/xform ht/line-chart
+               :DATA (vl-fn-ify (str "F" (st/u-sup-char num-compositions) " r=" param)
+                                x-min x-max 0.001 (msc/n-comp paramed-f num-compositions))
+               :COLOR "label")))
+
 ;; TODO Separate out the function plot, add param to specify whether
 ;; and how many f^n to plot after plotting f.
 ;; TODO Add diagonal y = -x + c, where c is such that the line will
@@ -119,28 +128,28 @@
   "ADD DOCSTRING"
   ([f param init-x num-iterations] (make-vl-spec 0.0 1.001 f param init-x num-iterations))
   ([x-min x-max f param init-x num-iterations]
-  (let [paramed-f (f param)]
-    (hc/xform ht/layer-chart
-              {:LAYER
-               (concat 
-                 [(hc/xform ht/line-chart ; y=x diagonal line that's used in mapping to next value
-                            :DATA [{"x" x-min, "y" x-min, "label" "y=x"} {"x" x-max, "y" x-max, "label" "y=x"}]
-                            :COLOR "label"
-                            :SIZE 1.0)
-                  (hc/xform ht/line-chart ; plot the function
-                            :DATA (vl-fn-ify (str "F" (st/u-sup-char 1) " r=" param)
-                                             x-min x-max 0.001 init-x paramed-f)
-                            :COLOR "label")
-                  ;(hc/xform ht/line-chart ; plot f^2, logistic of logistic
-                  ;          :DATA (vl-fn-ify (str "F" (st/u-sup-char 2) " r=" param ", x=" init-x)
-                  ;                           x-min x-max 0.001 init-x (msc/n-comp paramed-f 2))
-                  ;         :COLOR "label")
-                  ;(hc/xform ht/line-chart ; plot f^3
-                  ;          :DATA (vl-fn-ify (str "F" (st/u-sup-char 3) " r=" param ", x=" init-x)
-                  ;                           x-min x-max 0.001 init-x (msc/n-comp paramed-f 3))
-                  ;          :COLOR "label")
-                  ]
-                 ;; plot lines showing iteration through logistic function starting from init-x:
-                 (vl-iter-lines-charts (msc/n-comp paramed-f 1) param init-x num-iterations (str "r=" param ", x=" init-x)))}))))
+   (let [paramed-f (f param)]
+     (hc/xform ht/layer-chart
+               {:LAYER
+                (concat 
+                  [(hc/xform ht/line-chart ; y=x diagonal line that's used in mapping to next value
+                             :DATA [{"x" x-min, "y" x-min, "label" "y=x"} {"x" x-max, "y" x-max, "label" "y=x"}]
+                             :COLOR "label"
+                             :SIZE 1.0)
+                   (hc/xform ht/line-chart ; plot the function
+                             :DATA (vl-fn-ify (str "F" (st/u-sup-char 1) " r=" param)
+                                              x-min x-max 0.001 paramed-f)
+                             :COLOR "label")
+                   ;(hc/xform ht/line-chart ; plot f^2, logistic of logistic
+                   ;          :DATA (vl-fn-ify (str "F" (st/u-sup-char 2) " r=" param ", x=" init-x)
+                   ;                           x-min x-max 0.001 init-x (msc/n-comp paramed-f 2))
+                   ;         :COLOR "label")
+                   ;(hc/xform ht/line-chart ; plot f^3
+                   ;          :DATA (vl-fn-ify (str "F" (st/u-sup-char 3) " r=" param ", x=" init-x)
+                   ;                           x-min x-max 0.001 init-x (msc/n-comp paramed-f 3))
+                   ;          :COLOR "label")
+                   ]
+                  ;; plot lines showing iteration through logistic function starting from init-x:
+                  (vl-iter-lines-charts (msc/n-comp paramed-f 1) param init-x num-iterations (str "r=" param ", x=" init-x)))}))))
 
 
