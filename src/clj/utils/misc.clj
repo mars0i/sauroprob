@@ -18,15 +18,21 @@
   "Applies f to x, and then applies f to the result, performing n
   applications of f. Like 'iterate', but without constructing a lazy
   sequence of intermediate values.  With two arguments, uses 'partial'
-  to produce a function that performs the same iteration."
-  ([f n] (partial n-comp f n))
+  to produce a function that performs the same iteration.  If n <= 1,
+  simply returns f given two arguments, or (f x) given three."
+  ([f n] 
+   (if (<= n 1)
+     f
+     (partial n-comp f n)))
   ([f n x]
-   (loop [i n, y x]
-     (if (pos? i)
-       (recur (dec i), (f y))
-       y))))
+   (if (<= n 1)
+     (f x)
+     (loop [i n, y x]
+       (if (pos? i)
+         (recur (dec i), (f y))
+         y)))))
 
-(comment 
+  (comment 
   ;; Alternate version of n-comp:
 
   ;; Blows stack beyond about 19K iterations.
