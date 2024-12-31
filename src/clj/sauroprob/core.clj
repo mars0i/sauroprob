@@ -26,8 +26,10 @@
   (def grid-spec (hc/xform sh/grid-chart :COLUMNS 2 :ROWS 2 :CONCAT four-moran-specs))
   (oz/view! grid-spec)
 
+  (def yo (sh/neg-one-line 0.0 1.0 (um/logistic 2.0) 0.5))
+
   ;; Four logistic plots
-  (def four-logistic-specs [(sh/make-vl-spec 0.0 1.0 um/logistic 2.0 2 0.01 10)
+  (def four-logistic-specs [(sh/make-vl-spec 0.0 1.0 um/logistic 2.0 2 0.01 10 0.5)
                             (sh/make-vl-spec 0.0 1.0 um/logistic 3.0 3 0.01 10)
                             (sh/make-vl-spec 0.0 1.0 um/logistic 4.0 2 0.01 10)
                             (sh/make-vl-spec 0.0 1.2 um/logistic 4.5 1 0.01 10)]) ; note different x-max

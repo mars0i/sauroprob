@@ -128,8 +128,30 @@
        (msc/irange 1 num-compositions)))
 
 
-;; TODO Separate out the function plot, add param to specify whether
-;; and how many f^n to plot after plotting f.
+;;   y = -x + b
+;; where y0 = f(x0), so
+;;   f(x0) = -x0 + b
+;; or
+;;   b = f(x0) + x0
+(defn neg-one-line
+  "Given f and fixedpt-x, uses Hanami to construct a faint line 
+  with slope -1 through (fixedpt-x, f fixedpt-x), within [x-min, x-max]."
+  [x-min x-max f fixedpt-x]
+  (let [fixedpt-y (f fixedpt-x)
+        linefn (fn [x] (+ (- x) fixedpt-x fixedpt-y))
+        y-left (linefn x-min)
+        y-right (linefn x-max)]
+    (prn fixedpt-x fixedpt-y [x-min y-left] [x-max y-right]) ; DEBUG
+    (hc/xform ht/line-chart
+              :DATA [{"x" x-min, "y" y-left, "label" "y=-x"} {"x" x-max, "y" y-right, "label" "y=-x"}]
+              :COLOR "label"
+              :SIZE 2.5)))
+
+(comment
+  (def yo (sauroprob.hanami/neg-one-line 0.0 1.0 (um/logistic 2.0) 0.5))
+)
+
+;; FIXME the last line is breaking the vega-lite when it fires i.e. when non-nil
 ;; TODO Add diagonal y = -x + c, where c is such that the line will
 ;; pass through the fixed point.  (It will be easiest to add c by
 ;; hand, as a parameter value.)  This is the line such that if the
@@ -137,31 +159,19 @@
 ;; line, then the fixed point is stable; otherwise it's unstable.
 (defn make-vl-spec 
   "ADD DOCSTRING"
-  ([f param init-x num-compositions num-iterations]
-   (make-vl-spec 0.0 1.001 f param num-compositions init-x num-iterations))
-  ([x-min x-max f param num-compositions init-x num-iterations]
-   (let [paramed-f (f param)]
-     (hc/xform ht/layer-chart
-               {:LAYER
-                (concat 
-                  [(hc/xform ht/line-chart ; y=x diagonal line that's used in mapping to next value
-                             :DATA [{"x" x-min, "y" x-min, "label" "y=x"} {"x" x-max, "y" x-max, "label" "y=x"}]
-                             :COLOR "label"
-                             :SIZE 1.0)]
-                   (make-fn-vl-specs x-min x-max f param num-compositions)
-                   ;(hc/xform ht/line-chart ; plot the function
-                   ;          :DATA (vl-fn-ify (str "F" (st/u-sup-char 1) " r=" param)
-                   ;                           x-min x-max 0.001 paramed-f)
-                   ;          :COLOR "label")
-                   ;(hc/xform ht/line-chart ; plot f^2, logistic of logistic
-                   ;          :DATA (vl-fn-ify (str "F" (st/u-sup-char 2) " r=" param ", x=" init-x)
-                   ;                           x-min x-max 0.001 init-x (msc/n-comp paramed-f 2))
-                   ;         :COLOR "label")
-                   ;(hc/xform ht/line-chart ; plot f^3
-                   ;          :DATA (vl-fn-ify (str "F" (st/u-sup-char 3) " r=" param ", x=" init-x)
-                   ;                           x-min x-max 0.001 init-x (msc/n-comp paramed-f 3))
-                   ;          :COLOR "label")
-                  ;; plot lines showing iteration through logistic function starting from init-x:
-                  (vl-iter-lines-charts (msc/n-comp paramed-f 1) param init-x num-iterations (str "r=" param ", x=" init-x)))}))))
+  [x-min x-max f param num-compositions init-x num-iterations & fixedpt-x-seq]
+  (prn fixedpt-x-seq) ; DEBUG
+  (let [paramed-f (f param)]
+    (hc/xform ht/layer-chart
+              {:LAYER
+               (concat 
+                 [(hc/xform ht/line-chart ; y=x diagonal line that's used in mapping to next value
+                            :DATA [{"x" x-min, "y" x-min, "label" "y=x"} {"x" x-max, "y" x-max, "label" "y=x"}]
+                            :COLOR "label"
+                            :SIZE 1.0)]
+                 (make-fn-vl-specs x-min x-max f param num-compositions) ; draw num-compositions curves
+                 ;; plot lines showing iteration through logistic function starting from init-x:
+                 (vl-iter-lines-charts (msc/n-comp paramed-f 1) param init-x num-iterations (str "r=" param ", x=" init-x))
+                 (when fixedpt-x-seq [(neg-one-line x-min x-max (f param) (first fixedpt-x-seq))]))})))
 
 
