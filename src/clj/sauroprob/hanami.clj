@@ -158,7 +158,7 @@
 ;; line, then the fixed point is stable; otherwise it's unstable.
 (defn make-vl-spec 
   "ADD DOCSTRING"
-  [x-min x-max f param num-compositions init-x num-iterations & fixedpt-x-seq]
+  [x-min x-max f param num-compositions init-xs num-iterations & fixedpt-x-seq]
   ;(prn fixedpt-x-seq) ; DEBUG
   (let [paramed-f (f param)]
     (hc/xform ht/layer-chart
@@ -172,7 +172,7 @@
                  ; Curves (f x), (f (f x)), etc.--num-compositions of them:
                  (make-fn-vl-specs x-min x-max f param num-compositions)
                  ;; Plot lines showing iteration through logistic function starting from init-x:
-                 (vl-iter-lines-charts (msc/n-comp paramed-f 1) param init-x num-iterations (str "r=" param ", x=" init-x))
+                 (vl-iter-lines-charts (msc/n-comp paramed-f 1) param (first init-xs) num-iterations (str "r=" param ", x=" (first init-xs)))
                  ;; If extra arg, it's the x coord of the fixed point (x, f x), and indicates we want a faint line with slope -1 through it:
                  (when fixedpt-x-seq [(neg-one-line x-min x-max (f param) (first fixedpt-x-seq))]))})))
 
