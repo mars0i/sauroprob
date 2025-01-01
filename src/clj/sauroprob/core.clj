@@ -28,11 +28,17 @@
 
   (def yo (sh/neg-one-line 0.0 1.0 (um/logistic 2.0) 0.5))
 
+  ;; Checking whether apparent logistic fixed points are in fact:
+  (um/logistic 2 0.5)
+  (um/logistic 3 0.6667)
+  (um/logistic 4 0.75)
+  (um/logistic 4.5 0.77)
+
   ;; Four logistic plots
   (def four-logistic-specs [(sh/make-vl-spec 0.0 1.0 um/logistic 2.0 2 0.01 10 0.5)
-                            (sh/make-vl-spec 0.0 1.0 um/logistic 3.0 3 0.01 10)
-                            (sh/make-vl-spec 0.0 1.0 um/logistic 4.0 2 0.01 10)
-                            (sh/make-vl-spec 0.0 1.2 um/logistic 4.5 1 0.01 10)]) ; note different x-max
+                            (sh/make-vl-spec 0.0 1.0 um/logistic 3.0 3 0.01 10 0.66667)
+                            (sh/make-vl-spec 0.0 1.0 um/logistic 4.0 2 0.01 10 0.75)
+                            (sh/make-vl-spec 0.0 1.2 um/logistic 4.5 1 0.01 10 0.77)]) ; note different x-max
   (def grid-spec (hc/xform sh/grid-chart :COLUMNS 2 :ROWS 2 :CONCAT four-logistic-specs))
   (oz/view! grid-spec)
 
