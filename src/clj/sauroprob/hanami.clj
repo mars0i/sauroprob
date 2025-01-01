@@ -173,7 +173,7 @@
                  (make-fn-vl-specs x-min x-max f param num-compositions)
                  ;; Plot lines showing iteration through logistic function starting from init-x:
                  (mapcat (fn [init-x] 
-                           (vl-iter-lines-charts (msc/n-comp paramed-f 1) param init-x num-iterations (str "r=" param ", x=" (first init-xs))))
+                           (vl-iter-lines-charts (msc/n-comp paramed-f 1) param init-x num-iterations (str "r=" param ", x=" init-x)))
                          init-xs)
                  ;; If extra arg, it's the x coord of the fixed point (x, f x), and indicates we want a faint line with slope -1 through it:
                  (when fixedpt-x-seq [(neg-one-line x-min x-max (f param) (first fixedpt-x-seq))]))})))
