@@ -7,10 +7,10 @@
                  [org.clojure/data.json "2.4.0"]
                  ;[generateme/fastmath "2.1.8"] ; or 2.1.9-SNAPSHOT
                  [aerial.hanami "0.20.1"]
-                 [techascent/tech.viz "6.00-beta-16-4"]
+                 ;[techascent/tech.viz "6.00-beta-16-4"]
                  [io.github.nextjournal/clerk "0.12.707"]
                  [metasoarous/oz "2.0.0-alpha5"]
-                 [cljplot "0.0.2a-SNAPSHOT"]
+                 ;[cljplot "0.0.2a-SNAPSHOT"]
                  [metosin/jsonista "0.3.7"] ; ; generate json from edn for debugging
                 ]
   :source-paths ["src/clj"]
