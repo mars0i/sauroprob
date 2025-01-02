@@ -115,6 +115,7 @@
   [x-min x-max f param num-compositions]
    (let [paramed-f (f param)]
      (hc/xform ht/line-chart
+               :TITLE (str "r=" param)
                :DATA (vl-fn-ify (str "F" (st/u-sup-char num-compositions) " r=" param)
                                 x-min x-max 0.001 (msc/n-comp paramed-f num-compositions))
                :COLOR "label")))
@@ -162,7 +163,7 @@
   ;(prn fixedpt-x-seq) ; DEBUG
   (let [paramed-f (f param)]
     (hc/xform ht/layer-chart
-              {:LAYER
+              :LAYER
                (concat 
                  ; y=x diagonal line that's used in mapping to next value:
                  [(hc/xform ht/line-chart
@@ -176,6 +177,6 @@
                            (vl-iter-lines-charts (msc/n-comp paramed-f 1) param init-x num-iterations (str "r=" param ", x=" init-x)))
                          init-xs)
                  ;; If extra arg, it's the x coord of the fixed point (x, f x), and indicates we want a faint line with slope -1 through it:
-                 (when fixedpt-x-seq [(neg-one-line x-min x-max (f param) (first fixedpt-x-seq))]))})))
+                 (when fixedpt-x-seq [(neg-one-line x-min x-max (f param) (first fixedpt-x-seq))])))))
 
 
