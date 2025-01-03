@@ -152,11 +152,10 @@
   (def yo (sauroprob.hanami/neg-one-line 0.0 1.0 (um/logistic 2.0) 0.5))
 )
 
-;; DONE Add diagonal y = -x + c, where c is such that the line will
-;; pass through the fixed point.  (It will be easiest to add c by
-;; hand, as a parameter value.)  This is the line such that if the
-;; the if the function is less steep at the fixed point than this
-;; line, then the fixed point is stable; otherwise it's unstable.
+;; TODO move fixedpt diagonal and escape horizontal lines to separate
+;; functions or constants, and allow them to be passed as the & arg,
+;; and then concated into the :LAYER arg.  i.e. allow arbitrary single-line
+;; additions.
 (defn make-vl-spec 
   "ADD DOCSTRING"
   [x-min x-max f param num-compositions init-xs num-iterations & fixedpt-x-seq]
@@ -165,6 +164,11 @@
     (hc/xform ht/layer-chart
               :LAYER
                (concat 
+                 ; horizontal line at 1.0: if curve goes above this, paths hitting it escape to < 0:
+                 [(hc/xform ht/line-chart
+                            :DATA [{"x" 0.0, "y" 1.0, "label" "escape"} {"x" 1.0, "y" 1.0, "label" "escape"}]
+                            :COLOR "label"
+                            :SIZE 1.0)]
                  ; y=x diagonal line that's used in mapping to next value:
                  [(hc/xform ht/line-chart
                             :DATA [{"x" x-min, "y" x-min, "label" "y=x"} {"x" x-max, "y" x-max, "label" "y=x"}]
