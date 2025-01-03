@@ -169,7 +169,7 @@
 (defn make-vl-spec 
   "ADD DOCSTRING"
   [x-min x-max f param num-compositions init-xs num-iterations & {:keys [fixedpt-x addl-plots]}]
-  (prn fixedpt-x addl-plots) ; DEBUG
+  ;(prn fixedpt-x addl-plots) ; DEBUG
   (let [paramed-f (f param)]
     (hc/xform ht/layer-chart
               :LAYER

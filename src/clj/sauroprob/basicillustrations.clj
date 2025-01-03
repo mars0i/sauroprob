@@ -19,10 +19,10 @@
 (comment
 
   ;; Four moran1959 plots
-  (def four-moran-specs [(sh/make-vl-spec 0.0 3.0 um/moran1950 1.5 1 [0.01] 10 1.0)
-                         (sh/make-vl-spec 0.0 3.0 um/moran1950 2.0 1 [0.01 0.1 0.8 2.0] 10 1.0)
-                         (sh/make-vl-spec 0.0 3.0 um/moran1950 2.5 2 [0.01] 10 1.0)
-                         (sh/make-vl-spec 0.0 3.0 um/moran1950 3.0 1 [0.01] 10 1.0)])
+  (def four-moran-specs [(sh/make-vl-spec 0.0 3.0 um/moran1950 1.5 1 [0.01] 10 :fixedpt-x 1.0)
+                         (sh/make-vl-spec 0.0 3.0 um/moran1950 2.0 1 [0.01 0.1 0.8 2.0] 10 :fixedpt-x 1.0)
+                         (sh/make-vl-spec 0.0 3.0 um/moran1950 2.5 2 [0.01] 10 :fixedpt-x 1.0)
+                         (sh/make-vl-spec 0.0 3.0 um/moran1950 3.0 1 [0.01] 10 :fixedpt-x 1.0)])
   (def grid-spec (hc/xform sh/grid-chart :COLUMNS 2 :ROWS 2 :CONCAT four-moran-specs))
   (oz/view! grid-spec)
 
@@ -35,10 +35,11 @@
   (um/logistic 4.5 0.77)
 
   ;; Four logistic plots
-  (def four-logistic-specs [(sh/make-vl-spec 0.0 1.0 um/logistic 2.0 3 [0.01 0.1 0.2 0.7 0.8] 10 0.5)
-                            (sh/make-vl-spec 0.0 1.0 um/logistic 3.0 2 [0.01 0.5 0.9] 10 0.66667)
-                            (sh/make-vl-spec 0.0 1.0 um/logistic 4.0 1 [0.01 0.2 0.5 0.8] 10 0.75)
-                            (sh/make-vl-spec -0.2 1.2 um/logistic 4.5 1 [0.01] 10 0.77)]) ; note different x-min, x-max
+  (def four-logistic-specs [(sh/make-vl-spec 0.0 1.0 um/logistic 2.0 3 [0.01 0.1 0.2 0.7 0.8] 10 :fixedpt-x 0.3)
+                            (sh/make-vl-spec 0.0 1.0 um/logistic 3.0 2 [0.01 0.5 0.9] 10 :fixedpt-x 0.66667)
+                            (sh/make-vl-spec 0.0 1.0 um/logistic 4.0 1 [0.01 0.2 0.5 0.8] 10 :fixedpt-x 0.75 :addl-plots [(sh/horiz 1.0)])
+                            (sh/make-vl-spec -0.2 1.2 um/logistic 4.5 1 [0.01] 10 :fixedpt-x 0.77 :addl-plots [(sh/horiz 1.0)])
+                           ])
   (def grid-spec (hc/xform sh/grid-chart :COLUMNS 2 :ROWS 2 :CONCAT four-logistic-specs))
   (oz/view! grid-spec)
 

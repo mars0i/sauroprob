@@ -18,11 +18,9 @@
 (comment
   (oz/start-server!)
 
-  (def spec (sh/make-vl-spec 0.0 1.0 um/logistic 4.25 2
-                             [0.05 0.1 0.15] 3
+  (oz/view! (sh/make-vl-spec 0.0 1.0 um/logistic 4.25 1
+                             [0.05 0.075 0.15] 3
                              :fixedpt-x 0.5
-                             :addl-plots [(sh/horiz 1.0)]
-                             ))
-  (oz/view! spec)
+                             :addl-plots [(sh/horiz 1.0)]))
 
 )
