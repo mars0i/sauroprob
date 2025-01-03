@@ -152,11 +152,46 @@
   (def yo (sauroprob.hanami/neg-one-line 0.0 1.0 (um/logistic 2.0) 0.5))
 )
 
+(defn horiz
+  "Vega-line horizontal line from x-min (default 0.0) to x-max (default 1.0)
+  at height."
+  ([height] (horiz 0.0 1.0 height))
+  ([x-min x-max height]
+   (hc/xform ht/line-chart
+             :DATA [{"x" x-min, "y" height, "label" "escape"} {"x" x-max, "y" height, "label" "escape"}]
+             :COLOR "label"
+             :SIZE 0.5)))
+
 ;; TODO move fixedpt diagonal and escape horizontal lines to separate
 ;; functions or constants, and allow them to be passed as the & arg,
 ;; and then concated into the :LAYER arg.  i.e. allow arbitrary single-line
 ;; additions.
 (defn make-vl-spec 
+  "ADD DOCSTRING"
+  [x-min x-max f param num-compositions init-xs num-iterations & {:keys [fixedpt-x addl-plots]}]
+  (prn fixedpt-x addl-plots) ; DEBUG
+  (let [paramed-f (f param)]
+    (hc/xform ht/layer-chart
+              :LAYER
+               (concat 
+                 ; y=x diagonal line that's used in mapping to next value:
+                 [(hc/xform ht/line-chart
+                            :DATA [{"x" x-min, "y" x-min, "label" "y=x"} {"x" x-max, "y" x-max, "label" "y=x"}]
+                            :COLOR "label"
+                            :SIZE 1.0)]
+                 ; Curves (f x), (f (f x)), etc.--num-compositions of them:
+                 (make-fn-vl-specs x-min x-max f param num-compositions)
+                 ;; Plot lines showing iteration through logistic function starting from init-x:
+                 (mapcat (fn [init-x] 
+                           (vl-iter-lines-charts (msc/n-comp paramed-f 1) param init-x num-iterations (str "r=" param ", x=" init-x)))
+                         init-xs)
+                 ;; If extra arg, it's the x coord of the fixed point (x, f x), and indicates we want a faint line with slope -1 through it:
+                 (when fixedpt-x [(neg-one-line x-min x-max (f param) fixedpt-x)])
+                 addl-plots))))
+
+
+
+(defn old-make-vl-spec 
   "ADD DOCSTRING"
   [x-min x-max f param num-compositions init-xs num-iterations & fixedpt-x-seq]
   ;(prn fixedpt-x-seq) ; DEBUG
