@@ -18,4 +18,10 @@
 (comment
   (oz/start-server!)
 
+  (oz/view! (sh/make-vl-spec 0.0 1.0 um/logistic 4.25 1
+                             [0.05 0.1 0.15 
+                              0.2 0.25 0.3
+                             ]
+                             3))
+
 )
