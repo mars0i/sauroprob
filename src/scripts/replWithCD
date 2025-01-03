@@ -1,4 +1,5 @@
 #!/bin/sh
+# Opens repl in forage dir in current terminal window/tab using leiningen:
 set -x
 cd ~/cloj/sauroprob
 exec lein repl "$@"
