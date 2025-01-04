@@ -14,9 +14,9 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(oz/start-server!)
-
 (comment
+
+  (oz/start-server!)
 
   ;; Four moran1959 plots
   (def four-moran-specs [(sh/make-vl-spec 0.0 3.0 um/moran1950 1.5 1 [0.01] 10 :fixedpt-x 1.0)

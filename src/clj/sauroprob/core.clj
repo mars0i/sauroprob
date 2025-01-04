@@ -23,4 +23,11 @@
                              :fixedpt-x 0.5
                              :addl-plots [(sh/horiz 1.0)]))
 
+  ;; fixing aspect ration:
+  ;; Maybe something like `{:y scale = {domain = (200,300)}}` but the
+  ;; correct syntax. cf. forage/viz/hanami.clj:
+  ;;             :XSCALE {"domain" [data-bound-min data-bound-max]}
+  ;;             :YSCALE {"domain" [data-bound-min data-bound-max]}
+ 
+
 )
