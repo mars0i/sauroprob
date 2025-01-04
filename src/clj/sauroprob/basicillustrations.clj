@@ -38,12 +38,11 @@
   (def four-logistic-specs [(sh/make-vl-spec 0.0 1.0 um/logistic 2.0 3 [0.01 0.1 0.2 0.7 0.8] 10 :fixedpt-x 0.3)
                             (sh/make-vl-spec 0.0 1.0 um/logistic 3.0 2 [0.01 0.5 0.9] 10 :fixedpt-x 0.66667)
                             (sh/make-vl-spec 0.0 1.0 um/logistic 4.0 1 [0.01 0.2 0.5 0.8] 10 :fixedpt-x 0.75 :addl-plots [(sh/horiz 1.0)])
-                            (sh/make-vl-spec -0.2 1.2 um/logistic 4.5 1 [0.01] 10 :fixedpt-x 0.77 :addl-plots [(sh/horiz 1.0)])
-                           ])
+                            (sh/make-vl-spec -0.2 1.2 um/logistic 4.5 1 [0.01] 10 :fixedpt-x 0.77 :addl-plots [(sh/horiz 1.0)]) ])
   (def grid-spec (hc/xform sh/grid-chart :COLUMNS 2 :ROWS 2 :CONCAT four-logistic-specs))
   (oz/view! grid-spec)
 
-  (oz/view! (sh/make-vl-spec -0.2 1.2 um/logistic 4.5 1 [0.3] 10 0.77)) ; note different x-min, x-max
+  koz/view! (sh/make-vl-spec -0.2 1.2 um/logistic 4.5 1 [0.3] 10 0.77)) ; note different x-min, x-max
 
   (def grid-spec (hc/xform sh/grid-chart :COLUMNS 2 :ROWS 4 :CONCAT (concat four-moran-specs four-logistic-specs)))
   (oz/view! grid-spec)
@@ -59,7 +58,7 @@
                    (sh/make-vl-spec 0.0 1.0 um/logistic 1.5 1 [0.01] 10)
                    (sh/make-vl-spec 0.0 1.0 um/logistic 2.0 1 [0.01] 10)
                    (sh/make-vl-spec 0.0 1.0 um/logistic 3.0 1 [0.01] 10)
-                   (sh/make-vl-spec 0.0 1.0 um/logistic 4.0 1 [0.01] 10)
+                   (sh/make-vl-spec 0.0 1.0 um/logistic 4.0 1 [0.01] 10 :fixedpt-x 0.75 :addl-plots [(sh/horiz 1.0)])
                    (sh/make-vl-spec 0.0 1.2 um/logistic 4.5 1 [0.01] 10)]) ; note different x-max
   (def grid-spec (hc/xform sh/grid-chart :COLUMNS 3 :ROWS 4 :CONCAT some-specs))
   (oz/view! grid-spec)

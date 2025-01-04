@@ -143,10 +143,11 @@
         y-left (linefn x-min)
         y-right (linefn x-max)]
     ;(prn fixedpt-x fixedpt-y [x-min y-left] [x-max y-right]) ; DEBUG
-    (hc/xform ht/line-chart
-              :DATA [{"x" x-min, "y" y-left, "label" "y=-x"} {"x" x-max, "y" y-right, "label" "y=-x"}]
-              :COLOR "label"
-              :SIZE 0.4)))
+    (-> (hc/xform ht/line-chart
+                  :DATA [{"x" x-min, "y" y-left, "label" "y=-x"} {"x" x-max, "y" y-right, "label" "y=-x"}]
+                  :COLOR "label"
+                  :SIZE 0.4)
+        (assoc-in [:mark :clip] true)))) ; prevent from exceeding y boundaries of plot domain if using :XSCALE, :YSCALE
 
 (comment
   (def yo (sauroprob.hanami/neg-one-line 0.0 1.0 (um/logistic 2.0) 0.5))
@@ -176,12 +177,13 @@
                (concat 
                  ; y=x diagonal line that's used in mapping to next value:
                  [(hc/xform ht/line-chart
-                            :DATA [{"x" x-min, "y" x-min, "label" "y=x"} {"x" x-max, "y" x-max, "label" "y=x"}]
-                            ; FIXME This isn't doinmg what I hoped:
-                            ;:XSCALE {"domain" [x-min x-max]}
-                            ;:YSCALE {"domain" [x-min x-max]} ; set y display dimensions to the same values
-                            :COLOR "label"
-                            :SIZE 1.0)]
+                                      :DATA [{"x" x-min, "y" x-min, "label" "y=x"} {"x" x-max, "y" x-max, "label" "y=x"}]
+                                      ;; Intention of this was to make x distances and y diststances on screen the same.
+                                      ;; But V-L has no way to do that, apparently: https://github.com/vega/vega-lite/issues/4367
+                                      :XSCALE {"domain" [x-min x-max]}
+                                      :YSCALE {"domain" [x-min x-max]} ; set y display dimensions to the same values
+                                      :COLOR "label"
+                                      :SIZE 1.0)]
                  ; Curves (f x), (f (f x)), etc.--num-compositions of them:
                  (make-fn-vl-specs x-min x-max f param num-compositions)
                  ;; Plot lines showing iteration through logistic function starting from init-x:
