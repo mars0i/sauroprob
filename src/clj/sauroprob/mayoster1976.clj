@@ -48,5 +48,7 @@
                        (sh/make-vl-spec 0.0 3.0 um/moran1950 5.0  2 [0.25] 4 :fixedpt-x 1.0)
                       ]))
 
+  (oz/view! (sh/make-vl-spec 0.0 3.0 um/moran1950 2.2 2 [0.5] 20 :fixedpt-x 1.0))
+
 )
 
