@@ -23,4 +23,9 @@
                              :fixedpt-x 0.5
                              :addl-plots [(sh/horiz 1.0)]))
 
+  (def abs-spec (sh/make-vl-spec 0.0 1.0 um/tent 0.5 1 [] 3))
+  (oz/view! abs-spec)
+
+  (oz/view! (sh/make-vl-spec 0 4.5 um/foo 2.5 3 [] 14 :fixedpt-x 1.0))
+
 )

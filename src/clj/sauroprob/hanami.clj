@@ -163,10 +163,7 @@
              :COLOR "label"
              :SIZE 0.5)))
 
-;; TODO move fixedpt diagonal and escape horizontal lines to separate
-;; functions or constants, and allow them to be passed as the & arg,
-;; and then concated into the :LAYER arg.  i.e. allow arbitrary single-line
-;; additions.
+;; TODO Make params into a (possibly empty) sequence of parameters.
 (defn make-vl-spec 
   "ADD DOCSTRING"
   [x-min x-max f param num-compositions init-xs num-iterations & {:keys [fixedpt-x addl-plots]}]
