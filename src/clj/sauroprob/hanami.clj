@@ -116,8 +116,8 @@
   (fn [num-compositions]
     (let [paramed-f (apply f params)]
       (hc/xform ht/line-chart
-                :TITLE (str "params:" params)
-                :DATA (vl-fn-ify (str "F" (st/u-sup-char num-compositions) "params:" params)
+                :TITLE (str "params: " params)
+                :DATA (vl-fn-ify (str "F" (st/u-sup-char num-compositions) "params: " params)
                                  x-min x-max 0.001 (msc/n-comp paramed-f num-compositions))
                 :COLOR "label"))))
 
@@ -187,7 +187,7 @@
                  (make-fn-vl-specs x-min x-max f params num-compositions)
                  ;; Plot lines showing iteration through logistic function starting from init-x:
                  (mapcat (fn [init-x] 
-                           (vl-iter-lines-charts (msc/n-comp paramed-f 1) params init-x num-iterations (str "params:" params ", x=" init-x)))
+                           (vl-iter-lines-charts (msc/n-comp paramed-f 1) params init-x num-iterations (str "params: " params ", x=" init-x)))
                          init-xs)
                  ;; If extra arg, it's the x coord of the fixed point (x, f x), and indicates we want a faint line with slope -1 through it:
                  (when fixedpt-x [(neg-one-line x-min x-max (apply f params) fixedpt-x)])
