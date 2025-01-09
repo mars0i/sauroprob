@@ -108,26 +108,26 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; All-in-one function(s) to plot logistic maps, etc.
 
-(defn make-one-fn-vl-spec 
+(defn make-one-fn-vl-spec-fn
   "Makes a Vega-lite spec for the function f applied to itself num-compositions 
   times, where num-compositions >= 1.
   ADD REST OF DOCSTRING"
-  [x-min x-max f param num-compositions]
-   (let [paramed-f (f param)]
-     (hc/xform ht/line-chart
-               :TITLE (str "r=" param)
-               :DATA (vl-fn-ify (str "F" (st/u-sup-char num-compositions) " r=" param)
-                                x-min x-max 0.001 (msc/n-comp paramed-f num-compositions))
-               :COLOR "label")))
+  [x-min x-max f params]
+  (fn [num-compositions]
+    (let [paramed-f (apply f params)]
+      (hc/xform ht/line-chart
+                :TITLE (str "params:" params)
+                :DATA (vl-fn-ify (str "F" (st/u-sup-char num-compositions) "params:" params)
+                                 x-min x-max 0.001 (msc/n-comp paramed-f num-compositions))
+                :COLOR "label"))))
 
 (defn make-fn-vl-specs
   "Makes a sequence of Vega-lite specs for the function f, then its composition
   with itself, up to num-compositons.
   ADD REST OF DOCSTRING"
-  [x-min x-max f param num-compositions]
-  (map (partial make-one-fn-vl-spec x-min x-max f param)
+  [x-min x-max f params num-compositions]
+  (map (make-one-fn-vl-spec-fn x-min x-max f params)
        (msc/irange 1 num-compositions)))
-
 
 ;;   y = -x + b
 ;; where y0 = f(x0), so
@@ -168,9 +168,9 @@
 ;; NOTE This inefficiently recalculates the same values in each composed function.
 (defn make-vl-spec 
   "ADD DOCSTRING"
-  [x-min x-max f param num-compositions init-xs num-iterations & {:keys [fixedpt-x addl-plots]}]
+  [x-min x-max f params num-compositions init-xs num-iterations & {:keys [fixedpt-x addl-plots]}]
   ;(prn fixedpt-x addl-plots) ; DEBUG
-  (let [paramed-f (f param)]
+  (let [paramed-f (apply f params)]
     (hc/xform ht/layer-chart
               :LAYER
                (concat 
@@ -184,12 +184,12 @@
                                       :COLOR "label"
                                       :SIZE 1.0)]
                  ; Curves (f x), (f (f x)), etc.--num-compositions of them:
-                 (make-fn-vl-specs x-min x-max f param num-compositions)
+                 (make-fn-vl-specs x-min x-max f params num-compositions)
                  ;; Plot lines showing iteration through logistic function starting from init-x:
                  (mapcat (fn [init-x] 
-                           (vl-iter-lines-charts (msc/n-comp paramed-f 1) param init-x num-iterations (str "r=" param ", x=" init-x)))
+                           (vl-iter-lines-charts (msc/n-comp paramed-f 1) params init-x num-iterations (str "params:" params ", x=" init-x)))
                          init-xs)
                  ;; If extra arg, it's the x coord of the fixed point (x, f x), and indicates we want a faint line with slope -1 through it:
-                 (when fixedpt-x [(neg-one-line x-min x-max (f param) fixedpt-x)])
+                 (when fixedpt-x [(neg-one-line x-min x-max (apply f params) fixedpt-x)])
                  addl-plots))))
 
