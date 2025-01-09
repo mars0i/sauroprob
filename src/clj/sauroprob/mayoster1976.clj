@@ -50,5 +50,9 @@
 
   (oz/view! (sh/make-vl-spec 0 4.5 um/moran1950 [3.5] 3 [3.4] 14 :fixedpt-x 1.0))
 
+  ;; Illustrate mapping path for a composed function:
+  (oz/view! (sh/make-vl-spec 0 7 (msc/n-comp (um/moran1950 2.5) 5) [] 1 [6] 12 :fixedpt-x 1.0))
+  (oz/view! (sh/make-vl-spec 0 7 um/moran1950 [2.5] 3 [3.4] 14 :fixedpt-x 1.0))
+
 )
 
