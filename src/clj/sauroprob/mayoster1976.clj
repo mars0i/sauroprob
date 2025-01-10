@@ -79,27 +79,32 @@
                                :fixedpt-x 1.0
                                :addl-plots (sh/make-fn-vl-specs 0 x-max um/moran1950 [param] 1))))
 
-  ;; This illustrates the expected result, that two steps on F is equivalent to one step on F^2:
+  ;; This illustrates the expected result that n steps on F is equivalent to one step on F^n:
   (let [x-max 3.5
-        param 2.5]
-    (oz/view! (hc/xform sh/grid-chart :COLUMNS 1 :ROWS 2 :CONCAT 
-                        [(sh/make-vl-spec 0 x-max  ; domain boundaries
-                                          (msc/n-comp (um/moran1950 param) 2) ; initial curve fn
-                                          [] ; parameters for curve fn
-                                          1  ; number of compositions of curve fn
-                                          [1.5] 1 ; initial x's and number of steps
-                                          :fixedpt-x 1.0
-                                          :addl-plots (sh/make-fn-vl-specs 0 x-max um/moran1950 [param] 1))
-                         (sh/make-vl-spec 0 x-max  ; domain boundaries
-                                          um/moran1950 ; initial curve fn
-                                          [param] ; parameters for curve fn
-                                          2  ; number of compositions of curve fn
-                                          [1.5] 2 ; initial x's and number of steps
-                                          :fixedpt-x 1.0
-                                          :addl-plots (sh/make-fn-vl-specs 0 x-max um/moran1950 [param] 1))])))
+        param 2.5
+        init-x 0.22
+        num-comps 3]
+    (oz/view!
+      (hc/xform sh/grid-chart :COLUMNS 1 :ROWS 2 :CONCAT 
+                ;; Plot single-step path on F^n, but also plot F^1:
+                [(sh/make-vl-spec 0 x-max  ; domain boundaries
+                                  (msc/n-comp (um/moran1950 param) num-comps) ; initial curve fn
+                                  [] ; parameters for curve fn
+                                  1  ; number of compositions of curve fn
+                                  [init-x] 1 ; initial x's and number of steps
+                                  :fixedpt-x 1.0
+                                  ;; Add plot for F^1:
+                                  :addl-plots (sh/make-fn-vl-specs 0 x-max um/moran1950 [param] 1))
+                 ;; Plot n-comp steps on F, but also plot F^n:
+                 (sh/make-vl-spec 0 x-max  ; domain boundaries
+                                  um/moran1950 ; initial curve fn
+                                  [param] ; parameters for curve fn
+                                  num-comps  ; number of compositions of curve fn
+                                  [init-x] num-comps ; initial x's and number of steps
+                                  :fixedpt-x 1.0)])))
 
   (oz/start-server!)
 
   ((msc/n-comp (um/moran1950 2.5) 2) 1.5)
-)
+  )
 
