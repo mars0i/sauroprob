@@ -58,23 +58,28 @@
   ;; show that the third step goes to the max of F.  But it doesn't work
   ;; precisely?  Is this image slop?
   ((msc/n-comp (um/moran1950 2.5) 2) 2.7103)
-  (oz/view! (sh/make-vl-spec 0 4.5  ; domain boundaries
-                             (msc/n-comp (um/moran1950 2.5) 3) ; initial curve fn
-                             [] ; parameters for curve fn
-                             1  ; number of compositions of curve fn
-                             [2.7103] 3 ; initial x's and number of steps
-                             :fixedpt-x 1.0
-                             :addl-plots (sh/make-fn-vl-specs 0 7 um/moran1950 [2.5] 1)))
 
-  ;; similar experiment for the 6th composition.  Not looking good.
-  ;; Getting stuck in a fixedpoint.  (float slop?)
-  (oz/view! (sh/make-vl-spec 0 7  ; domain boundaries
-                             (msc/n-comp (um/moran1950 2.5) 6) ; initial curve fn
-                             [] ; parameters for curve fn
-                             1  ; number of compositions of curve fn
-                             [3.6] 7 ; initial x's and number of steps
-                             :fixedpt-x 1.0
-                             :addl-plots (sh/make-fn-vl-specs 0 7 um/moran1950 [2.5] 1)))
+  (oz/view! (let [x-max 4.5
+                  param 2.5]
+              (sh/make-vl-spec 0 x-max  ; domain boundaries
+                               (msc/n-comp (um/moran1950 param) 4) ; initial curve fn
+                               [] ; parameters for curve fn
+                               1  ; number of compositions of curve fn
+                               [1.2] 20 ; initial x's and number of steps
+                               :fixedpt-x 1.0
+                               :addl-plots (sh/make-fn-vl-specs 0 x-max um/moran1950 [param] 1))))
+
+  ;; Similar experiment for the 6th composition.  Not looking good.
+  ;; Getting stuck in a fixedpoint.  (Float slop??)
+  (oz/view! (let [x-max 8
+                  param 2.5]
+              (sh/make-vl-spec 0 x-max  ; domain boundaries
+                               (msc/n-comp (um/moran1950 param) 6) ; initial curve fn
+                               [] ; parameters for curve fn
+                               1  ; number of compositions of curve fn
+                               [3.6] 7 ; initial x's and number of steps
+                               :fixedpt-x 1.0
+                               :addl-plots (sh/make-fn-vl-specs 0 x-max um/moran1950 [param] 1))))
 
   (oz/start-server!)
 )
