@@ -105,6 +105,12 @@
 
   (oz/start-server!)
 
-  ((msc/n-comp (um/moran1950 2.5) 2) 1.5)
+  (oz/view! (sh/make-vl-spec 0 2  ; domain boundaries
+                             um/tent-fn
+                             [2 2] ; parameters for curve fn
+                             1 ; num compositions
+                             [] 2 ; initial x's and number of steps
+                             :fixedpt-x 1.0))
+
   )
 
