@@ -93,10 +93,10 @@
   ([r] (partial moran1950 r))
   ([r x] (* x (m/exp (* r (- 1 x))))))
 
-;; FIXME
-(defn tent 
-  ([width] (partial tent width 1.0))
-  ([width height x]
-      (* height
-         (abs (* width (- x (/ width 2.0)))))))
+;; FIXME: width calc isn't working right
+(defn tent-fn
+  "Returns a tent function on [0,2] with a max value y=height at x=width/2."
+  [height width]
+  (fn [x]
+    (+ height (* height (- (abs (- x (/ width 2.0))))))))
                         
