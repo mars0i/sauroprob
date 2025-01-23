@@ -83,15 +83,59 @@
   [r initial]
   (iter-vals logistic r initial))
 
-(defn moran1950
-  "Function from May and Oster 1976 _American Naturalist_ \"Bifurcations 
-  and Dynamic Complexity in Simple Ecological Models\", table 1 equation 1,
-  attributed to Moran 1950 and others (although I don't see it in Moran 
-  1950). Here rather than using N for absolute population size, and K for
-  carrying capacity, we use equation (3) on p. 577 (but for capitalization),
-  using x=N/K, or N=Kx."
-  ([r] (partial moran1950 r))
+(defn real-ricker
+  "Function from Ricker 1954 \"Stock and recruitment\"
+  (https://en.wikipedia.org/wiki/Ricker_model), or May and Oster 1976
+  _American Naturalist_ \"Bifurcations and Dynamic Complexity in Simple
+  Ecological Models\", table 1 equation 1. Rather than using N for absolute
+  population size, and K for carrying capacity, we use equation (3) on p.
+  577 of May and Oster, using x=N/K, or N=Kx."
+  ([r] (partial real-ricker r))
   ([r x] (* x (m/exp (* r (- 1 x))))))
+
+(defn ricker
+  "Function from Ricker 1954 \"Stock and recruitment\"
+  (https://en.wikipedia.org/wiki/Ricker_model), or May and Oster 1976
+  _American Naturalist_ \"Bifurcations and Dynamic Complexity in Simple
+  Ecological Models\", table 1 equation 1.  If N is a non-zero integer in
+  [0,K], result will be a double in the same range."
+  ([r K] (partial ricker r K))
+  ([r K N] (* N (m/exp (* r (- 1 (/ N K)))))))
+
+(defn ricker-relf
+  "Like ricker, but divides result by K so that the result is a double
+  representing a non-integer relative frequency (which need not correspond
+  to a rational N/K)."
+  ([r K] (partial ricker-relf r K))
+  ([r K N] (/ (ricker r K N) K)))
+
+(defn floored-ricker
+  "Ricker function wrapped in floor so it rounds down to the nearest
+  integer as a double."
+  ([r K] (partial floored-ricker))
+  ([r K N] (m/floor (ricker r K N))))
+
+(defn floored-ricker-relf
+  "Like floored-ricker, but divides result by K so that the result is a
+  double representing a relative frequency N/K."
+  ([r K] (partial floored-ricker-relf r K))
+  ([r K N] (/ (floored-ricker r K N) K)))
+
+(comment
+  ;; These results are as expected.
+  (real-ricker 1.5 0.4)
+  (ricker-relf 1.5 1000 400)
+  ((ricker-relf 1.5 1000) 400)
+  (ricker 1.5 1000 400)
+  ((ricker 1.5 1000) 400)
+  (floored-ricker 1.5 1000 400)
+  (floored-ricker 1.5 10000 4000)
+  (floored-ricker-relf 1.5 100 40)
+  (floored-ricker-relf 1.5 1000 400)
+  (floored-ricker-relf 1.5 10000 4000)
+  (floored-ricker-relf 1.5 100000 40000)
+  (floored-ricker-relf 1.5 1000000 400000)
+)
 
 ;; FIXME: width calc isn't working right
 (defn tent-fn

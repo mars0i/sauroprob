@@ -28,4 +28,11 @@
 
   (oz/view! (sh/make-vl-spec 0 4.5 um/foo 2.5 3 [] 14 :fixedpt-x 1.0))
 
+  (oz/view! (sh/make-vl-spec 0 2  ; domain boundaries
+                             um/tent-fn
+                             [2 2] ; parameters for curve fn
+                             1 ; num compositions
+                             [] 2 ; initial x's and number of steps
+                             :fixedpt-x 1.0))
+
 )
