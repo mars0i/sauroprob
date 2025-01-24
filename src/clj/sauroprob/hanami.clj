@@ -163,7 +163,6 @@
              :COLOR "label"
              :SIZE 0.5)))
 
-;; TODO Make params into a (possibly empty) sequence of parameters.
 ;; TODO Replace number of compositions with a sequence of composition numbers.
 ;; NOTE This inefficiently recalculates the same values in each composed function.
 (defn make-vl-spec 
