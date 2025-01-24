@@ -48,12 +48,13 @@
                        (sh/make-vl-spec 0.0 3.0 um/real-ricker [5.0]  2 [0.25] 4 :fixedpt-x 1.0)
                       ]))
 
-  (oz/view! (sh/make-vl-spec 0 4.5 um/real-ricker [3.5] 1 [0.5] 7 :fixedpt-x 1.0))
+  (oz/view! (sh/make-vl-spec 0 4.5 um/real-ricker [3.5]      1 [0.5] 7))
+  (oz/view! (sh/make-vl-spec 0 4.5 (um/real-ricker 3.5) []   1 [0.5] 7))
   ;; Why aren't the following producing results like the preceding?
-  (oz/view! (sh/make-vl-spec 0 4.5 um/ricker-relf [3.5 1000] 1 [0.5] 7 :fixedpt-x 1.0))
+  (oz/view! (sh/make-vl-spec 0 4500 um/ricker-relf [3.5 1000] 1 [0.5] 7))
   ;; check: should be same as preceding line:
-  (oz/view! (sh/make-vl-spec 0 4.5 (um/ricker-relf 3.5 1000) [] 1 [0.5] 7 :fixedpt-x 1.0))
-  (oz/view! (sh/make-vl-spec 0 4.5 um/floored-ricker-relf [3.5 1000] 1 [0.5] 7 :fixedpt-x 1.0))
+  (oz/view! (sh/make-vl-spec 0 4.5 (um/ricker-relf 3.5 1000) [] 1 [0.5] 7))
+  (oz/view! (sh/make-vl-spec 0 4.5 um/floored-ricker-relf [3.5 1000] 1 [0.5] 7))
 
   ;; Illustrate mapping path for a composed function:
   (oz/view! (sh/make-vl-spec 0 7 (msc/n-comp (um/real-ricker 2.5) 5) [] 1 [6] 12 :fixedpt-x 1.0))
