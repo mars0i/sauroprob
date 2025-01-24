@@ -9,7 +9,8 @@
                  [aerial.hanami "0.20.1"]
                  ;[techascent/tech.viz "6.00-beta-16-4"]
                  [io.github.nextjournal/clerk "0.12.707"]
-                 [metasoarous/oz "2.0.0-alpha5"]
+                 [metasoarous/oz "1.6.0-alpha36"]
+                 ;[metasoarous/oz "2.0.0-alpha5"]
                  ;[cljplot "0.0.2a-SNAPSHOT"]
                  [metosin/jsonista "0.3.7"] ; ; generate json from edn for debugging
                 ]
