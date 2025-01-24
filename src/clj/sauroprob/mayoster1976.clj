@@ -20,6 +20,17 @@
 (comment
   (oz/start-server!)
 
+  (require '[clojure.math :as m])
+  (require '[oz.core :as oz])
+  (require '[aerial.hanami.common :as hc])
+  (require '[aerial.hanami.templates :as ht])
+  (require '[utils.json :as json])
+  (require '[utils.string :as st])
+  (require '[utils.misc :as msc])
+  (require '[utils.math :as um])
+  (require '[sauroprob.hanami :as sh])
+
+
   ;; Illustration of methods.  Note that for this family of functions, the
   ;; last optional arg, which is the x coord of F^1 fixed point, is always
   ;; the same, 1.0.
@@ -50,9 +61,7 @@
 
   (oz/view! (sh/make-vl-spec 0 4.5 um/real-ricker [3.5]      1 [0.5] 7))
   (oz/view! (sh/make-vl-spec 0 4.5 (um/real-ricker 3.5) []   1 [0.5] 7))
-  ;; Why aren't the following producing results like the preceding?
-  (oz/view! (sh/make-vl-spec 0 4500 um/ricker-relf [3.5 1000] 1 [0.5] 7))
-  ;; check: should be same as preceding line:
+  ;; check: should be same as preceding line?:
   (oz/view! (sh/make-vl-spec 0 4.5 (um/ricker-relf 3.5 1000) [] 1 [0.5] 7))
   (oz/view! (sh/make-vl-spec 0 4.5 um/floored-ricker-relf [3.5 1000] 1 [0.5] 7))
 
