@@ -15,6 +15,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Hanami and Vega-lite plotting tools
 
+(def x-increment 0.01)
+;(def x-increment 10)
+
 (defn vl-data-ify
   "Given a sequence ys of results of a function, returns a sequence
   of Vega-Lite points with ys as y coordinates, and x coordinates
@@ -108,8 +111,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; All-in-one function(s) to plot logistic maps, etc.
 
-(def *plot-increment* 0.001)
-
 (defn make-one-fn-vl-spec-fn
   "Makes a Vega-lite spec for the function f applied to itself num-compositions 
   times, where num-compositions >= 1.
@@ -120,7 +121,7 @@
       (hc/xform ht/line-chart
                 :TITLE (str "params: " params)
                 :DATA (vl-fn-ify (str "F" (st/u-sup-char num-compositions) "params: " params)
-                                 x-min x-max *plot-increment* (msc/n-comp paramed-f num-compositions))
+                                 x-min x-max x-increment (msc/n-comp paramed-f num-compositions))
                 :COLOR "label"))))
 
 (defn make-fn-vl-specs
