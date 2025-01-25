@@ -111,10 +111,11 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; All-in-one function(s) to plot logistic maps, etc.
 
+;; NOTE I'm calling this repeatedly and inefficiently recalculating the same values in each composed function.
 (defn make-one-fn-vl-spec-fn
-  "Makes a Vega-lite spec for the function f applied to itself num-compositions 
-  times, where num-compositions >= 1.
-  ADD REST OF DOCSTRING"
+  "Returns a function of num-compositions that makes a Vega-lite spec that
+  plots a function f applied params and itself num-compositions times from
+  x-min to x-max. num-compositions should be >= 1."
   [x-min x-max f params]
   (fn [num-compositions]
     (let [paramed-f (apply f params)]
@@ -123,14 +124,6 @@
                 :DATA (vl-fn-ify (str "F" (st/u-sup-char num-compositions) "params: " params)
                                  x-min x-max x-increment (msc/n-comp paramed-f num-compositions))
                 :COLOR "label"))))
-
-(defn make-fn-vl-specs
-  "Makes a sequence of Vega-lite specs for the function f, then its composition
-  with itself, up to num-compositons.
-  ADD REST OF DOCSTRING"
-  [x-min x-max f params num-compositions]
-  (map (make-one-fn-vl-spec-fn x-min x-max f params)
-       (msc/irange 1 num-compositions)))
 
 ;;   y = -x + b
 ;; where y0 = f(x0), so
@@ -169,8 +162,7 @@
 ;; TODO Replace number of compositions with a sequence of composition numbers.
 ;; TODO? Maybe don't apply f to params, but instead just partial the params into the function.
 ;;      Well, the advantage of separating out the parameters is that they can be
-;;      put into a label on the plot.  This happens when make-fn-vl-specs
-;;      indirectly calls make-one-fn-vl-spec-fn.
+;;      put into a label on the plot.  This happens when make-one-fn-vl-spec-fn is called.
 ;; NOTE This inefficiently recalculates the same values in each composed function.
 (defn make-vl-spec 
   "Given a function f, applies it to params, and plots num-compositions of
@@ -195,7 +187,7 @@
                                       :COLOR "label"
                                       :SIZE 1.0)]
                  ; Curves (f x), (f (f x)), etc.--num-compositions of them:
-                 (make-fn-vl-specs x-min x-max f params num-compositions)
+                 (map (make-one-fn-vl-spec-fn x-min x-max f params) (msc/irange 1 num-compositions))
                  ;; Plot lines showing iteration through logistic function starting from init-x:
                  (mapcat (fn [init-x] 
                            (vl-iter-lines-charts (msc/n-comp paramed-f 1) params init-x num-iterations (str "params: " params ", x=" init-x)))
