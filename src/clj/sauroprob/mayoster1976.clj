@@ -20,16 +20,6 @@
 (comment
   (oz/start-server!)
 
-  (require '[clojure.math :as m])
-  (require '[oz.core :as oz])
-  (require '[aerial.hanami.common :as hc])
-  (require '[aerial.hanami.templates :as ht])
-  (require '[utils.json :as json])
-  (require '[utils.string :as st])
-  (require '[utils.misc :as msc])
-  (require '[utils.math :as um])
-  (require '[sauroprob.hanami :as sh])
-
 
   ;; Illustration of methods.  Note that for this family of functions, the
   ;; last optional arg, which is the x coord of F^1 fixed point, is always
@@ -122,3 +112,14 @@
 
 )
 
+(comment
+  (require '[clojure.math :as m])
+  (require '[oz.core :as oz])
+  (require '[aerial.hanami.common :as hc])
+  (require '[aerial.hanami.templates :as ht])
+  (require '[utils.json :as json])
+  (require '[utils.string :as st])
+  (require '[utils.misc :as msc])
+  (require '[utils.math :as um])
+  (require '[sauroprob.hanami :as sh])
+)
