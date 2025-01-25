@@ -15,8 +15,10 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Hanami and Vega-lite plotting tools
 
-(def x-increment 0.01)
-;(def x-increment 10)
+;; Default number of steps to plot a curve; the plot range will usually 
+;; be divided into this many steps:
+(def plot-steps 200)
+;(def x-increment 0.01)
 
 (defn vl-fn-ify
   "Given a function f, returns a sequence of Vega-Lite points with x
@@ -28,6 +30,7 @@
   (let [x-range (- x-max x-min)
         xs (msc/irange x-min x-max x-increment)
         ys (map f xs)]
+    (prn (map vector xs ys)) ; DEBUG
     (map (fn [x y] {"x" x, "y" y, "label" label}) xs ys)))
 
 ;; For more info, see discussion at:
@@ -144,7 +147,9 @@
       (hc/xform ht/line-chart
                 :TITLE (str "params: " params)
                 :DATA (vl-fn-ify (str "F" (st/u-sup-char num-compositions) "params: " params)
-                                 x-min x-max x-increment (msc/n-comp paramed-f num-compositions))
+                                 x-min x-max
+                                 (/ (- x-max x-min) (double plot-steps))
+                                 (msc/n-comp paramed-f num-compositions))
                 :COLOR "label"))))
 
 ;; TODO Replace number of compositions with a sequence of composition numbers.
