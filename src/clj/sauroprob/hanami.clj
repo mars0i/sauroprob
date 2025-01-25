@@ -18,18 +18,6 @@
 (def x-increment 0.01)
 ;(def x-increment 10)
 
-(defn vl-data-ify
-  "Given a sequence ys of results of a function, returns a sequence
-  of Vega-Lite points with ys as y coordinates, and x coordinates
-  evenly spaced between x-min and x-max.  label can be used to identify
-  these as distinct points in Vega-Lite."
-  [label x-min x-max ys]
-  (let [num-ys (count ys)
-        x-range (- x-max x-min)
-        x-increment (/ x-range num-ys)
-        xs (msc/irange x-min x-max x-increment)]
-    (map (fn [x y] {"x" x, "y" y, "label" label}) xs ys)))
-
 (defn vl-fn-ify
   "Given a function f, returns a sequence of Vega-Lite points with x
   coordinates running from x-min to x-max, inclusive, in steps of size
@@ -111,20 +99,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; All-in-one function(s) to plot logistic maps, etc.
 
-;; NOTE I'm calling this repeatedly and inefficiently recalculating the same values in each composed function.
-(defn make-one-fn-vl-spec-fn
-  "Returns a function of num-compositions that makes a Vega-lite spec that
-  plots a function f applied params and itself num-compositions times from
-  x-min to x-max. num-compositions should be >= 1."
-  [x-min x-max f params]
-  (fn [num-compositions]
-    (let [paramed-f (apply f params)]
-      (hc/xform ht/line-chart
-                :TITLE (str "params: " params)
-                :DATA (vl-fn-ify (str "F" (st/u-sup-char num-compositions) "params: " params)
-                                 x-min x-max x-increment (msc/n-comp paramed-f num-compositions))
-                :COLOR "label"))))
-
 ;;   y = -x + b
 ;; where y0 = f(x0), so
 ;;   f(x0) = -x0 + b
@@ -158,6 +132,20 @@
              :DATA [{"x" x-min, "y" height, "label" "escape"} {"x" x-max, "y" height, "label" "escape"}]
              :COLOR "label"
              :SIZE 0.5)))
+
+;; NOTE I'm calling this repeatedly and inefficiently recalculating the same values in each composed function.
+(defn make-one-fn-vl-spec-fn
+  "Returns a function of num-compositions that makes a Vega-lite spec that
+  plots a function f applied params and itself num-compositions times from
+  x-min to x-max. num-compositions should be >= 1."
+  [x-min x-max f params]
+  (fn [num-compositions]
+    (let [paramed-f (apply f params)]
+      (hc/xform ht/line-chart
+                :TITLE (str "params: " params)
+                :DATA (vl-fn-ify (str "F" (st/u-sup-char num-compositions) "params: " params)
+                                 x-min x-max x-increment (msc/n-comp paramed-f num-compositions))
+                :COLOR "label"))))
 
 ;; TODO Replace number of compositions with a sequence of composition numbers.
 ;; TODO? Maybe don't apply f to params, but instead just partial the params into the function.
