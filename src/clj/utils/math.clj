@@ -86,6 +86,12 @@
   ([r] (partial real-ricker r))
   ([r x] (* x (m/exp (* r (- 1 x))))))
 
+(defn restored-ricker
+  "Calls real-ricker, but then multiplies by K to get back a (real-valued)
+  population size."
+  ([r K] (partial restored-ricker r K))
+  ([r K x] (* K (real-ricker r x))))
+
 (defn ricker
   "Function from Ricker 1954 \"Stock and recruitment\"
   (https://en.wikipedia.org/wiki/Ricker_model), or May and Oster 1976
@@ -95,33 +101,39 @@
   ([r K] (partial ricker r K))
   ([r K N] (* N (m/exp (* r (- 1 (/ N K)))))))
 
-(defn ricker-relf
-  "Like ricker, but divides result by K so that the result is a double
-  representing a non-integer relative frequency (which need not correspond
-  to a rational N/K)."
-  ([r K] (partial ricker-relf r K))
-  ([r K N] (/ (ricker r K N) K)))
-
 (defn floored-ricker
   "Ricker function wrapped in floor so it rounds down to the nearest
   integer as a double."
   ([r K] (partial floored-ricker))
   ([r K N] (m/floor (ricker r K N))))
 
-(defn floored-ricker-relf
-  "Like floored-ricker, but divides result by K so that the result is a
-  double representing a relative frequency N/K."
-  ([r K] (partial floored-ricker-relf r K))
-  ([r K N] (/ (floored-ricker r K N) K)))
+(comment
+  ;; PROBLEMATIC DEFS:
+
+  (defn ricker-relf
+    "Like ricker, but divides result by K so that the result is a double
+    representing a non-integer relative frequency (which need not correspond
+    to a rational N/K)."
+    ([r K] (partial ricker-relf r K))
+    ([r K N] (/ (ricker r K N) K)))
+
+  (defn floored-ricker-relf
+    "Like floored-ricker, but divides result by K so that the result is a
+    double representing a relative frequency N/K."
+    ([r K] (partial floored-ricker-relf r K))
+    ([r K N] (/ (floored-ricker r K N) K)))
+
+)
 
 (comment
   ;; These results are as expected.
   (real-ricker 3.5 0.4)
+  (restored-ricker 3.5 1000 0.4)
+  (ricker 3.5 1000 400)
+
   (ricker-relf 3.5 1000 400)
 
   ((ricker-relf 1.5 1000) 400)
-  (ricker 1.5 1000 400)
-  ((ricker 1.5 1000) 400)
   (floored-ricker 1.5 1000 400)
   (floored-ricker 1.5 10000 4000)
   (floored-ricker-relf 1.5 100 40)
