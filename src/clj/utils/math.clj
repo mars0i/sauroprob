@@ -69,13 +69,6 @@
   value init."
   (iterate (partial f param) initial))
 
-(defn old-logistic-vals
-  "Returns a lazy sequence of values resulting from iterating a 
-  logistic function with parameter r, beginning with given initial
-  state."
-  [r initial]
-  (iterate (partial logistic r) initial))
-
 (defn logistic-vals
   "Returns a lazy sequence of values resulting from iterating a 
   logistic function with parameter r, beginning with given initial
