@@ -123,8 +123,9 @@
 
 (comment
   ;; These results are as expected.
-  (real-ricker 1.5 0.4)
-  (ricker-relf 1.5 1000 400)
+  (real-ricker 3.5 0.4)
+  (ricker-relf 3.5 1000 400)
+
   ((ricker-relf 1.5 1000) 400)
   (ricker 1.5 1000 400)
   ((ricker 1.5 1000) 400)
