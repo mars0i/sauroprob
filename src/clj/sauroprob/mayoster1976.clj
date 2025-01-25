@@ -49,17 +49,24 @@
                        (sh/make-vl-spec 0.0 3.0 um/real-ricker [5.0]  2 [0.25] 4 :fixedpt-x 1.0)
                       ]))
 
-  (def real-spec (sh/make-vl-spec 0 4.5 um/real-ricker [3.5] 1 [] 7))
+  (def real-spec (sh/make-vl-spec 0 4.5 um/real-ricker [3.5] 1 [0.5] 5))
   (oz/view! real-spec)
-  (def relf-spec (sh/make-vl-spec 0 4.5 um/ricker-relf [3.5 1000] 1 [] 7))
-  (oz/view! relf-spec)
-  (def rick-spec (sh/make-vl-spec 0 4.5 um/ricker [3.5 1000] 1 [] 7))
+  ;; Note that the range for both the function and plotting has to be shifted to 
+  ;; K-scale [0,4500] since K is 1000; init-x and fixed point must larger, too:
+  (def rick-spec  (sh/make-vl-spec 0 4500 um/ricker         [3.5 1000] 1 [500] 50))
   (oz/view! rick-spec)
+  (def floor-spec (sh/make-vl-spec 0 4500 um/floored-ricker [3.5 1000] 1 [500] 50))
+  (oz/view! floor-spec)
 
+  (oz/view! (sh/make-vl-spec 0 250 um/ricker          [2.9 100] 1 [90 85] 8 :fixedpt-x 100))
+  (oz/view! (sh/make-vl-spec 0 250 um/floored-ricker  [2.9 100] 1 [90 85] 8 :fixedpt-x 100))
 
-  (oz/view! (sh/make-vl-spec 0 4.5 (um/real-ricker 3.5) []   1 [0.5] 7))
-  (oz/view! (sh/make-vl-spec 0 4.5 (um/ricker-relf 3.5 1000) [] 1 [0.5] 7))
-
+  ;; These don't plot correctly because the input needs to be on the K
+  ;; scale (e.g. [0,4500], but the plot needs to be on the X scale [0,4.5]:
+  (def rest-spec (sh/make-vl-spec 0 4.5 um/restored-ricker [3.5 1000] 1 [] 7))
+  (oz/view! rest-spec)
+  (def relf-spec (sh/make-vl-spec 0 4500 um/ricker-relf [3.5 1000] 1 [] 7))
+  (oz/view! relf-spec)
   (oz/view! (sh/make-vl-spec 0 4.5 um/floored-ricker-relf [3.5 1000] 1 [0.5] 7))
 
   ;; Illustrate mapping path for a composed function:
