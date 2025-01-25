@@ -166,7 +166,12 @@
 ;; TODO Replace number of compositions with a sequence of composition numbers.
 ;; NOTE This inefficiently recalculates the same values in each composed function.
 (defn make-vl-spec 
-  "ADD DOCSTRING"
+  "Given a function f, applies it to params, and plots num-compositions of
+  it from x-min to x-max.  Also plots the map lines from init-xs to the
+  function to the diagonal y=x. If `:fixedpt-x x` is present, plots a
+  diagonal with slope -1 through (x,x); this can make it easier to see
+  whether the slope of f is greater than or less than -1.  The value of
+  :addl-plots is a sequence of arbitrary additional vega-lite plots."
   [x-min x-max f params num-compositions init-xs num-iterations & {:keys [fixedpt-x addl-plots]}]
   ;(prn fixedpt-x addl-plots) ; DEBUG
   (let [paramed-f (apply f params)]
