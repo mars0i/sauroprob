@@ -49,10 +49,17 @@
                        (sh/make-vl-spec 0.0 3.0 um/real-ricker [5.0]  2 [0.25] 4 :fixedpt-x 1.0)
                       ]))
 
-  (oz/view! (sh/make-vl-spec 0 4.5 um/real-ricker [3.5]      1 [0.5] 7))
+  (def real-spec (sh/make-vl-spec 0 4.5 um/real-ricker [3.5] 1 [] 7))
+  (oz/view! real-spec)
+  (def relf-spec (sh/make-vl-spec 0 4.5 um/ricker-relf [3.5 1000] 1 [] 7))
+  (oz/view! relf-spec)
+  (def rick-spec (sh/make-vl-spec 0 4.5 um/ricker [3.5 1000] 1 [] 7))
+  (oz/view! rick-spec)
+
+
   (oz/view! (sh/make-vl-spec 0 4.5 (um/real-ricker 3.5) []   1 [0.5] 7))
-  ;; check: should be same as preceding line?:
   (oz/view! (sh/make-vl-spec 0 4.5 (um/ricker-relf 3.5 1000) [] 1 [0.5] 7))
+
   (oz/view! (sh/make-vl-spec 0 4.5 um/floored-ricker-relf [3.5 1000] 1 [0.5] 7))
 
   ;; Illustrate mapping path for a composed function:
