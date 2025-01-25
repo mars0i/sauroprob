@@ -177,7 +177,7 @@
     (hc/xform ht/layer-chart
               :LAYER
                (concat 
-                 ; y=x diagonal line that's used in mapping to next value:
+                 ; y=x diagonal line that's used in mapping to next value along with global parameters of the plot:
                  [(hc/xform ht/line-chart
                                       :DATA [{"x" x-min, "y" x-min, "label" "y=x"} {"x" x-max, "y" x-max, "label" "y=x"}]
                                       ;; Intention of this was to make x distances and y diststances on screen the same.
@@ -186,7 +186,7 @@
                                       :YSCALE {"domain" [x-min x-max]} ; set y display dimensions to the same values
                                       :COLOR "label"
                                       :SIZE 1.0)]
-                 ; Curves (f x), (f (f x)), etc.--num-compositions of them:
+                 ; Generate vega-lite specs for curves (f x), (f (f x)), etc., num-compositions of them:
                  (map (make-one-fn-vl-spec-fn x-min x-max f params) (msc/irange 1 num-compositions))
                  ;; Plot lines showing iteration through logistic function starting from init-x:
                  (mapcat (fn [init-x] 
