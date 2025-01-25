@@ -49,14 +49,27 @@
                        (sh/make-vl-spec 0.0 3.0 um/real-ricker [5.0]  2 [0.25] 4 :fixedpt-x 1.0)
                       ]))
 
-  (def real-spec (sh/make-vl-spec 0 4.5 um/real-ricker [3.5] 1 [0.5] 5))
+  (def real-spec (sh/make-vl-spec 0 4.5 um/real-ricker [3.5] 1 [0.5] 10))
   (oz/view! real-spec)
   ;; Note that the range for both the function and plotting has to be shifted to 
   ;; K-scale [0,4500] since K is 1000; init-x and fixed point must larger, too:
-  (def rick-spec  (sh/make-vl-spec 0 4500 um/ricker         [3.5 1000] 1 [500] 50))
+  (def rick-spec  (sh/make-vl-spec 0 4500 um/ricker         [3.5 1000] 1 [500] 10))
   (oz/view! rick-spec)
-  (def floor-spec (sh/make-vl-spec 0 4500 um/floored-ricker [3.5 1000] 1 [500] 50))
+  (def floor-spec (sh/make-vl-spec 0 4500 um/floored-ricker [3.5 1000] 1 [500] 10))
   (oz/view! floor-spec)
+
+  ;; A strategy for starting with pop size but producing a real-ricker output.
+  ;; (Note this can't simply be built into a ricker fn, since params like
+  ;; x-max are only used in make-vl-spec.  I'd need a wrapper around
+  ;; make-vl-spec, I guess, to automate this kind of thing.)
+  (let [K 1000.0
+        N 500.0
+        n-min 0.0
+        n-max 4500.0
+        X (/ K N)
+        x-min (/ n-min K)
+        x-max (/ n-max K)]
+    (oz/view! (sh/make-vl-spec x-min x-max um/real-ricker [3.5] 1 [X] 10)))
 
   (oz/view! (sh/make-vl-spec 0 250 um/ricker          [2.9 100] 1 [90 85] 8 :fixedpt-x 100))
   (oz/view! (sh/make-vl-spec 0 250 um/floored-ricker  [2.9 100] 1 [90 85] 8 :fixedpt-x 100))
