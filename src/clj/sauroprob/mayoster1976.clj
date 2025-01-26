@@ -58,6 +58,10 @@
   (def floor-spec (sh/make-vl-spec 0 4500 um/floored-ricker [1000 3.5] 1 [500] 10))
   (oz/view! floor-spec)
 
+  ;; This puts the result of the floored function back on the x in [0,1] scale:
+  (def floor-normal (sh/make-vl-spec 0 4500 (um/normalize um/floored-ricker 1000 3.5) 1 [500] 10))
+  (oz/view! floor-normal)
+
   ;; A strategy for starting with pop size but producing a normalized-ricker output.
   ;; (Note this can't simply be built into a ricker fn, since params like
   ;; x-max are only used in make-vl-spec.  I'd need a wrapper around

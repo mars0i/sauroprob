@@ -73,13 +73,16 @@
 ;; "Ricker" functions
 ;; See docstrings for explanation.
 
-;(defn k-wrap
-;  [f K & params]
-;  (fn [x]
-;    (let [paramed-f (apply f params
-;          N (* x K)]
-;
-;  )
+(defn normalize
+  "Wraps a function f of a \"carrying capacity\" K and additional
+  parameters, and a population size N, returning instead a a function from
+  x in [0,1] to a result (typically) in [0,1], more or less representing a
+  relative frequency of N relative to K."
+  [f K & params]
+  (fn [x]
+    (let [N (* x K) ; multiply carrying capacity K by x to get pop size N
+          result (double ((apply f K params) N))] ; result is a new pop size on the K scale
+      (/ result K)))) ; So we divide by 
 
 (defn ricker
   "Function from Ricker 1954 \"Stock and recruitment\"
@@ -90,6 +93,8 @@
   ([K r] (partial ricker K r))
   ([K r N] (* N (m/exp (* r (- 1 (/ N K)))))))
 
+;;  This could be made using normalize, but it's considered a basic
+;;  function, so it's worth defining directly.
 (defn normalized-ricker
   "Function from Ricker 1954 \"Stock and recruitment\"
   (https://en.wikipedia.org/wiki/Ricker_model), or May and Oster 1976
@@ -103,49 +108,22 @@
 (defn floored-ricker
   "Ricker function wrapped in floor so it rounds down to the nearest
   integer as a double."
-  ([K r] (apply floored-ricker K r))
+  ([K r] (partial floored-ricker K r))
   ([K r N] (m/floor (ricker K r N))))
 
 (comment
-  ;; PROBLEMATIC DEFS:
+  (defn foo [x y] [y x])
+  (apply foo [2 3])
 
-(defn restored-ricker
-  "Calls normalized-ricker, but then multiplies by K to get back a (real-valued)
-  population size."
-  ([K r] (partial restored-ricker K r))
-  ([K r x] (* K (normalized-ricker r x))))
+  (ricker 100 3.5 50)
+  (normalized-ricker 3.5 0.5)
+  ((normalize ricker 100 3.5) 0.5)
 
-  (defn ricker-relf
-    "Like ricker, but divides result by K so that the result is a double
-    representing a non-integer relative frequency (which need not correspond
-    to a rational N/K)."
-    ([K r] (partial ricker-relf K r))
-    ([K r N] (/ (ricker K r N) K)))
-
-  (defn floored-ricker-relf
-    "Like floored-ricker, but divides result by K so that the result is a
-    double representing a relative frequency N/K."
-    ([K r] (partial floored-ricker-relf K r))
-    ([K r N] (/ (floored-ricker K r N) K)))
-
-)
-
-(comment
-  ;; These results are as expected.
-  (normalized-ricker 3.5 0.4)
-  (restored-ricker 3.5 1000 0.4)
-  (ricker 3.5 1000 400)
-
-  (ricker-relf 3.5 1000 400)
-
-  ((ricker-relf 1.5 1000) 400)
-  (floored-ricker 1.5 1000 400)
-  (floored-ricker 1.5 10000 4000)
-  (floored-ricker-relf 1.5 100 40)
-  (floored-ricker-relf 1.5 1000 400)
-  (floored-ricker-relf 1.5 10000 4000)
-  (floored-ricker-relf 1.5 100000 40000)
-  (floored-ricker-relf 1.5 1000000 400000)
+  (ricker 100 3.5 50)
+  (floored-ricker 100 3.5 50)
+  (normalized-ricker 3.5 0.5)
+  ;; This puts the result of the floored function back on the x in [0,1] scale:
+  ((normalize floored-ricker 100 3.5) 0.5)
 )
 
 ;; FIXME: width calc isn't working right
