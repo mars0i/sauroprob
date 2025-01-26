@@ -63,18 +63,11 @@
    Applies a logistic function with parameter r=4 to x."
   (partial logistic 4))
 
-(defn iter-vals [f param initial]
+(defn iter-vals [f params initial]
   "Returns a lazy sequence of values resulting from iterating a 
   function with parameter param, beginning with given initial
   value init."
-  (iterate (partial f param) initial))
-
-(defn logistic-vals
-  "Returns a lazy sequence of values resulting from iterating a 
-  logistic function with parameter r, beginning with given initial
-  state."
-  [r initial]
-  (iter-vals logistic r initial))
+  (iterate (apply f params) initial))
 
 (defn real-ricker
   "Function from Ricker 1954 \"Stock and recruitment\"
