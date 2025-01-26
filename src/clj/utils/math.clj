@@ -19,7 +19,7 @@
 ;; There are two kinds of plots of logistic functions supported below.
 ;;
 ;; One kind of plot is simply a plot of a function in the normal sense, but
-;; you canp lot the original logist function, or n compositions of it with itself.
+;; you can lot the original logistic function, or n compositions of it with itself.
 ;;
 ;; The other kind of plot gives a "path" starting from an initial value
 ;; through iterations of the function on the value, the result of
@@ -69,21 +69,17 @@
   value init."
   (iterate (apply f params) initial))
 
-(defn real-ricker
-  "Function from Ricker 1954 \"Stock and recruitment\"
-  (https://en.wikipedia.org/wiki/Ricker_model), or May and Oster 1976
-  _American Naturalist_ \"Bifurcations and Dynamic Complexity in Simple
-  Ecological Models\", table 1 equation 1. Rather than using N for absolute
-  population size, and K for carrying capacity, we use equation (3) on p.
-  577 of May and Oster, using x=N/K, or N=Kx."
-  ([r] (partial real-ricker r))
-  ([r x] (* x (m/exp (* r (- 1 x))))))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; "Ricker" functions
+;; See docstrings for explanation.
 
-(defn restored-ricker
-  "Calls real-ricker, but then multiplies by K to get back a (real-valued)
-  population size."
-  ([r K] (partial restored-ricker r K))
-  ([r K x] (* K (real-ricker r x))))
+;(defn k-wrap
+;  [f K & params]
+;  (fn [x]
+;    (let [paramed-f (apply f params
+;          N (* x K)]
+;
+;  )
 
 (defn ricker
   "Function from Ricker 1954 \"Stock and recruitment\"
@@ -91,36 +87,52 @@
   _American Naturalist_ \"Bifurcations and Dynamic Complexity in Simple
   Ecological Models\", table 1 equation 1.  If N is a non-zero integer in
   [0,K], result will be a double in the same range."
-  ([r K] (partial ricker r K))
-  ([r K N] (* N (m/exp (* r (- 1 (/ N K)))))))
+  ([K r] (partial ricker K r))
+  ([K r N] (* N (m/exp (* r (- 1 (/ N K)))))))
+
+(defn normalized-ricker
+  "Function from Ricker 1954 \"Stock and recruitment\"
+  (https://en.wikipedia.org/wiki/Ricker_model), or May and Oster 1976
+  _American Naturalist_ \"Bifurcations and Dynamic Complexity in Simple
+  Ecological Models\", table 1 equation 1. Rather than using N for absolute
+  population size, and K for carrying capacity, we use equation (3) on p.
+  577 of May and Oster, using x=N/K, or N=Kx."
+  ([r] (partial normalized-ricker r))
+  ([r x] (* x (m/exp (* r (- 1 x))))))
 
 (defn floored-ricker
   "Ricker function wrapped in floor so it rounds down to the nearest
   integer as a double."
-  ([r K] (partial floored-ricker))
-  ([r K N] (m/floor (ricker r K N))))
+  ([K r] (apply floored-ricker K r))
+  ([K r N] (m/floor (ricker K r N))))
 
 (comment
   ;; PROBLEMATIC DEFS:
+
+(defn restored-ricker
+  "Calls normalized-ricker, but then multiplies by K to get back a (real-valued)
+  population size."
+  ([K r] (partial restored-ricker K r))
+  ([K r x] (* K (normalized-ricker r x))))
 
   (defn ricker-relf
     "Like ricker, but divides result by K so that the result is a double
     representing a non-integer relative frequency (which need not correspond
     to a rational N/K)."
-    ([r K] (partial ricker-relf r K))
-    ([r K N] (/ (ricker r K N) K)))
+    ([K r] (partial ricker-relf K r))
+    ([K r N] (/ (ricker K r N) K)))
 
   (defn floored-ricker-relf
     "Like floored-ricker, but divides result by K so that the result is a
     double representing a relative frequency N/K."
-    ([r K] (partial floored-ricker-relf r K))
-    ([r K N] (/ (floored-ricker r K N) K)))
+    ([K r] (partial floored-ricker-relf K r))
+    ([K r N] (/ (floored-ricker K r N) K)))
 
 )
 
 (comment
   ;; These results are as expected.
-  (real-ricker 3.5 0.4)
+  (normalized-ricker 3.5 0.4)
   (restored-ricker 3.5 1000 0.4)
   (ricker 3.5 1000 400)
 
