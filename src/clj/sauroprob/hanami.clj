@@ -3,7 +3,6 @@
   (:require 
             ;[clojure.math.numeric-tower :as m]
             [clojure.math :as m] ; new in Clojure 1.11 
-            [oz.core :as oz]
             [aerial.hanami.common :as hc]
             [aerial.hanami.templates :as ht]
             [utils.json :as json]
@@ -13,7 +12,7 @@
             ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Hanami and Vega-lite plotting tools
+;; Hanami and Vega-lite plotting tools for exploring population maps
 
 ;; Default number of steps to plot a curve; the plot range will usually 
 ;; be divided into this many steps:
@@ -44,6 +43,33 @@
              :columns :COLUMNS 
              :resolve :RESOLVE
              :config ht/default-config)))
+
+(defn vl-plot-seq
+  "Simple function that generates a Vega-lite plot of the values in ys,
+  with each plotted at a subsequent integer x value.  Note: ys should be
+  of finite length."
+  [label ys]
+  (let [pts (map vector 
+                 (range (count ys))
+                 ys)
+        vl-pts (map (fn [[x y]] {"x" x, "y" y, "label" label}) pts)]
+      (hc/xform ht/line-chart
+                :DATA vl-pts
+                :COLOR "label"
+                :SIZE 1)))
+
+(comment
+  (require '[oz.core :as oz])
+  (oz/start-server!)
+
+  (oz/view! (vl-plot-seq "normal" (take 100 (um/iter-vals um/normalized-ricker [3.0] 0.1))))
+  (oz/view! (vl-plot-seq "100" (take 100 (iterate (um/normalize um/floored-ricker 100 3.0) 0.1))))
+  (oz/view! (vl-plot-seq "1K" (take 100 (iterate (um/normalize um/floored-ricker 1000 3.0) 0.1))))
+  (oz/view! (vl-plot-seq "10K" (take 100 (iterate (um/normalize um/floored-ricker 10000 3.0) 0.1))))
+  (oz/view! (vl-plot-seq "100K" (take 100 (iterate (um/normalize um/floored-ricker 100000 3.0) 0.1))))
+
+)
+
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Construct mapping lines as chart elements
@@ -154,7 +180,8 @@
 ;; TODO? Maybe don't apply f to params, but instead just partial the params into the function.
 ;;      Well, the advantage of separating out the parameters is that they can be
 ;;      put into a label on the plot.  This happens when make-one-fn-vl-spec-fn is called.
-;; NOTE This inefficiently recalculates the same values in each composed function.
+;; NOTE This inefficiently recalculates the same values in each composed
+;; function n order to plot them.
 (defn make-vl-spec 
   "Given a function f, applies it to params, and plots num-compositions of
   it from x-min to x-max.  Also plots the map lines from init-xs to the
