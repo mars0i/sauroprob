@@ -50,6 +50,9 @@
           {:value y :period (- i prev-idx) :starts-at prev-idx}  ; old version: [y (- i prev-idx) prev-idx]
           (recur (rest ys) (inc i) (assoc seen y i)))))))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Logistic maps
+
 (defn logistic
   "The logistic function with parameter mu applied to x.  If x is
   missing, returns the function with parameter mu."
@@ -63,10 +66,11 @@
    Applies a logistic function with parameter r=4 to x."
   (partial logistic 4))
 
-(defn iter-vals [f params initial]
+(defn iter-vals
   "Returns a lazy sequence of values resulting from iterating a 
   function with parameter param, beginning with given initial
   value init."
+ [f params initial]
   (iterate (apply f params) initial))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -82,7 +86,7 @@
   (fn [x]
     (let [N (* x K) ; multiply carrying capacity K by x to get pop size N
           result (double ((apply f K params) N))] ; result is a new pop size on the K scale
-      (/ result K)))) ; So we divide by 
+      (/ result K)))) ; so we divide by K
 
 (defn ricker
   "Function from Ricker 1954 \"Stock and recruitment\"
