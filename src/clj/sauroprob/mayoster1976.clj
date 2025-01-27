@@ -20,6 +20,15 @@
 (comment
   (oz/start-server!)
 
+  ;; Experiments with effects of integer pop sizes:
+  (oz/view! (sh/vl-plot-seq "normal" (take 100 (iterate (um/normalized-ricker 3.0) 0.1))))
+  (oz/view! (sh/vl-plot-seq "normal" (take 100 (iterate (um/normalize um/ricker 3.0) 0.1))))
+  (oz/view! (sh/vl-plot-seq "100" (take 100 (iterate (um/normalize um/floored-ricker 100 3.0) 0.1))))
+  (oz/view! (sh/vl-plot-seq "1K" (take 100 (iterate (um/normalize um/floored-ricker 1000 3.0) 0.1))))
+  (oz/view! (sh/vl-plot-seq "10K" (take 100 (iterate (um/normalize um/floored-ricker 10000 3.0) 0.1))))
+  (oz/view! (sh/vl-plot-seq "100K" (take 100 (iterate (um/normalize um/floored-ricker 100000 3.0) 0.1))))
+  (oz/view! (sh/vl-plot-seq "1M" (take 100 (iterate (um/normalize um/floored-ricker 1000000 3.0) 0.1))))
+
 
   ;; Illustration of methods.  Note that for this family of functions, the
   ;; last optional arg, which is the x coord of F^1 fixed point, is always
