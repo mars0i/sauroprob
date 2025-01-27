@@ -30,7 +30,6 @@
   (let [x-range (- x-max x-min)
         xs (msc/irange x-min x-max x-increment)
         ys (map f xs)]
-    (prn (map vector xs ys)) ; DEBUG
     (map (fn [x y] {"x" x, "y" y, "label" label}) xs ys)))
 
 ;; For more info, see discussion at:
@@ -115,7 +114,6 @@
         linefn (fn [x] (+ (- x) fixedpt-x fixedpt-y))
         y-left (linefn x-min)
         y-right (linefn x-max)]
-    ;(prn fixedpt-x fixedpt-y [x-min y-left] [x-max y-right]) ; DEBUG
     (-> (hc/xform ht/line-chart
                   :DATA [{"x" x-min, "y" y-left, "label" "y=-x"} {"x" x-max, "y" y-right, "label" "y=-x"}]
                   :COLOR "label"
@@ -165,7 +163,6 @@
   whether the slope of f is greater than or less than -1.  The value of
   :addl-plots is a sequence of arbitrary additional vega-lite plots."
   [x-min x-max f params num-compositions init-xs num-iterations & {:keys [fixedpt-x addl-plots]}]
-  ;(prn fixedpt-x addl-plots) ; DEBUG
   (let [paramed-f (apply f params)]
     (hc/xform ht/layer-chart
               :LAYER
