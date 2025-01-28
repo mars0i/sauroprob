@@ -88,9 +88,24 @@
           result (double ((apply f K params) N))] ; result is a new pop size on the K scale
       (/ result K)))) ; so we divide by K
 
+(defn pre-ricker
+  "Equation (7) from Ricker 1954 \"Stock and recruitment\", p. 611.
+  Here w is the ratio between two predator abundances p2 in situation
+  2 and p1 in situation 1.  s1 is the survival rate in situation 1,
+  where p1 is proportional to (log s1)."
+  ([s1] (partial pre-ricker s1))
+  ([s1 w] (* w (m/pow s1 (- w 1)))))
+
+(defn original-ricker
+  "Equation (10) from Ricker 1954 \"Stock and recruitment\", p. 611.
+  Here w is the ratio between two predator abundances p2 in situation
+  2 and p1 in situation 1."
+  ([] original-ricker) ; just returns the function (of w)
+  ([w] (* w (m/exp (- 1 w)))))
+
 (defn ricker
-  "Function from Ricker 1954 \"Stock and recruitment\"
-  (https://en.wikipedia.org/wiki/Ricker_model), or May and Oster 1976
+  "Function from Ricker 1954 \"Stock and recruitment\" according to
+  https://en.wikipedia.org/wiki/Ricker_model), or May and Oster 1976
   _American Naturalist_ \"Bifurcations and Dynamic Complexity in Simple
   Ecological Models\", table 1 equation 1.  If N is a non-zero integer in
   [0,K], result will be a double in the same range."

@@ -18,6 +18,14 @@
 (comment
   (oz/start-server!)
 
+  (- 1000000 (* 1000000 (m/exp (- 0.0008))))
+
+
+  (oz/view! (sh/make-vl-spec 0.0 5.0 um/pre-ricker [0.15] 1 [] 1))
+
+  (oz/view! (sh/make-vl-spec 0.0 5.0 um/original-ricker [] 1 [] 1))
+
+
   (oz/view! (sh/make-vl-spec 0.0 1.0 um/logistic [3.0] 1 [] 1))
 
   (oz/view! (sh/make-vl-spec 0.0 1.0 um/logistic [3.0] 6
