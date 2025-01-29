@@ -89,10 +89,9 @@
       (/ result K)))) ; so we divide by K
 
 (defn pre-ricker
-  "Equation (7) from Ricker 1954 \"Stock and recruitment\", p. 611.
-  Here w is the ratio between two predator abundances p2 in situation
-  2 and p1 in situation 1.  s1 is the survival rate in situation 1,
-  where p1 is proportional to (log s1)."
+  "Equation (7) from Ricker 1954 \"Stock and recruitment\", p. 611. Here w
+  is the ratio between two log survival rates s2 in situation 2 and s1 in
+  situation 1."
   ([s1] (partial pre-ricker s1))
   ([s1 w] (* w (m/pow s1 (- w 1)))))
 
