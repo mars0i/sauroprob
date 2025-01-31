@@ -167,7 +167,7 @@
   x-min to x-max. num-compositions should be >= 1."
   [x-min x-max f params]
   (fn [num-compositions]
-    (let [paramed-f (apply f params)]
+    (let [paramed-f (apply partial f params)]
       (hc/xform ht/line-chart
                 :TITLE (str "params: " params)
                 :DATA (vl-fn-ify (str "F" (st/u-sup-char num-compositions) "params: " params)
@@ -190,7 +190,7 @@
   whether the slope of f is greater than or less than -1.  The value of
   :addl-plots is a sequence of arbitrary additional vega-lite plots."
   [x-min x-max f params num-compositions init-xs num-iterations & {:keys [fixedpt-x addl-plots]}]
-  (let [paramed-f (apply f params)]
+  (let [paramed-f (apply partial f params)]
     (hc/xform ht/layer-chart
               :LAYER
                (concat 
