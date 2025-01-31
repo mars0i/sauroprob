@@ -18,15 +18,25 @@
 (comment
   (oz/start-server!)
 
-  (- 1000000 (* 1000000 (m/exp (- 0.0008))))
+  (oz/view! (sh/make-vl-spec 0.0 1400 um/logistic-plus [1000 3.00] 1 [0.1] 40))
+  
+  (oz/view! (sh/make-vl-spec 0.0 1400 (um/logistic-plus 1000 3.00) [] 1 [0.1] 40))
 
+  ;; FIXME The error here is that normalize returns a function of one arg
+  ;; that is supposed to be `apply`ed to zero args to produce a function of
+  ;; one arg, but apply doesn't work like that.
+  (oz/view! (sh/make-vl-spec 0.0 1.0 (um/normalize um/logistic-plus 1000 2.0) [] 1 [] 1))
+
+  (apply (fn [rx] 22) [])
+
+  (oz/view! (sh/vl-plot-seq "1K" (take 1000 (iterate (um/logistic-plus 100000 2.57) 0.1))))
 
   (oz/view! (sh/make-vl-spec 0.0 5.0 um/pre-ricker [0.3679] 1 [] 1))
 
   (oz/view! (sh/make-vl-spec 0.0 5.0 um/original-ricker [] 1 [] 1))
 
 
-  (oz/view! (sh/make-vl-spec 0.0 1.0 um/logistic [3.0] 1 [] 1))
+  (oz/view! (sh/make-vl-spec 0.0 1.0 um/logistic [3.0] 1 [0.99] 10))
 
   (oz/view! (sh/make-vl-spec 0.0 1.0 um/logistic [3.0] 6
                              [0.05 0.075 0.15] 3

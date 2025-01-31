@@ -1,22 +1,7 @@
 (ns utils.math
   (:require [clojure.math :as m])) ; new in Clojure 1.11 
 
-;; https://stackoverflow.com/a/73829330/1455243
-(defn round-to
-  "Rounds 'x' to 'places' decimal places"
-  [x places]
-  (->> x
-       bigdec
-       (#(.setScale % places java.math.RoundingMode/HALF_UP))
-       .doubleValue))
-
-(comment (round-to 32.12545 3) )
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Logistic and related functions
-;;
-;; There are two kinds of plots of logistic functions supported below.
+;; There are two kinds of plots supported below.
 ;;
 ;; One kind of plot is simply a plot of a function in the normal sense, but
 ;; you can lot the original logistic function, or n compositions of it with itself.
@@ -28,6 +13,24 @@
 ;; [so that the x value there is the same as the old f(x)], and then 
 ;; up, or down, to the f curve [since that shows how x=f(x) is mapped
 ;; by f to f(f(x))], and so on.
+
+;; https://stackoverflow.com/a/73829330/1455243
+(defn round-to
+  "Rounds 'x' to 'places' decimal places"
+  [x places]
+  (->> x
+       bigdec
+       (#(.setScale % places java.math.RoundingMode/HALF_UP))
+       .doubleValue))
+
+(comment (round-to 32.12545 3) )
+
+(defn iter-vals
+  "Returns a lazy sequence of values resulting from iterating a 
+  function with parameter param, beginning with given initial
+  value init."
+ [f params initial]
+  (iterate (apply f params) initial))
 
 (defn find-cycle
   "Loops through the values in sequence xs, looking for the first value
@@ -50,6 +53,17 @@
           {:value y :period (- i prev-idx) :starts-at prev-idx}  ; old version: [y (- i prev-idx) prev-idx]
           (recur (rest ys) (inc i) (assoc seen y i)))))))
 
+(defn normalize
+  "Wraps a function f of a \"carrying capacity\" K and additional
+  parameters, and a population size N, returning instead a a function from
+  x in [0,1] to a result (typically) in [0,1], more or less representing a
+  relative frequency of N relative to K."
+  [f K & params]
+  (fn [x]
+    (let [N (* x K) ; multiply carrying capacity K by x to get pop size N
+          result (double ((apply f K params) N))] ; result is a new pop size on the K scale
+      (/ result K)))) ; so we divide by K
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Logistic maps
 
@@ -66,27 +80,19 @@
    Applies a logistic function with parameter r=4 to x."
   (partial logistic 4))
 
-(defn iter-vals
-  "Returns a lazy sequence of values resulting from iterating a 
-  function with parameter param, beginning with given initial
-  value init."
- [f params initial]
-  (iterate (apply f params) initial))
+(defn logistic-plus
+  "Like a K-scaled discrete logistic function, but adds N to the result of
+  the logistic function, i.e. N' = N + rN(1 - N/K). See May 1973 book,
+  May's 1973 paper, equation 2 in table 1 in May and Oster, etc. [This is
+  another natural extension of the continuous logistic: subtract N from
+  both sides let N' approach N.]"
+  ([K r] (partial logistic-plus K r))
+  ([K r N]
+   (* N (+ 1 (* r (- 1 (/ N K)))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; "Ricker" functions
 ;; See docstrings for explanation.
-
-(defn normalize
-  "Wraps a function f of a \"carrying capacity\" K and additional
-  parameters, and a population size N, returning instead a a function from
-  x in [0,1] to a result (typically) in [0,1], more or less representing a
-  relative frequency of N relative to K."
-  [f K & params]
-  (fn [x]
-    (let [N (* x K) ; multiply carrying capacity K by x to get pop size N
-          result (double ((apply f K params) N))] ; result is a new pop size on the K scale
-      (/ result K)))) ; so we divide by K
 
 (defn pre-ricker
   "Equation (7) from Ricker 1954 \"Stock and recruitment\", p. 611. Here w
