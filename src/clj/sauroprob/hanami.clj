@@ -1,4 +1,4 @@
-;; Hanami and Vega-lite plotting tools for logistic maps, etc.
+;; Hanami and Vega-lite plotting tools for exploring population maps
 (ns sauroprob.hanami
   (:require 
             ;[clojure.math.numeric-tower :as m]
@@ -11,25 +11,12 @@
             [utils.math :as um]
             ))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Hanami and Vega-lite plotting tools for exploring population maps
-
 ;; Default number of steps to plot a curve; the plot range will usually 
 ;; be divided into this many steps:
 (def plot-steps 200)
-;(def x-increment 0.01)
 
-(defn vl-fn-ify
-  "Given a function f, returns a sequence of Vega-Lite points with x
-  coordinates running from x-min to x-max, inclusive, in steps of size
-  x-increment.  The y coordinates are results of applying f to the x
-  coordinates. label can be used to identify these as distinct points in
-  Vega-Lite.  This can be used to plot f."
-  [label x-min x-max x-increment f]
-  (let [x-range (- x-max x-min)
-        xs (msc/irange x-min x-max x-increment)
-        ys (map f xs)]
-    (map (fn [x y] {"x" x, "y" y, "label" label}) xs ys)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Basic tools
 
 ;; For more info, see discussion at:
 ;; https://clojurians.zulipchat.com/#narrow/stream/210075-saite-dev/topic/concat.20template/near/279290717
@@ -43,6 +30,18 @@
              :columns :COLUMNS 
              :resolve :RESOLVE
              :config ht/default-config)))
+
+(defn vl-fn-ify
+  "Given a function f, returns a sequence of Vega-Lite points with x
+  coordinates running from x-min to x-max, inclusive, in steps of size
+  x-increment.  The y coordinates are results of applying f to the x
+  coordinates. label can be used to identify these as distinct points in
+  Vega-Lite.  This can be used to plot f."
+  [label x-min x-max x-increment f]
+  (let [x-range (- x-max x-min)
+        xs (msc/irange x-min x-max x-increment)
+        ys (map f xs)]
+    (map (fn [x y] {"x" x, "y" y, "label" label}) xs ys)))
 
 (defn vl-plot-seq
   "Simple function that generates a Vega-lite plot of the values in ys,
@@ -61,15 +60,40 @@
 (comment
   (require '[oz.core :as oz])
   (oz/start-server!)
-
   (oz/view! (vl-plot-seq "normal" (take 100 (um/iter-vals um/normalized-ricker [3.0] 0.1))))
   (oz/view! (vl-plot-seq "100" (take 100 (iterate (um/normalize um/floored-ricker 100 3.0) 0.1))))
   (oz/view! (vl-plot-seq "1K" (take 100 (iterate (um/normalize um/floored-ricker 1000 3.0) 0.1))))
   (oz/view! (vl-plot-seq "10K" (take 100 (iterate (um/normalize um/floored-ricker 10000 3.0) 0.1))))
   (oz/view! (vl-plot-seq "100K" (take 100 (iterate (um/normalize um/floored-ricker 100000 3.0) 0.1))))
-
 )
 
+(defn vl-ify-iterates
+  "Given a sequence of numbers, returns a Vega-Lite sequence of maps
+  suitable as Vega-Lite data (or Hanami :DATA value) constructed by
+  treating each subsequent overlapping pair from xs as a point."
+  [label xs]
+  (map (fn [[x y]] {"x" x, "y" y, "label" label})
+       (partition 2 1 xs)))
+
+(comment (vl-ify-iterates "yow" (range 20)) )
+
+(defn vl-iterate-density-plot
+  "Construct a density plot from a sequence of subsequent values generated
+  by a function iterated on its results, treating each overlapping pair of
+  values as a point."
+  [label xs]
+  (hc/xform ht/point-chart
+            :DATA (vl-ify-iterates label xs)
+            :COLOR "label"
+            :SIZE 1))
+
+(defn vl-fn-density-plot
+  "Applies f to init-x and then to each subsequent result, generating a
+  sequence of points contructred from subsequent overlapping pairs, and
+  generates a Vega-Lite density plot from the resulting points."
+  [label f init-x n]
+  (vl-iterate-density-plot
+    (take n (iterate f init-x))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Construct mapping lines as chart elements
@@ -126,6 +150,7 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; All-in-one function(s) to plot logistic maps, etc.
+;; perhaps with mapping lines
 
 ;;   y = -x + b
 ;; where y0 = f(x0), so
