@@ -85,15 +85,25 @@
   (hc/xform ht/point-chart
             :DATA (vl-ify-iterates label xs)
             :COLOR "label"
-            :SIZE 1))
+            :SIZE 10))
 
+  ;; FIXME Example below shows that what I got is NOT a density plot--it's not what I wanted.
 (defn vl-fn-density-plot
   "Applies f to init-x and then to each subsequent result, generating a
   sequence of points contructred from subsequent overlapping pairs, and
   generates a Vega-Lite density plot from the resulting points."
   [label f init-x n]
   (vl-iterate-density-plot
+    label
     (take n (iterate f init-x))))
+
+(comment
+  (require '[oz.core :as oz])
+  (oz/start-server!)
+  ;; FIXME This shows that what I got is NOT a density plot--it's not what I wanted.
+  (def density (sh/vl-fn-density-plot "Yow" (um/logistic 4) 0.1 200))
+  (oz/view! density)
+)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Construct mapping lines as chart elements
