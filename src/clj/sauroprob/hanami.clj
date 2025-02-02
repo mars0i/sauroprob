@@ -96,7 +96,7 @@
   sequence of points contructred from subsequent overlapping pairs, and
   generates a Vega-Lite density plot from the resulting points."
   [label f init-x n]
-  (vl-iterate-density-plot
+  (vl-iterate-plot
     label
     (take n (iterate f init-x))))
 
