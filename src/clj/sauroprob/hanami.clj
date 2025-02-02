@@ -100,43 +100,15 @@
     label
     (take n (iterate f init-x))))
 
-(defn blah
-  [label ys]
-  (let [vlys (map (fn [y] {"y" y, "label" label}) ys)]
-        (hc/xform ht/bar-chart
-                  :DATA vlys
-                  :TRANSFORM [{:bin "true", :field "y", :as "bin"}]
-                  :COLOR "label"
-                  :SIZE 10)))
-
-(defn bleh
-  [label ys]
-  (let [vlys (map (fn [y] {"x", {:bin {:maxbins 25} :field "y"},
-                           "y" {:aggregate "count"},
-                           "label" label}) ys)]
-        (hc/xform ht/bar-chart
-                  :DATA vlys
-                  :TRANSFORM [{:bin "true", :field "y", :as "bin"}]
-                  :COLOR "label"
-                  :SIZE 10)))
-
-
-(defn bin-it
-  [label n-bins ys]
-  (let [sorted-ys (vec (sort ys))
-        min-ys (first ys)
-        max-ys (last ys)
-        bin-size (/ (double (- max-ys min-ys)) n-bins)
-        partitioned-ys (partition-by
-                         (fn [y] "something here")
-                         ys)
-        more-transformation nil]
-    ))
-
-(comment
-  (sort (reverse (range 10)))
-
-)
+;; I'm not sure how to do this the Hanami way [something using (hc/xform ht/bar-chart ...)]
+;; but the raw V-L below works.
+;; Inspired by histogram examples at https://behrica.github.io/vl-galery/convert
+;; Note adding a "label" field in values or encoding seems to do nothing
+(defn histogram
+  [n-bins xs]
+  {:data {:values (map (fn [z] {:z z}) xs)}
+   :encoding {:x {:bin {:maxbins n-bins} :field :z} :y {:aggregate "count"}}
+   :mark "bar"})
 
 
 (comment

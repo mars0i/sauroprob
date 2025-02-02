@@ -18,43 +18,8 @@
 (comment
   (oz/start-server!)
 
-  ;; From https://behrica.github.io/vl-galery/convert/
-  (def simple-bar-chart
-    {:data {:values [{:a "A" :b 28}
-                     {:a "B" :b 55}
-                     {:a "C" :b 43}
-                     {:a "D" :b 91}
-                     {:a "E" :b 81}
-                     {:a "F" :b 53}
-                     {:a "G" :b 19}
-                     {:a "H" :b 87}
-                     {:a "I" :b 52}]}
-     :description "A simple bar chart with embedded data."
-     :encoding {:x {:axis {:labelAngle 0} :field "a" :type "nominal"}
-                :y {:field "b" :type "quantitative"}}
-     :mark "bar"})
+  (oz/view! (sh/histogram 100 (take 10000 (iterate (um/logistic 4.0) 0.6))))
 
-  (oz/view! simple-bar-chart)
-
-  (def histogram
-    {:data {:url "https://raw.githubusercontent.com/vega/vega/master/docs/data/movies.json"}
-     :encoding {:x {:bin true :field "IMDB Rating"} :y {:aggregate "count"}}
-     :mark "bar"})
-
-  (oz/view! histogram)
-
-  (def my-histogram
-    {:data {:values (map (fn [data-x] {:data-x data-x}) 
-                (take 10000 (iterate (um/logistic 3.9) 0.1))
-                ;(take 50 (iterate um/original-ricker 0.1))
-                )}
-     :encoding {:x {:bin {:maxbins 50} :field :data-x} :y {:aggregate "count"}}
-     :mark "bar"})
-
-  (oz/view! my-histogram)
-
-  
-  
 
   ;; FIXME This shows that what I got is not a density plot--not what I wanted.
   (def density (sh/vl-fn-plot "Yow" (um/logistic 4) 0.1 200))
