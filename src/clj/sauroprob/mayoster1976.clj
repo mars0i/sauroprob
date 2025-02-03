@@ -20,8 +20,13 @@
 (comment
   (oz/start-server!)
 
-(oz/view! (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.70] [1 2] [] 4 :fixedpt-x 3.57))
-(oz/view! (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.70] [1 4] [] 4 :fixedpt-x 3.57))
+  (oz/view! (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.70] [1 2]   [] 1 :fixedpt-x 3.57))
+
+  (oz/view! (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.60] [1 2 4] [] 1 :fixedpt-x 0.038))
+  ;; Why isn't the F^4 crossing between 0.2 and 0.4 outside [-1,1]:
+  (oz/view! (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.55] [1 2 4] [] 1 :fixedpt-x 0.042))
+  (oz/view! (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.50] [1 2 4] [] 1 :fixedpt-x 0.05))
+  (oz/view! (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.45] [1 2 4] [] 1 :fixedpt-x 0.057))
 
 
   ;; Experiments with effects of integer pop sizes:
