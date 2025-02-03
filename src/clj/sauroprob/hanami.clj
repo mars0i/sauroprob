@@ -240,7 +240,7 @@
   diagonal with slope -1 through (x,x); this can make it easier to see
   whether the slope of f is greater than or less than -1.  The value of
   :addl-plots is a sequence of arbitrary additional vega-lite plots."
-  [x-min x-max f params num-compositions init-xs num-iterations & {:keys [fixedpt-x addl-plots]}]
+  [x-min x-max f params compositions init-xs num-iterations & {:keys [fixedpt-x addl-plots]}]
   (let [paramed-f (apply partial f params)]
     (hc/xform ht/layer-chart
               :LAYER
@@ -255,7 +255,7 @@
                                       :COLOR "label"
                                       :SIZE 1.0)]
                  ; Generate vega-lite specs for curves (f x), (f (f x)), etc., num-compositions of them:
-                 (map (make-one-fn-vl-spec-fn x-min x-max f params) (msc/irange 1 num-compositions))
+                 (map (make-one-fn-vl-spec-fn x-min x-max f params) compositions) ; old: (msc/irange 1 num-compositions))
                  ;; Plot lines showing iteration through logistic function starting from init-x:
                  (mapcat (fn [init-x] 
                            (vl-iter-lines-charts (msc/n-comp paramed-f 1) params init-x num-iterations (str "params: " params ", x=" init-x)))
