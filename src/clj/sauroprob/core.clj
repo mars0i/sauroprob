@@ -20,6 +20,8 @@
 
   (oz/view! (sh/histogram 100 (take 10000 (iterate (um/logistic 4.0) 0.6))))
 
+  (oz/view! (sh/hanami-histogram 100 (take 10000 (iterate (um/logistic 4.0) 0.6))))
+
   (oz/view! (sh/make-vl-spec 0.0 1400 um/logistic-plus [1000 3.00] 1 [0.1] 40))
   
   (oz/view! (sh/make-vl-spec 0.0 1400 (um/logistic-plus 1000 3.00) [] 1 [0.1] 40))

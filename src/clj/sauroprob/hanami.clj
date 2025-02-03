@@ -96,11 +96,16 @@
     label
     (take n (iterate f init-x))))
 
-;; I'm not sure how to do this the Hanami way [something using (hc/xform ht/bar-chart ...)]
-;; but the raw V-L below works.
+(defn histogram
+  [n-bins xs]
+  (hc/xform ht/bar-chart
+            :DATA (map (fn [z] {:z z}) xs)
+            :ENCODING {:x {:bin {:maxbins n-bins} :field :z} ; Not sure if I can Hanami-ize
+                       :y {:aggregate "count"}}))            ;  the rest.
+
 ;; Inspired by histogram examples at https://behrica.github.io/vl-galery/convert
 ;; Note adding a "label" field in values or encoding seems to do nothing
-(defn histogram
+(defn raw-vl-histogram
   [n-bins xs]
   {:data {:values (map (fn [z] {:z z}) xs)}
    :encoding {:x {:bin {:maxbins n-bins} :field :z} :y {:aggregate "count"}}
