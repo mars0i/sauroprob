@@ -87,10 +87,6 @@
             :COLOR "label"
             :SIZE 10))
 
-;; FIXME Example below shows that what I got is NOT a density plot--it's not what I wanted.
-;; cf. my src/netlogo/gadget
-;; What I want is a histogram!  I want to plot the number of values in buckets.
-;; In Hanami, following Vega-lite, this is a bar-chart with binned data.
 (defn vl-fn-plot
   "Applies f to init-x and then to each subsequent result, generating a
   sequence of points contructred from subsequent overlapping pairs, and
