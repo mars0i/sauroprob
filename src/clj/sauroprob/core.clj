@@ -20,15 +20,6 @@
 
   (oz/view! (sh/histogram 100 (take 10000 (iterate (um/logistic 4.0) 0.6))))
 
-
-  ;; FIXME This shows that what I got is not a density plot--not what I wanted.
-  (def density (sh/vl-fn-plot "Yow" (um/logistic 4) 0.1 200))
-  (oz/view! density)
-  (def splot (sh/vl-plot-seq "1K" (take 20 (iterate (um/logistic 3) 0.1))))
-  (oz/view! splot)
-  (def mplot (sh/make-vl-spec 0.0 1.0 um/logistic [3.0] 1 [0.99] 10))
-  (oz/view! mplot)
-
   (oz/view! (sh/make-vl-spec 0.0 1400 um/logistic-plus [1000 3.00] 1 [0.1] 40))
   
   (oz/view! (sh/make-vl-spec 0.0 1400 (um/logistic-plus 1000 3.00) [] 1 [0.1] 40))
