@@ -1,5 +1,6 @@
 ;; From 
 ;; https://github.com/scicloj/noj-v2-getting-started/blob/main/notebooks/index.clj
+;; and
 ;; https://scicloj.github.io/noj-v2-getting-started/
 ;; --Marshall
 
