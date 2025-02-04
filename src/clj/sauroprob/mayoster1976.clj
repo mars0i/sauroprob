@@ -40,8 +40,6 @@
 
   (oz/view! (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.80] [1 2 4 8 16] [] 1 :fixedpt-x 1.0))
 
-  (oz/view! (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [3.50] [32] [] 1))
-
   ;; And as long as F2 has |slope| < 1 at the new fp's, the same is true of F4, so there 
   ;; are no new crossings.
   (oz/view! (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.40] [1 2 4] [] 1 :fixedpt-x 3.33))
@@ -59,6 +57,18 @@
 
   (oz/view! (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [3.10] [1 2 4 8 16] [] 1))
 
+  ;; When the slope at a fp is slow, subsequent powers just reduce the slope at that fp:
+  (oz/view! (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.50] [1 2 4 32] [] 1))
+  (oz/view! (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.50] [64] [] 1))
+
+  ;; But when the slope is high, it just increases with subsequent powers:
+  (oz/view! (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [3.10] [1 2 4 8] [] 1))
+
+  ;; At that point, the higher powers will mostly have very steep crossings. 
+  ;; I suppose that the only way you get a stable fp is when some higher power 
+  ;; just happens to have a crossing near a peak or valley in its curve.
+  (oz/view! (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [3.10] [16] [] 1))
+  (oz/view! (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [3.10] [32] [] 1))
 
 
   ;; Experiments with effects of integer pop sizes:
