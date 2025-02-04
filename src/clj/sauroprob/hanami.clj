@@ -221,7 +221,7 @@
     (let [paramed-f (apply partial f params)]
       (hc/xform ht/line-chart
                 :TITLE (str "params: " params)
-                :DATA (vl-fn-ify (str "F" (st/u-sup-char num-compositions) "params: " params)
+                :DATA (vl-fn-ify (str "F" (st/u-sup-char num-compositions) " params: " params)
                                  x-min x-max
                                  (/ (- x-max x-min) (double plot-steps))
                                  (msc/n-comp paramed-f num-compositions))
