@@ -1,0 +1,10 @@
+#!/bin/sh
+# Opens clj in another Terminal tab using the
+# newtab function defined in ~/bin/definenewtab based on 
+# https://stackoverflow.com/a/12147804/1455243
+
+# Allows opening new Terminal tab:
+source ~/bin/definenewtab
+# Starts nrepl using clj, in forage dir in new tab:
+newtab src/scripts/cljWithCD  
+

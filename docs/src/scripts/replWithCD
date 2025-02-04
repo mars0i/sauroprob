@@ -1,0 +1,12 @@
+#!/bin/sh
+# Opens repl in forage dir in current terminal window/tab using leiningen:
+set -x
+cd ~/cloj/sauroprob
+java --version
+exec lein repl "$@"
+# I think this *both* produces a prompt *and* allows Conjure to connect
+# because it starts an nrepl server *and then* connects another nrepl
+# to it.  The latter creates the prompt, but the former is what Conjure
+# also connects to.  Use :headless to skip the prompt.
+# More info here:
+# https://nrepl.org/nrepl/usage/server.html
