@@ -3,17 +3,20 @@
 {:paths ["src/clj"] 
 
  :deps {org.clojure/clojure {:mvn/version "1.12.0"}
+        org.scicloj/noj {:mvn/version "2-beta5.1"} ; includes fastmath, Hanami, Clay
+        ;aerial.hanami/aerial.hanami {:mvn/version "0.20.1"}
+        ;metasoarous/oz {:mvn/version "1.6.0-alpha36"}
+        ;metasoarous/oz {:mvn/version "2.0.0-alpha5"}
         org.clojure/data.json {:mvn/version "2.4.0"}
+        metosin/jsonista {:mvn/version "0.3.7"} ; generate json from edn for debugging
+
         ;generateme/fastmath {:mvn/version "2.1.8"} ; or 2.1.9-SNAPSHOT
         ;generateme/fitdistr {:mvn/version "1.0.4"}
         ;cljplot/cljplot {:mvn/version "0.0.2a-SNAPSHOT"} ; also by generateme
-        aerial.hanami/aerial.hanami {:mvn/version "0.20.1"}
         ;techascent/tech.viz {:mvn/version "6.00-beta-16-4"}
-        io.github.nextjournal/clerk {:mvn/version "0.12.707"}
+        ;io.github.nextjournal/clerk {:mvn/version "0.12.707"}
         ;; Has trouble with Java 23, but Java 17, 19, 21 seem to work:
-        metasoarous/oz {:mvn/version "1.6.0-alpha36"}
-        ;metasoarous/oz {:mvn/version "2.0.0-alpha5"}
-        metosin/jsonista {:mvn/version "0.3.7"}} ; generate json from edn for debugging
+       }
 
  :aliases {:nrepl-server {:extra-deps {nrepl/nrepl {:mvn/version "1.0.0"}} ; see note above
                           :main-opts  ["-m" "nrepl.cmdline"]}}
