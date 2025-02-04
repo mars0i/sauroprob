@@ -1,4 +1,4 @@
-(ns sauroprob.core
+(ns sauroprob.sliderexamples
   (:require [fitdistr.core :as fitc]
             [fitdistr.distributions :as fitd]
             ;[clojure.math.numeric-tower :as m]
