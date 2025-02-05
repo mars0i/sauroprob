@@ -1,5 +1,6 @@
 (ns sauroprob.bifurcation
   (:require [scicloj.kindly.v4.kind :as kind]
+            [scicloj.clay.v2.api :as clay]
             ;[aerial.hanami.common :as hc]
             ;[aerial.hanami.templates :as ht]
             [utils.misc :as msc]
@@ -7,9 +8,16 @@
             [sauroprob.hanami :as sh]))
 
 (comment
-  (require '[scicloj.clay.v2.api :as clay])
+  (clay/browse!) ; make Clay open the browser window
+
   (clay/make! {:source-path "src/clj/sauroprob/bifurcation.clj"}) ; opens on localhost:1971
 )
+
+(kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [1.95] [1] [0.075] 2 :fixedpt-x 1.0))
+
+(kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [1.95] [1] [1.65] 2 :fixedpt-x 1.0))
+
+(kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [1.95] [1 2] [1.65] 2 :fixedpt-x 1.0))
 
 ;; When F has |slope| < 1 at the fixed point, F2 does as well, and since
 ;; F's slope is < -1, F2's is less than 1, so it doesn't cross y=x. Ditto for F4, F8, etc.
