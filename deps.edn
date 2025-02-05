@@ -4,12 +4,11 @@
 
  :deps {org.clojure/clojure {:mvn/version "1.12.0"}
         org.scicloj/noj {:mvn/version "2-beta5.1"} ; includes fastmath, Hanami, Clay
+        org.clojure/data.json {:mvn/version "2.4.0"}
+        metosin/jsonista {:mvn/version "0.3.7"} ; generate json from edn for debugging
         ;aerial.hanami/aerial.hanami {:mvn/version "0.20.1"}
         ;metasoarous/oz {:mvn/version "1.6.0-alpha36"}
         ;metasoarous/oz {:mvn/version "2.0.0-alpha5"}
-        org.clojure/data.json {:mvn/version "2.4.0"}
-        metosin/jsonista {:mvn/version "0.3.7"} ; generate json from edn for debugging
-
         ;generateme/fastmath {:mvn/version "2.1.8"} ; or 2.1.9-SNAPSHOT
         ;generateme/fitdistr {:mvn/version "1.0.4"}
         ;cljplot/cljplot {:mvn/version "0.0.2a-SNAPSHOT"} ; also by generateme
