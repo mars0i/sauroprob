@@ -1,4 +1,0 @@
-#!/bin/sh
-# Opens repl in forage dir in new Terminal window using clj:
-open -a Terminal src/scripts/cljWithCD
-

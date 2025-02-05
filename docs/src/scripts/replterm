@@ -1,3 +1,0 @@
-#!/bin/sh
-# Opens repl in forage dir in new Terminal window using leiningent:
-open -a Terminal src/scripts/replWithCD
