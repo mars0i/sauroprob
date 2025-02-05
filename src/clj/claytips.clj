@@ -13,27 +13,27 @@
 ;; https://scicloj.github.io/clay/#configuration
 
 (comment
-  (clay/browse!) ; make Clay open the browser
+  (clay/browse!) ; make Clay open the browser window
 
   ;; opens on localhost:1971
   (clay/make! {:source-path "src/clj/sauroprob/yo.clj"
                :live-reload true}) ; doesn't work consistently
 
-  ;; This is what I'm talking about!
+  ;; This is what I'm talking about!  One plot by itself.
   (clay/make! {:single-value 
                (kind/vega-lite 
                  (sh/make-vl-spec 0.0 3.0 um/normalized-ricker
                                   [2.95] [1 3 5] [] 1 :fixedpt-x 1.0))
                :hide-ui-header true
-               :hide-info-line true
-               })
+               :hide-info-line true})
 
-  ;; Note the quote:
+  ;; Here's another way to do it.  Note the quote:
   (clay/make! {:single-form 
                '(kind/vega-lite 
                  (sh/make-vl-spec 0.0 10.0 um/normalized-ricker
                                   [4.95] [40] [] 1 :fixedpt-x 1.0))
                :hide-ui-header true
+               :hide-info-line true})
 
 )
 
