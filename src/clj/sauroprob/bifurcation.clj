@@ -1,11 +1,14 @@
-(ns sauroprob.bifurcation (:require [scicloj.kindly.v4.kind :as kind] [utils.math :as um] [sauroprob.hanami :as sh]))
+(ns sauroprob.bifurcation 
+  (:require [scicloj.kindly.v4.kind :as kind]
+            [utils.math :as um]
+            [sauroprob.hanami :as sh]))
 
 ;; ### Humps
 
 ;; Where do the additional humps come from in the iterations of the function?
-;; The new humps are at locations of x values such that two iterations of F map to the x
-;; value for F's hump.  (Ignore the horizontal line from the peak of the
-;; F curve to the y=x line.)
+;; The new humps are at locations of $x$ values such that two iterations of
+;; $F$ map to the $x$ value for $F$'s hump.  (Ignore the horizontal line from the peak of the
+;; $F$ curve to the $y=x$ line.)
 (kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [1.95] [1 2] [0.086 1.572] 2))
 ; That is, the y value of F^2: at those initial x's is the y value of the F^1 hump.
 ;; There are two humps in F^2 because there are two ways to get to the F^1
@@ -65,8 +68,14 @@
 (kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [3.10] [32] [] 1))
 
 
+;; ### More on bifurcation
+;; Based on Devaney, 3rd ed., chapter 12.
+
 (comment
   (require '[scicloj.clay.v2.api :as clay])
   (clay/browse!) ; make Clay open the browser window
-  (clay/make! {:source-path "src/clj/sauroprob/bifurcation.clj"}) ; opens on localhost:1971
+  (clay/make! {:source-path "src/clj/sauroprob/bifurcation.clj"
+               :format [:quarto :html]}) ; opens on localhost:1971
+  ;; Note Quarto has to be installed from the web (not as a Clojure
+  ;; dependency) for this to work.
 )
