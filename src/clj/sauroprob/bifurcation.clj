@@ -1,23 +1,19 @@
-(ns sauroprob.bifurcation
-  (:require [scicloj.kindly.v4.kind :as kind]
-            [scicloj.clay.v2.api :as clay]
-            ;[aerial.hanami.common :as hc]
-            ;[aerial.hanami.templates :as ht]
-            [utils.misc :as msc]
-            [utils.math :as um]
-            [sauroprob.hanami :as sh]))
+(ns sauroprob.bifurcation (:require [scicloj.kindly.v4.kind :as kind] [utils.math :as um] [sauroprob.hanami :as sh]))
 
-(comment
-  (clay/browse!) ; make Clay open the browser window
+;; ### Humps
 
-  (clay/make! {:source-path "src/clj/sauroprob/bifurcation.clj"}) ; opens on localhost:1971
-)
+;; Where do the additional humps come from in the iterations of the function?
+;; The new humps are at locations of x values such that two iterations of F map to the x
+;; value for F's hump.  (Ignore the horizontal line from the peak of the
+;; F curve to the y=x line.)
+(kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [1.95] [1 2] [0.086 1.572] 2))
+; That is, the y value of F^2: at those initial x's is the y value of the F^1 hump.
+;; There are two humps in F^2 because there are two ways to get to the F^1
+;; hump---since F slopes down on both sides, there are two initial x's
+;; whose y values under F^1 are the x value under the F^1 hump.
 
-(kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [1.95] [1] [0.075] 2 :fixedpt-x 1.0))
 
-(kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [1.95] [1] [1.65] 2 :fixedpt-x 1.0))
-
-(kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [1.95] [1 2] [1.65] 2 :fixedpt-x 1.0))
+;; ### Stability and bifurcation
 
 ;; When F has |slope| < 1 at the fixed point, F2 does as well, and since
 ;; F's slope is < -1, F2's is less than 1, so it doesn't cross y=x. Ditto for F4, F8, etc.
@@ -68,3 +64,9 @@
 (kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [3.10] [16] [] 1))
 (kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [3.10] [32] [] 1))
 
+
+(comment
+  (require '[scicloj.clay.v2.api :as clay])
+  (clay/browse!) ; make Clay open the browser window
+  (clay/make! {:source-path "src/clj/sauroprob/bifurcation.clj"}) ; opens on localhost:1971
+)
