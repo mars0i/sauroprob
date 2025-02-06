@@ -1,5 +1,7 @@
 ;; This will be passed to clay/make! when evaluating a file.
-{:format [:quarto]}
+{:format [:quarto :html]}
+;; If you just use :quarto and not :html as well, it will update
+;; properly using `make!`, but not using the Clay eval keybinding.
 
 ;; Defaults fromn Copied clay/resources/clay-default.edn in the Clay repo:
 (comment
