@@ -1,4 +1,4 @@
-(ns sauroprob.yo
+(ns sauroprob.claytips
   (:require [scicloj.kindly.v4.kind :as kind]
             [scicloj.clay.v2.api :as clay]
             ;[aerial.hanami.common :as hc]
