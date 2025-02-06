@@ -67,6 +67,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Logistic maps
 
+;; The strategy below of defining variants of functions that take
+;; fewer arguments and return a function defined by partial or apply
+;; duplicates the functionality that's built in in a language like Haskell or Lean.
+;; It could be avoided using partial explicitly, but that's verbose.
+;; otoh this makes definitions verbose, and more confusing.
+
 (defn logistic
   "The logistic function with parameter mu applied to x.  If x is
   missing, returns the function with parameter mu."
@@ -157,3 +163,11 @@
   (fn [x]
     (+ height (* height (- (abs (- x (/ width 2.0))))))))
                         
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Other functions that come up in dynamical systems lit
+
+(defn scaled-exp
+  "Multiplies lambda times e to the x."
+  [lambda x]
+  ([lambda] (partial scaled-exp lambda))
+  ([lambda x] (* lambda (m/exp x))))
