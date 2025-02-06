@@ -21,3 +21,5 @@ profiles.clj
 .*.swp
 .clerk
 docs/
+.DS_Store
+.lnvim.lua
