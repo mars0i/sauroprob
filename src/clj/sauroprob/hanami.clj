@@ -134,7 +134,7 @@
      {"x" x, "y" x',  "f-param" f-param, "label" label, "ord" 1}   ;  default. Need to order points for lines
      {"x" x', "y" x', "f-param" f-param, "label" label, "ord" 2}])) ;  that go right to left, to avoid bad lines.
 
-;; TODO Will be obsoleted
+;; DEPRECATED
 (defn vl-iter-line-chart
   "Returns a Vega-Lite line spec containing two line segments which 
   together represent the mapping from x to x'=(f x).  The points will
@@ -167,9 +167,10 @@
    (vl-iter-lines-charts f-param f init-x iters "mapping"))
   ([f f-param init-x iters label]
    (let [xs (take iters (iterate f init-x))]
-     (map (comp vl-iter-pair-chart (partial vl-iter-line-chart f f-param))
+     ;(map (partial vl-iter-line-chart f f-param) ; old version
+     (map (comp vl-iter-pair-chart (partial vl-iter-segment-pair f f-param))
           xs
-          (repeat label))))) ; old version: "s" instead of label
+          (repeat label)))))
 
 ;; Unused
 ;(defn vl-iter-lines-charts*
