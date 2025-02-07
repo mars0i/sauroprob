@@ -134,6 +134,7 @@
      {"x" x, "y" x',  "f-param" f-param, "label" label, "ord" 1}   ;  default. Need to order points for lines
      {"x" x', "y" x', "f-param" f-param, "label" label, "ord" 2}])) ;  that go right to left, to avoid bad lines.
 
+;; TODO Will be obsoleted
 (defn vl-iter-line-chart
   "Returns a Vega-Lite line spec containing two line segments which 
   together represent the mapping from x to x'=(f x).  The points will
@@ -146,6 +147,16 @@
                 :MSDASH [5 2]) ; dashed [stroke length, space between]
       (assoc-in [:encoding :order :field] "ord"))) ; walk through lines in order not L-R
 
+(defn vl-iter-pair-chart
+  [segment-pair]
+  (-> (hc/xform ht/line-chart 
+                :DATA segment-pair
+                :COLOR "label"
+                :SIZE 1.5      ; line thickness
+                :MSDASH [5 2]) ; dashed [stroke length, space between]
+      (assoc-in [:encoding :order :field] "ord"))) ; walk through lines in order not L-R
+
+
 (defn vl-iter-lines-charts
   "Returns a sequence of Vega-Lite line specs, each containing two line
   segments, which together represent the mapping from x to x'=(f x).
@@ -156,23 +167,24 @@
    (vl-iter-lines-charts f-param f init-x iters "mapping"))
   ([f f-param init-x iters label]
    (let [xs (take iters (iterate f init-x))]
-     (map (partial vl-iter-line-chart f f-param)
+     (map (comp vl-iter-pair-chart (partial vl-iter-line-chart f f-param))
           xs
           (repeat label))))) ; old version: "s" instead of label
 
-(defn vl-iter-lines-charts*
-  "Returns a sequence of Vega-Lite line specs, each containing two line
-  segments, which together represent the mapping from x to x'=(f x).
-  There will be iters line specs, beginning with the one for (f init-x),
-  then (f (f init-x)), and so on.  If distinguish? is present and is
-  truthy, each pair of segments will have a different color."
-  [f init-x iters & [distinguish?]]
-  (let [xs (take iters (iterate f init-x))]
-    (map (partial vl-iter-line-chart f)
-         xs
-         (if distinguish?
-           (map #(str " " %) (msc/irange 1 iters))
-           (repeat "s"))))) ; the "s" makes "mapping" into "mappings"
+;; Unused
+;(defn vl-iter-lines-charts*
+;  "Returns a sequence of Vega-Lite line specs, each containing two line
+;  segments, which together represent the mapping from x to x'=(f x).
+;  There will be iters line specs, beginning with the one for (f init-x),
+;  then (f (f init-x)), and so on.  If distinguish? is present and is
+;  truthy, each pair of segments will have a different color."
+;  [f init-x iters & [distinguish?]]
+;  (let [xs (take iters (iterate f init-x))]
+;    (map (partial vl-iter-line-chart f)
+;         xs
+;         (if distinguish?
+;           (map #(str " " %) (msc/irange 1 iters))
+;           (repeat "s"))))) ; the "s" makes "mapping" into "mappings"
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; All-in-one function(s) to plot logistic maps, etc.
