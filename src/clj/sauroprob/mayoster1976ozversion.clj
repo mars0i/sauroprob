@@ -26,7 +26,8 @@
 
   ;; Experiments with effects of integer pop sizes:
   (oz/view! (sh/vl-plot-seq "normal" (take 100 (iterate (um/normalized-ricker 3.0) 0.1))))
-  (oz/view! (sh/vl-plot-seq "normal" (take 100 (iterate (um/normalize um/ricker 3.0) 0.1))))
+  ;; FIXME doesn't work:
+  ;(oz/view! (sh/vl-plot-seq "normal" (take 100 (iterate (um/normalize um/ricker 3.0) 0.1))))
   (oz/view! (sh/vl-plot-seq "100" (take 100 (iterate (um/normalize um/floored-ricker 100 3.0) 0.1))))
   (oz/view! (sh/vl-plot-seq "1K" (take 100 (iterate (um/normalize um/floored-ricker 1000 3.0) 0.1))))
   (oz/view! (sh/vl-plot-seq "10K" (take 100 (iterate (um/normalize um/floored-ricker 10000 3.0) 0.1))))
