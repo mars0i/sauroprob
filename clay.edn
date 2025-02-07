@@ -1,5 +1,8 @@
 ;; This will be passed to clay/make! when evaluating a file.
-{:format [:quarto :html]}
+{:format [:quarto :html]
+   :hide-ui-header true
+   ;:hide-info-line true
+}
 ;; If you just use :quarto and not :html as well, it will update
 ;; properly using `make!`, but not using the Clay eval keybinding.
 
@@ -10,6 +13,8 @@
    :format [:html]
    :show true
    :browse true
+   ;:hide-ui-header true
+   ;:hide-info-line true
    :live-reload false
    :run-quarto true
    :quarto {:format {:html {:toc true
