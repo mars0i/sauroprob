@@ -1,8 +1,11 @@
+^:kindly/hide-code
 (ns sauroprob.bifurcation 
   (:require [scicloj.kindly.v4.kind :as kind]
             [scicloj.clay.v2.api :as clay] ; needed for clay eval keymappings
             [utils.math :as um]
             [sauroprob.hanami :as sh]))
+
+; {:kindly/options {:kinds-that-hide-code #{:kind/code}}}
 
 ;; ### Humps
 
