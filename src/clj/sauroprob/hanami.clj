@@ -124,6 +124,18 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Construct mapping lines as chart elements
 
+(defn vl-iter-initial-pair
+  "Returns a sequence of three Vega-Lite points representing two 
+  connected line segments.  The first goes from the line y=0 vertically
+  to the plot for f.  The second then goes horizontally to y=x.  Can be
+  used as the first elemeent in a sequence of mapping lines since people 
+  think of the plotting as starting fromt the x axis, rather than y=x."
+  [f f-param x label]
+  (let [x' (f x)]
+    [{"x" x, "y" 0,   "f-param" f-param, "label" label, "ord" 0}   ; Vega-Lite sorts points from left to right by
+     {"x" x, "y" x',  "f-param" f-param, "label" label, "ord" 1}   ;  default. Need to order points for lines
+     {"x" x', "y" x', "f-param" f-param, "label" label, "ord" 2}])) ;  that go right to left, to avoid bad lines.
+
 (defn vl-iter-segment-pair
   "Returns a sequence of three Vega-Lite points representing two 
   connected line segments.  The first goes from the line y=x vertically
@@ -133,6 +145,16 @@
     [{"x" x, "y" x,   "f-param" f-param, "label" label, "ord" 0}   ; Vega-Lite sorts points from left to right by
      {"x" x, "y" x',  "f-param" f-param, "label" label, "ord" 1}   ;  default. Need to order points for lines
      {"x" x', "y" x', "f-param" f-param, "label" label, "ord" 2}])) ;  that go right to left, to avoid bad lines.
+
+(defn vl-iter-final-pair
+  "Returns a sequence of two Vega-Lite points representing one 
+  connected line segment going from the line y=x vertically
+  to the plot for f.  Typically used as the last element in sequence
+  of mapping lines.."
+  [f f-param x label]
+  (let [x' (f x)]
+    [{"x" x, "y" x,   "f-param" f-param, "label" label, "ord" 0}   ; Vega-Lite sorts points from left to right by
+     {"x" x, "y" x',  "f-param" f-param, "label" label, "ord" 1}]))   ;  default. Need to order points for lines
 
 ;; DEPRECATED
 (defn vl-iter-line-chart
@@ -157,20 +179,28 @@
       (assoc-in [:encoding :order :field] "ord"))) ; walk through lines in order not L-R
 
 
+;; The construction of the sequence of segment pairs is inefficient, but 
+;; it doesn't matter, since there will rarely be more than a dozen or two
+;; such pairs.
 (defn vl-iter-lines-charts
-  "Returns a sequence of Vega-Lite line specs, each containing two line
-  segments, which together represent the mapping from x to x'=(f x).
-  There will be iters line specs, beginning with the one for (f init-x),
-  then (f (f init-x)), and so on.  If distinguish? is present and is
-  truthy, each pair of segments will have a different color."
+  "Returns a sequence of Vega-Lite line specs, most containing two line
+  segments, which together represent the mapping from x to x'=(f x). There
+  will be iters line specs, beginning with the one for (f init-x), then (f
+  (f init-x)), and so on.  Exceptions: The first pair of segments will
+  start at the x-axis rather than at y=x, and the last one will end where
+  it hits f's curve, without adding an additional segment over to the y=x
+  line."
   ([f f-param init-x iters]
    (vl-iter-lines-charts f-param f init-x iters "mapping"))
   ([f f-param init-x iters label]
    (let [xs (take iters (iterate f init-x))]
-     ;(map (partial vl-iter-line-chart f f-param) ; old version
-     (map (comp vl-iter-pair-chart (partial vl-iter-segment-pair f f-param))
-          xs
-          (repeat label)))))
+     (map vl-iter-pair-chart ; make the pairs into segment vega-line "charts"
+          ;; Construct segment pairs, with the first and last as special cases:
+          (conj (vec (cons (vl-iter-initial-pair f f-param (first xs) label) ; first start from x-axis
+                           (map (partial vl-iter-segment-pair f f-param) ; then map to f, to y=x, etc.
+                                (butlast (rest xs))
+                                (repeat label)))) ; only the inner coords
+                (vl-iter-final-pair f f-param (last xs) label))))))
 
 ;; Unused
 ;(defn vl-iter-lines-charts*
