@@ -35,7 +35,7 @@
 ;; Illustration of methods.  Note that for this family of functions, the
 ;; last optional arg, which is the x coord of F^1 fixed point, is always
 ;; the same, 1.0.
-(def four-ricker-specs [(sh/make-vl-spec 0.0 3.0 um/normalized-ricker [1.5] [1] [0.01] 0 :fixedpt-x 1.0)
+(def four-ricker-specs [(sh/make-vl-spec 0.0 3.0 um/normalized-ricker [1.5] [1] [0.01] 1 :fixedpt-x 1.0)
                         (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.0] [1] [0.01 0.1 0.8 2.0] 10 :fixedpt-x 1.0)
                         (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.5] [2] [0.01] 3 :fixedpt-x 1.0)
                         (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [3.0] [1] [0.01] 10 :fixedpt-x 1.0)])
@@ -70,14 +70,15 @@
 ;(def floor-spec (sh/make-vl-spec 0 4500 um/floored-ricker [1000 3.5] [1] [500] 10))
 ;(kind/vega-lite floor-spec)
 
-(require 'clojure.repl)
-(clojure.repl/pst)
+;(require 'clojure.repl)
+;(clojure.repl/pst)
 
 ;; This puts the result of the floored function back on the x in [0,1] scale:
 ;(def floor-normal (sh/make-vl-spec 0 4500 (um/normalize um/floored-ricker 1000 3.5) [1] [500] 10))
 ;(kind/vega-lite floor-normal)
 
 
+(comment
 ;; A strategy for starting with pop size but producing a normalized-ricker output.
 ;; (Note this can't simply be built into a ricker fn, since params like
 ;; x-max are only used in make-vl-spec.  I'd need a wrapper around
@@ -91,7 +92,6 @@
       x-max (/ n-max K)]
   (kind/vega-lite (sh/make-vl-spec x-min x-max um/normalized-ricker [3.5] [1] [X] 10)))
 
-(comment
   ;; This illustrates the expected result that n steps on F is equivalent to one step on F^n:
   (let [x-max 3.5
         param 2.5

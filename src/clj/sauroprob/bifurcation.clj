@@ -1,12 +1,14 @@
 ^:kindly/hide-code
 ;^{:kindly/options {:kinds-that-hide-code #{:kind/code}}}
+;^{:kindly/options {:hide-code true}}
+; cf. https://clojurians.zulipchat.com/#narrow/channel/422115-clay-dev/topic/Hiding.20all.20code.20in.20namespace
+; and https://github.com/scicloj/clay/issues/202
 (ns 
   sauroprob.bifurcation 
   (:require [scicloj.kindly.v4.kind :as kind]
             [scicloj.clay.v2.api :as clay] ; needed for clay eval keymappings
             [utils.math :as um]
             [sauroprob.hanami :as sh]))
-
 
 ;; ### Humps
 
