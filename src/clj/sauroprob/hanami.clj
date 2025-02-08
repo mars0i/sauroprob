@@ -278,9 +278,9 @@
 ;; function n order to plot them.
 (defn make-vl-spec 
   "Given a function f, applies it to params, and plots num-compositions of
-  it from x-min to x-max.  Also plots the map lines from init-xs to the
-  function to the diagonal y=x. If `:fixedpt-x x` is present, plots a
-  diagonal with slope -1 through (x,x); this can make it easier to see
+  it from x-min to x-max.  Also plots the map lines from values in init-xs
+  to the function to the diagonal y=x. If `:fixedpt-x x` is present, plots
+  a diagonal with slope -1 through (x,x); this can make it easier to see
   whether the slope of f is greater than or less than -1.  The value of
   :addl-plots is a sequence of arbitrary additional vega-lite plots."
   [x-min x-max f params compositions init-xs num-iterations & {:keys [fixedpt-x addl-plots]}]
