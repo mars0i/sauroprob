@@ -38,7 +38,7 @@
   ;; Illustration of methods.  Note that for this family of functions, the
   ;; last optional arg, which is the x coord of F^1 fixed point, is always
   ;; the same, 1.0.
-  (def four-ricker-specs [(sh/make-vl-spec 0.0 3.0 um/normalized-ricker [1.5] [1] [0.01] 0 :fixedpt-x 1.0)
+  (def four-ricker-specs [(sh/make-vl-spec 0.0 3.0 um/normalized-ricker [1.5] [1] [0.01] 1 :fixedpt-x 1.0)
                           (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.0] [1] [0.01 0.1 0.8 2.0] 10 :fixedpt-x 1.0)
                           (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.5] [2] [0.01] 3 :fixedpt-x 1.0)
                           (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [3.0] [1] [0.01] 10 :fixedpt-x 1.0)])
