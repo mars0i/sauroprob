@@ -36,5 +36,23 @@
                              [0.05 0.075 0.15] 3
                              :fixedpt-x 0.5
                              :addl-plots [(sh/horiz 1.0)]))
+  (require 'clojure.repl)
+  (clojure.repl/pst)
+
+  (def two-plots
+    {:concat [{:layer [{:encoding
+                        {:y {:scale {"domain" [0.0 3.0]}, :field "y", :type "quantitative"},
+                         :x {:scale {"domain" [0.0 3.0]}, :field "x", :type "quantitative"}},
+                        :mark {:type "line"},
+                        :data {:values [{"x" 0.0, "y" 0.0, "label" "y=x"}
+                                        {"x" 3.0, "y" 3.0, "label" "y=x"}]}}]}
+              {:layer [{:encoding
+                        {:y {:scale {"domain" [0.0 3.0]}, :field "y", :type "quantitative"},
+                         :x {:scale {"domain" [0.0 3.0]}, :field "x", :type "quantitative"}},
+                        :mark {:type "line"},
+                        :data {:values [{"x" 0.0, "y" 3.0, "label" "y=-x"}
+                                        {"x" 3.0, "y" 0.0, "label" "y=-x"}]}}]}],})
+
+  (oz/view! two-plots)
 
 )
