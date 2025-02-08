@@ -1,11 +1,12 @@
 ^:kindly/hide-code
-(ns sauroprob.bifurcation 
+;^{:kindly/options {:kinds-that-hide-code #{:kind/code}}}
+(ns 
+  sauroprob.bifurcation 
   (:require [scicloj.kindly.v4.kind :as kind]
             [scicloj.clay.v2.api :as clay] ; needed for clay eval keymappings
             [utils.math :as um]
             [sauroprob.hanami :as sh]))
 
-; {:kindly/options {:kinds-that-hide-code #{:kind/code}}}
 
 ;; ### Humps
 
@@ -39,8 +40,6 @@
 ;; Thus this is not enough to make $F^4$ cross again.
 (kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.20] [1 2 4] [] 1 :fixedpt-x 1.0))
 
-(kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.80] [1 2 4 8 16] [] 1 :fixedpt-x 1.0))
-
 ;; And as long as $F^2$ has |slope| < 1 at the new fp's, the same is true of $F^4$, so there 
 ;; are no new crossings.
 (kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.40] [1 2 4] [] 1 :fixedpt-x 3.33))
@@ -50,15 +49,14 @@
 (kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.45] [1 2 4] [] 1 :fixedpt-x 0.055))
 
 ;; But when $F$ gets peaked enough that it causes $F^2$ to have a slope > -1 at the newer
-;; right-hand fp, so $F^4$ must have new crossings as well.
+;; right-hand fp, $F^4$ must have new crossings as well.
 (kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.65] [1 2 4] [] 1 :fixedpt-x 3.52))
 
-(kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.65] [4 8 16] [] 1))
-(kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.72] [8 16] [] 1))
+(kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [3.10] [1 2 4 8] [] 1))
 
 (kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [3.10] [1 2 4 8 16] [] 1))
 
-;; When the slope at a fp is slow, subsequent powers just reduce the slope at that fp:
+;; When the slope at a fp is not steep, subsequent powers just reduce the slope at that fp:
 (kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.50] [1 2 4 32] [] 1))
 (kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.50] [64] [] 1))
 
@@ -72,6 +70,9 @@
 (kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [3.10] [16] [] 1))
 (kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [3.10] [32] [] 1))
 
+;; Some other examples:
+(kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.65] [4 8 16] [] 1))
+(kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.72] [8 16] [] 1))
 
 ;; ### More on bifurcation
 ;; Based on Devaney, 3rd ed., chapter 12.
