@@ -30,10 +30,13 @@
                 :height 400
                 :background "floralwhite"})
 
-(def eight-plots {:concat [plot1 plot2
+(def eight-plots {:hconcat [plot1 plot2
                            plot1 plot2
                            plot1 plot2
-                           plot1 plot2]})
+                           plot1 plot2]
+                :columns 3,
+                ;:rows 2,
+                  })
 
 (kind/vega-lite two-plots)
 (kind/vega-lite eight-plots)
