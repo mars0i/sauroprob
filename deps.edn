@@ -1,7 +1,4 @@
-;; See my project cloj/depsedntest for tips.
-
 {:paths ["src/clj"] 
-
  :deps {org.clojure/clojure {:mvn/version "1.12.0"}
         org.scicloj/noj {:mvn/version "2-beta5.1"} ; includes fastmath, Hanami, Clay
 
