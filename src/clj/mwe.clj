@@ -24,13 +24,21 @@
 
 ^:kindly/hide-code
 (def two-plots {:concat [plot1 plot2]
-   :width 400 
-   :height 400
-   :background "floralwhite"})
+                :columns 2,
+                :rows 2,
+                :width 400 
+                :height 400
+                :background "floralwhite"})
 
+(def eight-plots {:concat [plot1 plot2
+                           plot1 plot2
+                           plot1 plot2
+                           plot1 plot2]})
+
+(kind/vega-lite two-plots)
+(kind/vega-lite eight-plots)
 (kind/vega-lite plot1)
 (kind/vega-lite plot2)
-(kind/vega-lite two-plots)
 
 ^:kindly/hide-code
 (comment
@@ -38,4 +46,5 @@
   (oz/view! plot1)
   (oz/view! plot2)
   (oz/view! two-plots)
+  (oz/view! eight-plots)
 )
