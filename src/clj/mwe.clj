@@ -23,22 +23,42 @@
                      {"x" 1.0, "y" 0.0}]}}]})
 
 ^:kindly/hide-code
+(def two-plots-bare {:concat [plot1 plot2]})
+
+^:kindly/hide-code
 (def two-plots {:concat [plot1 plot2]
                 :columns 2,
-                :rows 2,
                 :width 400 
                 :height 400
                 :background "floralwhite"})
 
+^:kindly/hide-code
+(def two-plots-horiz {:hconcat [plot1 plot2]
+                      :columns 2,
+                      :width 400 
+                      :height 400
+                      :background "floralwhite"})
+
+^:kindly/hide-code
+(def two-plots-vert {:vconcat [plot1 plot2]
+                     :columns 2,
+                     :width 400 
+                     :height 400
+                     :background "floralwhite"})
+
+^:kindly/hide-code
 (def eight-plots {:hconcat [plot1 plot2
                            plot1 plot2
                            plot1 plot2
                            plot1 plot2]
-                :columns 3,
-                ;:rows 2,
+                  :columns 3,
+                  ;:rows 2,
                   })
 
+(kind/vega-lite two-plots-bare)
 (kind/vega-lite two-plots)
+(kind/vega-lite two-plots-horiz)
+(kind/vega-lite two-plots-vert)
 (kind/vega-lite eight-plots)
 (kind/vega-lite plot1)
 (kind/vega-lite plot2)
