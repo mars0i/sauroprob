@@ -8,7 +8,12 @@
             [utils.math :as um]
             [sauroprob.hanami :as sh]))
 
-(kind/vega-lite (sh/make-vl-spec 0.0 2.0 um/scaled-exp [1] [1] [] 5))
+(kind/vega-lite (sh/make-vl-spec -4.0 0.5 um/scaled-exp [1] [1] [] 1 :y-lims [0.0 2.0]))
+(kind/vega-lite (sh/make-vl-spec -4.0 2.0 um/scaled-exp [(/ m/E)] [1] [] 1 :y-lims [0.0 2.0]))
+(kind/vega-lite (sh/make-vl-spec -4.0 2.0 um/scaled-exp [(/ m/E)] [1] [-0.5 1.70] 2 :y-lims [0.0 2.0]))
+(kind/vega-lite (sh/make-vl-spec -4.0 2.0 um/scaled-exp [(- (/ m/E) 0.1)] [1] [] 1 :y-lims [0.0 2.0]))
+(kind/vega-lite (sh/make-vl-spec -4.0 2.0 um/scaled-exp [(- (/ m/E) 0.1)] [1] [1.85] 6 :y-lims [0.0 2.0]))
+(kind/vega-lite (sh/make-vl-spec -4.0 0.5 um/scaled-exp [(- m/E)] [1] [] 5 :y-lims [0.0 2.0]))
 
 ^:kindly/hide-code
 (comment
