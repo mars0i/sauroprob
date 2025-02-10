@@ -156,18 +156,19 @@
   ((normalize floored-ricker 100 3.5) 0.5)
 )
 
-;; FIXME: width calc isn't working right
-(defn tent-fn
-  "Returns a tent function on [0,2] with a max value y=height at x=width/2."
-  [height width]
-  (fn [x]
-    (+ height (* height (- (abs (- x (/ width 2.0))))))))
-                        
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Other functions that come up in dynamical systems lit
 
 (defn scaled-exp
   "Multiplies lambda times e to the x."
-  [lambda x]
   ([lambda] (partial scaled-exp lambda))
   ([lambda x] (* lambda (m/exp x))))
+
+
+;; FIXME: width calc isn't working right
+(defn tent
+  "Returns a tent function on [0,2] with a max value y=height at x=width/2."
+  [height width]
+  (fn [x]
+    (+ height (* height (- (abs (- x (/ width 2.0))))))))
