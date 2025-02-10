@@ -17,11 +17,29 @@
 
 
 (kind/vega-lite (sh/make-vl-spec 0.0 3.0 um/normalized-ricker [2.5] [1] [0.6] 60))
-(kind/vega-lite (sh/make-vl-spec 0.0 3.0 (msc/n-comp (um/normalized-ricker 2.5) 10) [] [1] [0.6] 20))
-(kind/vega-lite (sh/vl-plot-seq "1K" (take 90 (iterate (um/normalized-ricker 2.5) 0.6))))
+(kind/vega-lite (sh/vl-plot-seq "stuff" (take 100 (iterate (um/normalized-ricker 2.5) 0.6))))
 (kind/vega-lite (sh/histogram 100 (take 10000 (iterate (um/normalized-ricker 2.5) 0.6))))
+(kind/vega-lite (sh/make-vl-spec 0.0 3.0 
+                                 (msc/n-comp (um/normalized-ricker 2.5) 80)
+                                 [] [1] [1.6] 10))
+(kind/vega-lite (sh/make-vl-spec 0.0 3.0 
+                                 (msc/n-comp (um/normalized-ricker 2.5) 80)
+                                 [] [1] [2.0] 10))
+(kind/vega-lite (sh/make-vl-spec 0.0 3.0 
+                                 (msc/n-comp (um/normalized-ricker 2.5) 80)
+                                 [] [1] [0.8] 10))
+(kind/vega-lite (sh/make-vl-spec 0.0 3.0 
+                                 (msc/n-comp (um/normalized-ricker 2.5) 80)
+                                 [] [1] [1.2] 10))
+(kind/vega-lite (sh/make-vl-spec 0.0 3.0 
+                                 (msc/n-comp (um/normalized-ricker 2.5) 80)
+                                 [] [1] [1.0] 10))
+(kind/vega-lite (sh/make-vl-spec 0.0 3.0 
+                                 (msc/n-comp (um/normalized-ricker 2.5) 80)
+                                 [] [1] [0.99 1.01] 10))
 
 
+^:kindly/hide-code
 (comment
   (kind/vega-lite (sh/histogram 100 (take 10000 (iterate (um/logistic 4.0) 0.6))))
   (kind/vega-lite (sh/make-vl-spec 0.0 1400 um/logistic-plus [1000 3.00] [1] [0.1] 40))
@@ -41,6 +59,7 @@
                              :addl-plots [(sh/horiz 1.0)]))
 )
 
+^:kindly/hide-code
 (comment
   (require 'clojure.repl)
   (clojure.repl/pst)
