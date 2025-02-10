@@ -270,6 +270,15 @@
                                  (msc/n-comp paramed-f num-compositions))
                 :COLOR "label"))))
 
+
+
+;; To equalize aspect ratio:
+;; height / width = (y-max - y-min) / (x-max - x-min)
+;; so
+;; height = width * ((y-max - y-min) / (x-max - x-min))
+;; or
+;; let [height (* width (/ (- y-max y-min) (- x-max x-min)))]
+;; 
 ;; TODO Replace number of compositions with a sequence of composition numbers.
 ;; TODO? Maybe don't apply f to params, but instead just partial the params into the function.
 ;;      Well, the advantage of separating out the parameters is that they can be
@@ -282,28 +291,47 @@
   to the function to the diagonal y=x. If `:fixedpt-x x` is present, plots
   a diagonal with slope -1 through (x,x); this can make it easier to see
   whether the slope of f is greater than or less than -1.  The value of
-  :addl-plots is a sequence of arbitrary additional vega-lite plots."
-  [x-min x-max f params compositions init-xs num-iterations & {:keys [fixedpt-x addl-plots]}]
-  (let [paramed-f (apply partial f params)]
+  :addl-plots is a sequence of arbitrary additional vega-lite plots.  If
+  y-lims is provided, it should be a pair containing the min y val and max
+  y val for the plot; otherwise these values will be the same as x-min and
+  x-max, respectively."
+  [x-min x-max f params compositions init-xs num-iterations
+   & {:keys [fixedpt-x addl-plots y-lims display-width]}]
+  (let [paramed-f (apply partial f params)
+        [y-min y-max] (or y-lims [x-min x-max])
+        line-min (max x-min y-min)  ; endpoints of y=x line segment
+        line-max (min x-max y-max)
+        width (or display-width 300)
+        height (* width (/ (- y-max y-min) (- x-max x-min)))] ; calc height to equalize aspect ratio
     (hc/xform ht/layer-chart
               :LAYER
-               (concat 
-                 ; y=x diagonal line that's used in mapping to next value along with global parameters of the plot:
-                 [(hc/xform ht/line-chart
-                                      :DATA [{"x" x-min, "y" x-min, "label" "y=x"} {"x" x-max, "y" x-max, "label" "y=x"}]
-                                      ;; Intention of this was to make x distances and y diststances on screen the same.
-                                      ;; But V-L has no way to do that, apparently: https://github.com/vega/vega-lite/issues/4367
-                                      :XSCALE {"domain" [x-min x-max]}
-                                      :YSCALE {"domain" [x-min x-max]} ; set y display dimensions to the same values
-                                      :COLOR "label"
-                                      :SIZE 1.0)]
-                 ; Generate vega-lite specs for curves (f x), (f (f x)), etc., num-compositions of them:
-                 (map (make-one-fn-vl-spec-fn x-min x-max f params) compositions) ; old: (msc/irange 1 num-compositions))
-                 ;; Plot lines showing iteration through logistic function starting from init-x:
-                 (mapcat (fn [init-x] 
-                           (vl-iter-lines-charts (msc/n-comp paramed-f 1) params init-x num-iterations (str "params: " params ", x=" init-x)))
-                         init-xs)
-                 ;; If extra arg, it's the x coord of the fixed point (x, f x), and indicates we want a faint line with slope -1 through it:
-                 (when fixedpt-x [(neg-one-line x-min x-max (apply f params) fixedpt-x)])
-                 addl-plots))))
+              (concat 
+                ; y=x diagonal line that's used in mapping to next value along with global parameters of the plot:
+                [(hc/xform ht/line-chart
+                           :DATA [{"x" line-min, "y" line-min, "label" "y=x"}
+                                  {"x" line-max, "y" line-max, "label" "y=x"}]
+                           ;; Intention of this was to make x distances and y diststances on screen the same.
+                           ;; But V-L has no way to do that, apparently: https://github.com/vega/vega-lite/issues/4367
+                           ;:XSCALE {"domain" [x-min x-max]}
+                           ;:YSCALE {"domain" [y-min y-max]}
+                           :WIDTH width
+                           :HEIGHT height
+                           :COLOR "label"
+                           :SIZE 1.0)]
+                ; Generate vega-lite specs for curves (f x), (f (f x)), etc., num-compositions of them:
+                (map (make-one-fn-vl-spec-fn x-min x-max f params) compositions) ; old: (msc/irange 1 num-compositions))
+                ;; Plot lines showing iteration through logistic function starting from init-x:
+                (mapcat (fn [init-x] 
+                          (vl-iter-lines-charts (msc/n-comp paramed-f 1)
+                                                params init-x num-iterations
+                                                (str "params: " params ", x=" init-x)))
+                        init-xs)
+                ;; If extra arg, it's the x coord of the fixed point (x, f x), and indicates we want a faint line with slope -1 through it:
+                (when fixedpt-x [(neg-one-line x-min x-max (apply f params) fixedpt-x)])
+                addl-plots))))
+
+(comment
+  (if-let [[y1 y2] (seq [])] (* y1 y2) 25)
+
+)
 
