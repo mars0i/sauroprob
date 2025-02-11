@@ -13,7 +13,7 @@
 (kind/vega-lite (sh/make-vl-spec -4.0 2.0 um/scaled-exp [(/ m/E)] [1] [-0.5 1.70] 2 :y-lims [0.0 2.0]))
 (kind/vega-lite (sh/make-vl-spec -4.0 2.0 um/scaled-exp [(- (/ m/E) 0.1)] [1] [] 1 :y-lims [0.0 2.0]))
 (kind/vega-lite (sh/make-vl-spec -4.0 2.0 um/scaled-exp [(- (/ m/E) 0.1)] [1] [1.85] 6 :y-lims [0.0 2.0]))
-(kind/vega-lite (sh/make-vl-spec -4.0 0.5 um/scaled-exp [(- m/E)] [1] [] 5 :y-lims [0.0 2.0]))
+(kind/vega-lite (sh/make-vl-spec -2.0 0.5 um/scaled-exp [(- m/E)] [1] [-0.5 -1.5] 5 :y-lims [-2.0 0.0]))
 
 ^:kindly/hide-code
 (comment
