@@ -9,7 +9,23 @@
             [utils.math :as um]
             [sauroprob.hanami :as sh]))
 
+;; ### $\lambda < 0$,  $E_\lambda^2$:
+
+(defn scaled-exp-2
+  ([lambda] (partial scaled-exp-2 lambda))
+  ([lambda x] (um/scaled-exp lambda (um/scaled-exp lambda x))))
+
+;; #### $-e < \lambda < 0$ (i.e. $\lambda = -e + 2$):, $E_\lambda^2$:
+(kind/vega-lite (sh/make-vl-spec [-1.4 1.0] scaled-exp-2 [(+ (- m/E) 2.0)] [] [] 5 :y-lims [-0.8 -0.0]))
+
+;; #### $\lambda < -e$ (i.e. $\lambda = -e - 3$), $E_\lambda^2$::
+(kind/vega-lite (sh/make-vl-spec [-7.0 2.0] scaled-exp-2 [(- (- m/E) 3.0)] [] [] 5 :y-lims [-6.0 1.0]))
+
+;; #### $\lambda = e^{-1}$, $E_\lambda^2$:
+(kind/vega-lite (sh/make-vl-spec [-3.5 1.0] scaled-exp-2 [(- m/E)] [] [] 1 :y-lims [-3.0 1.0]))
+
 ;; ## $\S 12.1$ $x_{n+1} = \lambda e^x$
+
 
 ;; ### $\lambda < 0$:
 
@@ -29,17 +45,6 @@
 (kind/vega-lite (sh/make-vl-spec [-2.0 0.5] um/scaled-exp [(- m/E)] [1] [-1.10] 100 :y-lims [-2.0 0.0]))
 (kind/vega-lite (sh/make-vl-spec [-2.0 0.5] um/scaled-exp [(- m/E)] [1] [-0.90] 100 :y-lims [-2.0 0.0]))
 
-
-;; ### $\lambda < 0$,  $E_\lambda^2$:
-
-;; #### $-e < \lambda < 0$ (i.e. $\lambda = -e + 2$):, $E_\lambda^2$:
-(kind/vega-lite (sh/make-vl-spec [-1.4 1.0] um/scaled-exp [(+ (- m/E) 2.0)] [2] [] 5 :y-lims [-0.8 -0.0]))
-
-;; #### $\lambda < -e$ (i.e. $\lambda = -e - 3$), $E_\lambda^2$::
-(kind/vega-lite (sh/make-vl-spec [-7.0 2.0] um/scaled-exp [(- (- m/E) 3.0)] [2] [] 5 :y-lims [-6.0 1.0]))
-
-;; #### $\lambda = e^{-1}$, $E_\lambda^2$:
-(kind/vega-lite (sh/make-vl-spec [-3.5 1.0] um/scaled-exp [(- m/E)] [2] [] 1 :y-lims [-3.0 1.0]))
 
 
 ;; ---
