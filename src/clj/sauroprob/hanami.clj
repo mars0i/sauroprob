@@ -295,7 +295,7 @@
   y-lims is provided, it should be a pair containing the min y val and max
   y val for the plot; otherwise these values will be the same as x-min and
   x-max, respectively."
-  [x-min x-max f params compositions init-xs num-iterations
+  [[x-min x-max] f params compositions init-xs num-iterations
    & {:keys [fixedpt-x addl-plots y-lims display-width]}]
   (let [paramed-f (apply partial f params)
         [y-min y-max] (or y-lims [x-min x-max])
