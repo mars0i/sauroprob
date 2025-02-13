@@ -22,8 +22,11 @@
 ;; #### $-e < \lambda < 0$ (i.e. $\lambda = -e + 2$):, $E_\lambda^2$:
 (kind/vega-lite (sh/make-vl-spec [-1.4 1.0] scaled-exp-2 [(+ (- m/E) 2.0)] [1] [-1.4 0.20] 5 :y-lims [-0.8 -0.0]))
 
-;; For $\lambda < -e$, $\hat{x} = E_\lambda^2(\hat{x}) = \lambda e^{\lambda
-;; e^\hat{x}} = \lambda \exp(\lambda \exp\hat{x})$.
+;; For $\lambda < -e$, $\hat{x} = E_\lambda^2(\hat{x}) = 
+;; \lambda e^{\lambda e^\hat{x}} = \lambda \exp(\lambda \exp\hat{x})$.
+;; Suppose $\lambda=-3$.  Then 
+;; $\hat{x} =  -3 e^{-3 e^\hat{x}}$ and $\ln \hat{x} =  \ln(-3) + -3 e^\hat{x}$.
+;; So $\ln(-3) = \ln\hat{x} + 3e^\hat{x}$.  I don't know how to solve this.
 
 
 ;; #### $\lambda < -e$ (i.e. $\lambda = -e - 3$), $E_\lambda^2$::
