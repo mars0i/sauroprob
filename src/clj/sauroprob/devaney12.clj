@@ -1,7 +1,7 @@
-;; # Experiments to go with Devaney 3rd ed
+;; # Experiments to go with Devaney 3rd ed, chapter 12
 ;; ---
 ^:kindly/hide-code
-(ns sauroprob.devaney
+(ns sauroprob.devaney12
   (:require [clojure.math :as m]
             [scicloj.kindly.v4.kind :as kind]
             [scicloj.clay.v2.api :as clay] ; needed for clay eval keymappings
@@ -19,21 +19,66 @@
   ([lambda] (partial scaled-exp-2 lambda))
   ([lambda x] (um/scaled-exp lambda (um/scaled-exp lambda x))))
 
-;; #### $-e < \lambda < 0$ (i.e. $\lambda = -e + 2$):, $E_\lambda^2$:
-(kind/vega-lite (sh/make-vl-spec [-1.4 1.0] scaled-exp-2 [(+ (- m/E) 2.0)] [1] [-1.4 0.20] 5 :y-lims [-0.8 -0.0]))
+;; #### $\lambda < -e$ (i.e. $\lambda = -e - 3$), $E_\lambda^2$::
 
+;; What are the fixed points of $E_\lambda^2$?
 ;; For $\lambda < -e$, $\hat{x} = E_\lambda^2(\hat{x}) = 
 ;; \lambda e^{\lambda e^\hat{x}} = \lambda \exp(\lambda \exp\hat{x})$.
 ;; Suppose $\lambda=-3$.  Then 
 ;; $\hat{x} =  -3 e^{-3 e^\hat{x}}$ and $\ln \hat{x} =  \ln(-3) + -3 e^\hat{x}$.
-;; So $\ln(-3) = \ln\hat{x} + 3e^\hat{x}$.  I don't know how to solve this.
+;; So $\ln(-3) = \ln\hat{x} + 3e^\hat{x}$. Um $ln(-3)$ is complex.  Oops.  Don't do this.
 
+;; The $E_\lambda^2$ in next few plots all display the same $E_\lambda^2$,
+;; but the first plot uses a pre-composed $E_\lambda^2$, so that's what the 
+;; mapping lines follow.  In the other plots, mapping lines are run through $E_\lambda$.
 
-;; #### $\lambda < -e$ (i.e. $\lambda = -e - 3$), $E_\lambda^2$::
 (kind/vega-lite (sh/make-vl-spec [-7.0 2.0] scaled-exp-2 [(- (- m/E) 3.0)] [1] [-2 -1] 5 :y-lims [-7.0 1.0]))
+;; These illustrate the approach to the 2-cycle:
+(kind/vega-lite (sh/make-vl-spec [-6.0 0.5] um/scaled-exp [(- (- m/E) 3.0)] [1 2] [-2] 9 :y-lims [-7.0 1.0]))
+(kind/vega-lite (sh/make-vl-spec [-6.0 0.5] um/scaled-exp [(- (- m/E) 3.0)] [1 2] [-1] 9 :y-lims [-7.0 1.0]))
+;; These illustrate the 2-cycle (initial $x$ determined by trial and error):
+(kind/vega-lite (sh/make-vl-spec [-6.0 0.5] um/scaled-exp [(- (- m/E) 3.0)] [1 2] [-0.021178] 4 :y-lims [-7.0 1.0]))
+
+;; ?:
+;; Let $\lambda = -(e + 3) = -5.718281828459045$, and try $\hat{x} = -0.021178$.
+
+;; So $-0.021178 \approx -5.718 e^{-5.718 e^{-0.021178}}$
+
+;; Is this true?  Let's see:
+
+(let [λ -5.718281828459045
+      x-hat -0.021178]
+  (* λ (m/exp (* λ (m/exp x-hat)))))
+
+;; So this is one fixed point of $E_\lambda^2$.  The other one on the
+;; 2-cycle should be approximately $E_\lambda(\hat{x}):$
+
+(let [λ -5.718281828459045
+      x-hat -0.021178]
+  (* λ (m/exp x-hat)))
+
+;; Let's try starting the mapping at that point:
+(kind/vega-lite (sh/make-vl-spec [-7.0 0.5] um/scaled-exp [(- (- m/E) 3.0)] [1] [-5.598453397779256] 4 :y-lims [-7.0 1.0]))
+
+;; To summarize, for $\lambda = -5.718281828459045$, $E_\lambda$'s fixed
+;; point is unstable.  Given precisely the value of the fixed point, it
+;; will remain there, but any other point will walk toward one of
+;; $E_\lambda^2$'s fixed points.  When (maybe in the limit) a value gets
+;; to one of those $E_\lambda^2$ fixed points, subsequently $E_\lambda$ will
+;; generate a 2-cycle between the two $E_\lambda^2$ fixed points.  That's
+;; the first bifurcation.
+
+;; ---
+
+;; #### $-e < \lambda < 0$ (i.e. $\lambda = -e + 2$):, $E_\lambda^2$:
+(kind/vega-lite (sh/make-vl-spec [-1.4 1.0] scaled-exp-2 [(+ (- m/E) 2.0)] [1] [-1.4 0.20] 5 :y-lims [-0.8 -0.0]))
+
+;; ---
 
 ;; #### $\lambda = e^{-1}$, $E_\lambda^2$:
 (kind/vega-lite (sh/make-vl-spec [-3.5 1.0] scaled-exp-2 [(- m/E)] [1] [] 1 :y-lims [-3.0 1.0]))
+
+;; --
 
 ;; ## $\S 12.1$ $x_{n+1} = \lambda e^x$
 
