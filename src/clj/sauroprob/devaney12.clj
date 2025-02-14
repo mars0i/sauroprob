@@ -73,12 +73,16 @@
 ;; ---
 
 ;; #### $-e < \lambda < 0$ (i.e. $\lambda = -e + 2$):, $E_\lambda^2$
+(kind/vega-lite (sh/make-vl-spec [-1.4 1.0] um/scaled-exp [(+ (- m/E) 2.0)] [1 2] [] 5 :y-lims [-0.8 -0.0]))
 (kind/vega-lite (sh/make-vl-spec [-1.4 1.0] scaled-exp-2 [(+ (- m/E) 2.0)] [1] [-1.4 0.20] 5 :y-lims [-0.8 -0.0]))
 
 ;; ---
 
 ;; #### $\lambda = e^{-1}$, $E_\lambda^2$
-(kind/vega-lite (sh/make-vl-spec [-3.5 1.0] scaled-exp-2 [(- m/E)] [1] [] 1 :y-lims [-3.0 1.0]))
+(kind/vega-lite (sh/make-vl-spec [-4.0 1.0] um/scaled-exp [(- m/E)] [1 2] [] 1 :y-lims [-4.0 1.0]))
+
+^:kindly/hide-code
+;(kind/vega-lite (sh/make-vl-spec [-3.5 1.0] scaled-exp-2 [(- m/E)] [1] [] 1 :y-lims [-3.0 1.0]))
 
 ;; --
 
