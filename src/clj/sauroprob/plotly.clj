@@ -13,29 +13,29 @@
            ))
 
 
-;; This shows that Plotly lines are written in the order of points, and
-;; can go up, backwards, down:
 (def data {:x [1 2 2 1 1 1.2]
            :y [1 1 3 3 2 2.5]})
 
+;; How to specify equal units on both axes:
 (-> data
     tc/dataset
-    ;; I haven't figured out how to set height/width in layer-line, but
-    ;; this works for those keys (but not :=margin):
-    (plotly/base {;:=height 400
-                  ;:=width 400
-                  ;:=margins {:t 25 :b 25 :l 25 :r 25}
-    })
+    (plotly/layer-line {:=x :x, :=y :y})
+    plotly/plot ; needed to convert Hanami/Plotly edn to pure Plotly edn
+    (assoc-in [:layout :yaxis :scaleanchor] :x)
+    (assoc-in [:layout :yaxis :scaleratio] 1)) ; 1 is the default, but this can be used to specify other ratios
+
+
+;; Data from https://plotly.com/javascript/axes/#fixedratio-axes
+(def data2 {:x [0,1,1,0,0,1,1,2,2,3,3,2,2,3]
+            :y [0,0,1,1,3,3,2,2,3,3,1,1,0,0]})
+
+(-> data2
+    tc/dataset
     (plotly/layer-line {:=x :x
                         :=y :y
-                        :=mark-color "purple"
+                        :=mark-color "blue"
                         })
-    ;(assoc-in [:yaxes :scaleanchor] "x")
-    ;(assoc-in [:yaxes :scaleratio] 1)
-    kind/pprint
-    )
-
-
+)
 
 ;; Where do these go?
 (def yo {:=automargin true
