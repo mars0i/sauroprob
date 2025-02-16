@@ -35,15 +35,10 @@
                         :=y :y
                         :=mark-color "blue"
                         })
+    plotly/plot
 )
 
-;; Where do these go?
-(def yo {:=automargin true
-         :=margin {:t 25 :b 25 :l 25 :r 25}
-         :=height 400
-         :=width 400})
-
-;; Examples from docs
+;; Examples from Tableplot docs
 
 (-> (rdatasets/datasets-iris)
     (plotly/splom
