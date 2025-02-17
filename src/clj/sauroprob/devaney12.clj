@@ -23,13 +23,6 @@
 
 ;; #### $\lambda < -e$ (i.e. $\lambda = -e - 3$), $E_\lambda^2$
 
-;; What are the fixed points of $E_\lambda^2$?
-;; For $\lambda < -e$, $\hat{x} = E_\lambda^2(\hat{x}) = 
-;; \lambda e^{\lambda e^\hat{x}} = \lambda \exp(\lambda \exp\hat{x})$.
-;; Suppose $\lambda=-3$.  Then 
-;; $\hat{x} =  -3 e^{-3 e^\hat{x}}$ and $\ln \hat{x} =  \ln(-3) + -3 e^\hat{x}$.
-;; So $\ln(-3) = \ln\hat{x} + 3e^\hat{x}$. Um $ln(-3)$ is complex.  Oops.  Don't do this.
-
 ;; The $E_\lambda^2$ in next few plots all display the same $E_\lambda^2$,
 ;; but the first plot uses a pre-composed $E_\lambda^2$, so that's what the 
 ;; mapping lines follow.  In the other plots, mapping lines are run through $E_\lambda$.
@@ -72,19 +65,21 @@
 
 ;; ---
 
-;; #### $-e < \lambda < 0$ (i.e. $\lambda = -e + 2$):, $E_\lambda^2$
+;; #### $-e < \lambda < 0$ (i.e. $\lambda = -e + 2$), $E_\lambda^2$:
 (kind/vega-lite (sh/make-vl-spec [-1.4 1.0] um/scaled-exp [(+ (- m/E) 2.0)] [1 2] [] 5 :y-lims [-0.8 -0.0]))
 (kind/vega-lite (sh/make-vl-spec [-1.4 1.0] scaled-exp-2 [(+ (- m/E) 2.0)] [1] [-1.4 0.20] 5 :y-lims [-0.8 -0.0]))
 
 ;; ---
 
-;; #### $\lambda = e^{-1}$, $E_\lambda^2$
+;; #### $\lambda = -e$, $E_\lambda^2$
 (kind/vega-lite (sh/make-vl-spec [-4.0 1.0] um/scaled-exp [(- m/E)] [1 2] [] 1 :y-lims [-4.0 1.0]))
 
 ^:kindly/hide-code
-;(kind/vega-lite (sh/make-vl-spec [-3.5 1.0] scaled-exp-2 [(- m/E)] [1] [] 1 :y-lims [-3.0 1.0]))
+(comment
+  (kind/vega-lite (sh/make-vl-spec [-3.5 1.0] scaled-exp-2 [(- m/E)] [1] [] 1 :y-lims [-3.0 1.0]))
+)
 
-;; --
+;; ---
 
 
 ;; ### $\lambda < 0$
@@ -126,4 +121,16 @@
 (comment
   (require 'clojure.repl)
   (clojure.repl/pst)
+)
+
+
+^:kindly/hide-code
+(comment
+;; obsolete:
+;; What are the fixed points of $E_\lambda^2$?
+;; For $\lambda < -e$, $\hat{x} = E_\lambda^2(\hat{x}) = 
+;; \lambda e^{\lambda e^\hat{x}} = \lambda \exp(\lambda \exp\hat{x})$.
+;; Suppose $\lambda=-3$.  Then 
+;; $\hat{x} =  -3 e^{-3 e^\hat{x}}$ and $\ln \hat{x} =  \ln(-3) + -3 e^\hat{x}$.
+;; So $\ln(-3) = \ln\hat{x} + 3e^\hat{x}$. Um $\ln(-3)$ is complex.  Oops.  Don't do this.
 )
