@@ -5,6 +5,8 @@
   (:require [clojure.math :as m]
             [scicloj.kindly.v4.kind :as kind]
             [scicloj.clay.v2.api :as clay] ; needed for clay eval keymappings
+            [aerial.hanami.common :as hc]
+            [aerial.hanami.templates :as ht]
             [utils.misc :as msc]
             [utils.math :as um]
             [sauroprob.hanami :as sh]))
@@ -74,15 +76,33 @@
 
 ;; ---
 
-;; This illustrates the point on Devaney p. 99 that $E_\lambda^2$ (blue) is convex
-;; down where $E_\lambda > -1$ (orange), and convex up where $E_\lambda >
-;; -1$.  The upper curve is $(E_\lambda^2)''$.  (Ignore the fixed point;
+;; The following plot illustrates the point on Devaney p. 99 that $E_\lambda^2$
+;; (blue) is convex down where $E_\lambda > -1$ (orange), and convex up where
+;; $E_\lambda > -1$.  The upper curve is $(E_\lambda^2)''$ (marked misleadingly 
+;; as "F^0").  (Ignore the fixed point;
 ;; it's not relevant.)  Notice where $E_\lambda$ crosses the $y=-1$ line,
 ;; and where $(E_\lambda^2)''$ crosses the $y$-axis, $y=0$. See
 ;; math/dynamicalsysts/DevaneyIntroChaoticDynSystsPage99.md for more, and
 ;; math/dynamicalsysts/lambdaequals_ex-*.gcx.
 
-(let [lambda (- (- m/E) 2.0)] (kind/vega-lite (sh/make-vl-spec [-7.0 0.5] um/scaled-exp [lambda] [1 2] [] 1 :y-lims [-7.0 1.0] :addl-plots [((sh/make-one-fn-vl-spec-fn -7.0 0.5 second-deriv-scaled-exp-2 [lambda]) 1)])))
+^:kindly/hide-code
+(let [lambda (- (- m/E) 2.0)
+      x-min -7.0
+      x-max 0.5
+      y-min -7.0
+      y-max 1.0]
+  (kind/vega-lite (sh/make-vl-spec [x-min x-max] um/scaled-exp [lambda] [1 2] [] 1 :y-lims [y-min y-max]
+                                                               :addl-plots [((sh/make-one-fn-vl-spec-fn -7.0 0.5 second-deriv-scaled-exp-2 [lambda]) 0) ; 0 compositions is same a 1, but this provides a different label to the plot
+                                                                            (hc/xform ht/line-chart
+                                                                                      :DATA [{"x" x-min, "y" -1, "label" "y=-1"} {"x" x-max, "y" -1 "label" "y=-1"}]
+                                                                                      :COLOR "label" :SIZE 0.7)
+                                                                            (hc/xform ht/line-chart
+                                                                                      :DATA [{"x" x-min, "y" 0, "label" "y=0"} {"x" x-max, "y" 0 "label" "y=0"}]
+                                                                                      :COLOR "label" :SIZE 0.7)
+                                                                            (hc/xform ht/line-chart
+                                                                                      :DATA [{"x" -1.54, "y" y-min, "label" "x=-1.54"} {"x" -1.54 "y" y-max "label" "x=-1.54"}]
+                                                                                      :COLOR "label" :SIZE 0.7)
+                                                                           ])))
 
 ;; ---
 
