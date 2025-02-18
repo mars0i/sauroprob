@@ -21,6 +21,15 @@
   ([lambda] (partial scaled-exp-2 lambda))
   ([lambda x] (um/scaled-exp lambda (um/scaled-exp lambda x))))
 
+(defn second-deriv-scaled-exp-2
+  "Implements the second derivative of the composition of lambda exp(x)
+  with itself."
+  ([lambda] (partial second-deriv-scaled-exp-2 lambda))
+  ([lambda x]
+  (* (um/scaled-exp lambda x)
+     (scaled-exp-2 lambda x)
+     (+ 1 (um/scaled-exp lambda x)))))
+
 ;; #### $\lambda < -e$ (i.e. $\lambda = -e - 3$), $E_\lambda^2$
 
 ;; The $E_\lambda^2$ in next few plots all display the same $E_\lambda^2$,
@@ -62,6 +71,18 @@
 ;; to one of those $E_\lambda^2$ fixed points, subsequently $E_\lambda$ will
 ;; generate a 2-cycle between the two $E_\lambda^2$ fixed points.  That's
 ;; the first bifurcation.
+
+;; ---
+
+;; This illustrates the point on Devaney p. 99 that $E_\lambda^2$ (blue) is convex
+;; down where $E_\lambda > -1$ (orange), and convex up where $E_\lambda >
+;; -1$.  The upper curve is $(E_\lambda^2)''$.  (Ignore the fixed point;
+;; it's not relevant.)  Notice where $E_\lambda$ crosses the $y=-1$ line,
+;; and where $(E_\lambda^2)''$ crosses the $y$-axis, $y=0$. See
+;; math/dynamicalsysts/DevaneyIntroChaoticDynSystsPage99.md for more, and
+;; math/dynamicalsysts/lambdaequals_ex-*.gcx.
+
+(let [lambda (- (- m/E) 2.0)] (kind/vega-lite (sh/make-vl-spec [-7.0 0.5] um/scaled-exp [lambda] [1 2] [] 1 :y-lims [-7.0 1.0] :addl-plots [((sh/make-one-fn-vl-spec-fn -7.0 0.5 second-deriv-scaled-exp-2 [lambda]) 1)])))
 
 ;; ---
 
