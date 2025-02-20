@@ -19,6 +19,7 @@
        }
 
  :aliases {:nrepl-server {:extra-deps {nrepl/nrepl {:mvn/version "1.0.0"}} ; see note above
-                          :main-opts  ["-m" "nrepl.cmdline"]}}
+                          :main-opts  ["-e" "(require '[scicloj.clay.v2.api :as clay])"
+                                       "-m" "nrepl.cmdline"]}}
 }
 

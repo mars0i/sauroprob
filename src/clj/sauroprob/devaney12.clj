@@ -4,7 +4,7 @@
 (ns sauroprob.devaney12
   (:require [clojure.math :as m]
             [scicloj.kindly.v4.kind :as kind]
-            [scicloj.clay.v2.api :as clay] ; needed for clay eval keymappings
+            ;[scicloj.clay.v2.api :as clay] ; needed for clay eval keymappings
             [aerial.hanami.common :as hc]
             [aerial.hanami.templates :as ht]
             [utils.misc :as msc]
