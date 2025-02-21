@@ -19,11 +19,14 @@
              ""
              ["(scicloj.clay.v2.api/make! {:source-path \"" (nvim.fn.expand "%.") "\"})"])}))
 
+(var clay-not-yet-required true)
+
 (defn on-filetype []
-  ;; This is OK, but it runs every time you enter a file, which is unnecessary:
-  (eval.eval-str 
-    {:origin "custom-clay-wrapper"
-     :code "(require 'scicloj.clay.v2.api)"})
+  (when clay-not-yet-required ; no need to run on every new file
+    (set clay-not-yet-required false)
+    (eval.eval-str 
+      {:origin "custom-clay-wrapper"
+       :code "(require 'scicloj.clay.v2.api)"})) ; needs to run only once per nvim session
   (nvim.buf_set_keymap
     0 :n "<localleader>ev" ""
     {:callback eval-clojure-for-form-viz})
