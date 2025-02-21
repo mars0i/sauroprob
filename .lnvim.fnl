@@ -20,6 +20,10 @@
              ["(scicloj.clay.v2.api/make! {:source-path \"" (nvim.fn.expand "%.") "\"})"])}))
 
 (defn on-filetype []
+  ;; This is OK, but it runs every time you enter a file, which is unnecessary:
+  (eval.eval-str 
+    {:origin "custom-clay-wrapper"
+     :code "(require 'scicloj.clay.v2.api)"})
   (nvim.buf_set_keymap
     0 :n "<localleader>ev" ""
     {:callback eval-clojure-for-form-viz})
