@@ -4,12 +4,17 @@
 (ns sauroprob.devaney12
   (:require [clojure.math :as m]
             [scicloj.kindly.v4.kind :as kind]
-            ;[scicloj.clay.v2.api :as clay] ; needed for clay eval keymappings
+            ;[scicloj.clay.v2.api :as clay]
             [aerial.hanami.common :as hc]
             [aerial.hanami.templates :as ht]
             [utils.misc :as msc]
             [utils.math :as um]
             [sauroprob.hanami :as sh]))
+
+(comment
+  (require '[scicloj.clay.v2.api :as clay])
+  (clay/make! {:source-path ["src/clj/sauroprob/devaney12.clj"] :live-reload true})
+)
 
 ;; ## $\S 12.1$: $x_{n+1} = \lambda e^x$
 
@@ -38,7 +43,7 @@
 ;; but the first plot uses a pre-composed $E_\lambda^2$, so that's what the 
 ;; mapping lines follow.  In the other plots, mapping lines are run through $E_\lambda$.
 
-(kind/vega-lite (sh/make-vl-spec [-7.0 2.0] scaled-exp-2 [(- (- m/E) 3.0)] [1] [-2 -1] 5 :y-lims [-7.0 1.0]))
+(kind/vega-lite (sh/make-vl-spec [-7.0 2.0] scaled-exp-2 [(- (- m/E) 3.0)] [1 2] [-2 -1] 5 :y-lims [-7.0 1.0]))
 ;; These illustrate the approach to the 2-cycle:
 (kind/vega-lite (sh/make-vl-spec [-6.0 0.5] um/scaled-exp [(- (- m/E) 3.0)] [1 2] [-2] 9 :y-lims [-7.0 1.0]))
 (kind/vega-lite (sh/make-vl-spec [-6.0 0.5] um/scaled-exp [(- (- m/E) 3.0)] [1 2] [-1] 9 :y-lims [-7.0 1.0]))
