@@ -14,6 +14,7 @@
 (comment
   (require '[scicloj.clay.v2.api :as clay])
   (clay/make! {:source-path ["src/clj/sauroprob/devaney12.clj"] :live-reload true})
+  (clay/make! {:source-path ["src/clj/sauroprob/devaney12.clj"] :format [:quarto :html]})
 )
 
 ;; ## $\S 12.1$: $x_{n+1} = \lambda e^x$
