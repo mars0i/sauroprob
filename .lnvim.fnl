@@ -1,12 +1,5 @@
 ;; nvim functions and keymappings to evaluate scicloj Clay files
 
-;; In theory it would make sense to run the `require-clay-if-needed`
-;; function below in the `on-filetype` function, and that does work.
-;; However, it causes the the nrepl to be connected an extra time
-;; and disconnected unnecessarily when on-filetype is first run.
-;; Not sure why.  So instead I run `require-clay-if-needed` in the
-;; keymapping callbacks.
-
 (module viz.lnvim
   {autoload {a aniseed.core
              str aniseed.string
@@ -33,7 +26,14 @@
     {:origin "custom-clay-wrapper"
      :code (str.join
              ""
-             ["(scicloj.clay.v2.api/make! {:source-path \"" (nvim.fn.expand "%.") "\" :single-form `" (a.get (extract.form {:root? true}) :content) "})"])}))
+             ["(scicloj.clay.v2.api/make! {:source-path \"" (nvim.fn.expand "%.") "\" :single-form `" (a.get (extract.form {:root? true}) :content) " :format [:quarto :html]})"])}))
+
+;; In theory it would make sense to run the `require-clay-if-needed`
+;; function below in the `on-filetype` function, and that does work.
+;; However, it causes the the nrepl to be connected an extra time
+;; and disconnected unnecessarily when on-filetype is first run.
+;; Not sure why.  So instead I run `require-clay-if-needed` in the
+;; keymapping callbacks.
 
 (defn eval-clojure-for-ns-viz []
   "Display the entire namespace, typically a Clay source file."
@@ -42,7 +42,7 @@
     {:origin "custom-clay-wrapper"
      :code (str.join
              ""
-             ["(scicloj.clay.v2.api/make! {:source-path \"" (nvim.fn.expand "%.") "\"})"])}))
+             ["(scicloj.clay.v2.api/make! {:source-path \"" (nvim.fn.expand "%.") "\" :format [:quarto :html]})"])}))
 
 (defn on-filetype []
   "Map <localleader>ev to eval-clojure-for-form-viz and <localleader>env to
