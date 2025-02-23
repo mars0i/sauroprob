@@ -19,6 +19,33 @@
 
 ;; ## $\S 12.1$: $x_{n+1} = \lambda e^x$
 
+;; ### $\lambda > 0$
+
+;; #### $\lambda = 1/e$
+
+(kind/vega-lite (sh/make-vl-spec [-1.0 2] um/scaled-exp [(/ 1 m/E)] [1] [] 1 :y-lims [-0.5 2.0]))
+
+;; #### $\lambda < 1/e = 0.36787944117144233$
+
+(let [x-min -0.5, x-max 3, y-min -0.5, y-max 3.5]
+  (kind/vega-lite (sh/make-vl-spec [x-min x-max] um/scaled-exp [(- (/ 1 m/E) 0.2)]
+                                   [1] [] 1
+                                   :y-lims [y-min y-max]
+                                   :addl-plots [(hc/xform ht/line-chart ; vert line at 1.0
+                                                          :DATA [{"x" 1, "y" y-min, "label" "x=1"}
+                                                                 {"x" 1, "y" y-max, "label" "x=1"}]
+                                                          :COLOR "label" :SIZE 0.7)])))
+
+;; Note that figure 12.3 suggests that the fixed points after the
+;; bifurcation are symmetrical around 1.0.  The preceding plot shows they're not.  
+;; (So figure 12.3 is only intended to be qualitatively accurate.)
+
+;; ---
+
+;; #### $\lambda > 1/e$
+
+(kind/vega-lite (sh/make-vl-spec [-0.5 3] um/scaled-exp [(+ (/ 1 m/E) 0.1)] [1] [] 1 :y-lims [-0.5 3]))
+
 ;; ### $\lambda < 0$,  $E_\lambda^2$
 
 ;; Note $E'_\lambda (x) = (\lambda e^x)' = \lambda e^x$, and 
