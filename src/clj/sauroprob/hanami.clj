@@ -5,11 +5,8 @@
             [clojure.math :as m] ; new in Clojure 1.11 
             [aerial.hanami.common :as hc]
             [aerial.hanami.templates :as ht]
-            [utils.json :as json]
-            [utils.string :as st]
             [utils.misc :as msc]
-            [utils.math :as um]
-            ))
+            [utils.string :as st]))
 
 ;; Default number of steps to plot a curve; the plot range will usually 
 ;; be divided into this many steps:
@@ -58,6 +55,7 @@
                 :SIZE 1)))
 
 (comment
+  (require '[utils.math :as um])
   (require '[oz.core :as oz])
   (oz/start-server!)
   (oz/view! (vl-plot-seq "normal" (take 100 (um/iter-vals um/normalized-ricker [3.0] 0.1))))
@@ -113,6 +111,7 @@
 
 
 (comment
+  (require '[utils.math :as um])
   (require '[oz.core :as oz])
   (oz/start-server!)
   ;; FIXME This shows that what I got is NOT a density plot--it's not what I wanted.
@@ -241,6 +240,7 @@
         (assoc-in [:mark :clip] true)))) ; prevent from exceeding y boundaries of plot domain if using :XSCALE, :YSCALE
 
 (comment
+  (require '[utils.math :as um])
   (def yo (sauroprob.hanami/neg-one-line 0.0 1.0 (um/logistic 2.0) 0.5))
 )
 
