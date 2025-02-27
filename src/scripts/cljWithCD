@@ -1,9 +1,8 @@
 #!/bin/sh
 # Starts nrepl in forage dir in current terminal window/tab using clj:
-set -x
-cd ~/cloj/sauroprob
-java --version
-clj -M:nrepl-server "$@"  # uses nepl-server alias I defined in deps.edn
+#set -x
+#cd ~/cloj/sauroprob
+clojure -M:nrepl-server "$@"  # uses nepl-server alias I defined in deps.edn
 # More info here: https://nrepl.org/nrepl/usage/server.html
 
 # /bin/bash  # DEBUG
