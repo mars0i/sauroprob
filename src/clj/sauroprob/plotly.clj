@@ -14,7 +14,7 @@
 
 ;; [xmin x-max] is the first arg, for use with -> , because it's likely
 ;; that different fns will share same x coords.
-(defn f-dataset
+(defn fn2dataset
   [[x-min x-max] catkey catval f & {:keys [steps]}] 
   (let [x-increment (/ (double (- x-max x-min))
                        (or steps plot-steps))
@@ -23,27 +23,35 @@
     (-> {:x xs, :y ys, catkey catval}
         tc/dataset)))
 
-(-> (f-dataset [-4.0 1.0] :fun :base (partial um/scaled-exp (- m/E)))
-    (plotly/layer-line {:=x :x, :=y, :y}))
-
-(-> (f-dataset [-4.0 1.0] :fun :comp2
-                  (msc/n-comp (partial um/scaled-exp (- m/E)) 2))
-    (plotly/layer-line {:=x :x, :=y, :y}))
+(defn equalize-display-units
+  "Given a Tableplot plot (in either Hanami-key form or full Plotly EDN),
+  adds Plotly settings to force the displayed x and y units to be equal."
+  [plot]
+  (-> plot
+      plotly/plot
+      (assoc-in [:layout :yaxis :scaleanchor] :x)
+      (assoc-in [:layout :yaxis :scaleratio] 1)
+      ;; make same grid lines?  not this, doesn't work:
+      ;(assoc-in [:layout :grid :xgap] 1)
+      ;(assoc-in [:layout :grid :ygap] 1)
+      ))
 
 (def all
   (tc/concat
-    (-> (f-dataset [-4.0 1.0] :fun :base
+    (-> (fn2dataset [-4.0 1.0] :fun :base
                       (partial um/scaled-exp (- m/E))
                       :keysuffix "1"))
-    (-> (f-dataset [-4.0 1.0] :fun :comp2
+    (-> (fn2dataset [-4.0 1.0] :fun :comp2
                       (msc/n-comp (partial um/scaled-exp (- m/E)) 2)
                       :keysuffix "2"))
-    (-> (f-dataset [-4.0 1.0] :fun :comp3
+    (-> (fn2dataset [-4.0 1.0] :fun :comp3
                       (msc/n-comp (partial um/scaled-exp (- m/E)) 3)
                       :keysuffix "3"))))
 
 (-> all
-    (plotly/layer-line {:=x :x, :=y, :y :=color :fun}))
+    (plotly/layer-line {:=x :x, :=y, :y :=color :fun})
+    equalize-display-units)
+
 
 (comment
          ;; old version
