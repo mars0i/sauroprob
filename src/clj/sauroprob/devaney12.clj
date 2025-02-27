@@ -11,11 +11,14 @@
             [utils.math :as um]
             [sauroprob.hanami :as sh]))
 
+^:kindly/hide-code
 (comment
   (require '[scicloj.clay.v2.api :as clay])
   (clay/make! {:source-path ["src/clj/sauroprob/devaney12.clj"] :live-reload true})
   (clay/make! {:source-path ["src/clj/sauroprob/devaney12.clj"] :format [:quarto :html]})
 )
+
+(let [λ 4] (kind/vega-lite (sh/make-vl-spec [-6.0 6] (fn [x] (* λ (m/sin x))) [] [1 4] [] 1 :y-lims [-2.5 2.5])))
 
 ;; ## $\S 12.1$: $x_{n+1} = \lambda e^x$
 
