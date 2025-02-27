@@ -1,26 +1,18 @@
 ^:kindly/hide-code
-(ns sauroprob.plotly
-  (:require [clojure.math :as m] ; new in Clojure 1.11 
-            [scicloj.tableplot.v1.plotly :as plotly]
+(ns sauroprob.plotlydemo
+  (:require [scicloj.tableplot.v1.plotly :as plotly]
+            [tablecloth.api :as tc]
+            [tablecloth.column.api :as tcc]
+            [tech.v3.datatype.datetime :as datetime]
+            [tech.v3.dataset.print :as print]
             [scicloj.kindly.v4.kind :as kind]
+            ;[clojure.string :as str]
             [scicloj.kindly.v4.api :as kindly]
-            [utils.string :as st]
-            [utils.misc :as msc]
-            [utils.math :as um]
+            [scicloj.metamorph.ml.rdatasets :as rdatasets]
+            ;[aerial.hanami.templates :as ht]
            ))
 
 
-(def plot-steps 400)
-
-(defn make-plot
-  [[x-min x-max] [y-min y-max] f & {:keys [steps]}] 
-  (let [x-increment (/ (- x-max x-min) (double (or steps *plot-steps*)))
-        xs (msc/irange x-min x-max x-increment)
-        ys (map f xs)]
-    (-> {:x xs, :y ys}
-        (plotly/layer-line {:=x :x, :=y, :y}))))
-
-(comment
 (def data {:x [1 2 2 1 1 1.2]
            :y [1 1 3 3 2 2.5]})
 
@@ -78,4 +70,3 @@
       :=color :species
       :=mark-size 20
       :=mark-opacity 0.6}))
-)
