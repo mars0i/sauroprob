@@ -10,7 +10,7 @@
 
 ;; Default number of steps to plot a curve; the plot range will usually 
 ;; be divided into this many steps:
-(def plot-steps 200)
+(def plot-steps 400)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Basic tools
@@ -35,8 +35,7 @@
   coordinates. label can be used to identify these as distinct points in
   Vega-Lite.  This can be used to plot f."
   [label x-min x-max x-increment f]
-  (let [x-range (- x-max x-min)
-        xs (msc/irange x-min x-max x-increment)
+  (let [xs (msc/irange x-min x-max x-increment)
         ys (map f xs)]
     (map (fn [x y] {"x" x, "y" y, "label" label}) xs ys)))
 
@@ -268,7 +267,8 @@
                                  x-min x-max
                                  (/ (- x-max x-min) (double plot-steps))
                                  (msc/n-comp paramed-f num-compositions))
-                :COLOR "label"))))
+                :COLOR "label"
+                :SIZE 0.75))))
 
 
 
