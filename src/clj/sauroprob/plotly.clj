@@ -3,8 +3,8 @@
   (:require [clojure.math :as m] ; new in Clojure 1.11 
             [scicloj.tableplot.v1.plotly :as plotly]
             [scicloj.kindly.v4.kind :as kind]
-            [scicloj.kindly.v4.api :as kindly]
-            [utils.string :as st]
+            ;[scicloj.kindly.v4.api :as kindly]
+            [tablecloth.api :as tc]
             [utils.misc :as msc]
             [utils.math :as um]
            ))
@@ -12,70 +12,36 @@
 
 (def plot-steps 400)
 
-(defn make-plot
-  [[x-min x-max] [y-min y-max] f & {:keys [steps]}] 
-  (let [x-increment (/ (- x-max x-min) (double (or steps *plot-steps*)))
+(defn fn-dataset
+  [[x-min x-max] [y-min y-max] f & {:keys [steps keysuffix]}] 
+  (let [x-increment (/ (- x-max x-min) (double (or steps plot-steps)))
         xs (msc/irange x-min x-max x-increment)
-        ys (map f xs)]
-    (-> {:x xs, :y ys}
-        (plotly/layer-line {:=x :x, :=y, :y}))))
+        ys (map f xs)
+        xkey (keyword (str "x" (or keysuffix "")))
+        ykey (keyword (str "y" (or keysuffix "")))]
+    (-> {xkey xs, ykey ys}
+        tc/dataset)))
 
-(comment
-(def data {:x [1 2 2 1 1 1.2]
-           :y [1 1 3 3 2 2.5]})
+(-> (fn-dataset [-4.0 1.0] [-4.0 1.0] (partial um/scaled-exp (- m/E)))
+    (plotly/layer-line {:=x :x, :=y, :y}))
 
-;; How to specify equal units on both axes:
-(-> data
-    tc/dataset
-    (plotly/layer-line {:=x :x, :=y :y})
-    plotly/plot ; needed to convert Hanami/Plotly edn to pure Plotly edn
-    (assoc-in [:layout :yaxis :scaleanchor] :x)
-    (assoc-in [:layout :yaxis :scaleratio] 1)) ; 1 is the default, but this can be used to specify other ratios
+(-> (fn-dataset [-4.0 1.0] [-4.0 1.0]
+                  (msc/n-comp (partial um/scaled-exp (- m/E)) 2))
+    (plotly/layer-line {:=x :x, :=y, :y}))
 
+(def all
+  (tc/concat
+    (-> (fn-dataset [-4.0 1.0] [-4.0 1.0]
+                      (partial um/scaled-exp (- m/E))
+                      :keysuffix "1"))
+    (-> (fn-dataset [-4.0 1.0] [-4.0 1.0]
+                      (msc/n-comp (partial um/scaled-exp (- m/E)) 2)
+                      :keysuffix "2"))
+    (-> (fn-dataset [-4.0 1.0] [-4.0 1.0]
+                      (msc/n-comp (partial um/scaled-exp (- m/E)) 3)
+                      :keysuffix "3"))))
 
-;; Data from https://plotly.com/javascript/axes/#fixedratio-axes
-(def data2 {:x [0,1,1,0,0,1,1,2,2,3,3,2,2,3]
-            :y [0,0,1,1,3,3,2,2,3,3,1,1,0,0]})
-
-(-> data2
-    tc/dataset
-    (plotly/layer-line {:=x :x
-                        :=y :y
-                        :=mark-color "blue"
-                        })
-    plotly/plot
-)
-
-;; Examples from Tableplot docs
-
-(-> (rdatasets/datasets-iris)
-    (plotly/splom
-     {:=colnames [:sepal-length :sepal-width :petal-length :petal-width]
-      :=color :species
-      :=height 800
-      :=width 600}))
-
-;; Why is it not flush with margins?  If you remove the big spots, it's
-;; flush on left and right.
-(-> (rdatasets/ggplot2-economics_long)
-    (tc/select-rows #(-> % :variable (= "unemploy")))
-    (plotly/layer-point {:=x :date
-                         :=y :value
-                         :=mark-color "green"
-                         :=mark-size 20
-                         :=mark-opacity 0.5})
-    (plotly/layer-line {:=x :date
-                        :=y :value
-                        :=mark-color "purple"}))
-
-
-;; Example from docs
-(-> (rdatasets/datasets-iris)
-    (tc/random 10 {:seed 1})
-    (plotly/layer-point
-     {:=x :sepal-width
-      :=y :sepal-length
-      :=color :species
-      :=mark-size 20
-      :=mark-opacity 0.6}))
-)
+(-> all
+    (plotly/layer-line {:=x :x1, :=y, :y1})
+    (plotly/layer-line {:=x :x2, :=y, :y2})
+    (plotly/layer-line {:=x :x3, :=y, :y3}))
