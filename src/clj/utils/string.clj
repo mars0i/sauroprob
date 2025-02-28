@@ -4,12 +4,8 @@
   "If n is a single-digit integer in [0, ..., 9], returns the
   Unicode supscript character for n.  Otherwise returns nil."
   [n]
-  (if (and (integer? n)
-           (not (neg? n))
-           (>= n 0)
-           (<= n 9))
-    (char (+ 0x2080 n))
-    nil))
+  (when (and (integer? n) (>= n 0) (< n 10))
+    (char (+ 0x2080 n))))
 
 
 ;; Unicode supports a limited number of supscript and superscript characters,
@@ -30,13 +26,33 @@
 (defn u-sup-chars
   [n]
   (when (and (integer? n) (>= n 0) (>= n 10))
-    (loop [curr-chars [], this-n (rem n 10), next-n (quot n 10)]
-      (recur (conj curr-chars (u-sup-char this-n))))))
+    (loop [curr-chars (), this-n n]
+      (let [next-char (u-sup-char (rem this-n 10))
+            next-chars (cons next-char curr-chars)
+            next-n (quot this-n 10)]
+        (if (zero? next-n)
+          next-chars
+          (recur next-chars next-n))))))
+
 
 
 (comment
+  
+  (rem 12345 10)
+  (quot 12345 10)
+  (quot 5 10)
+  (quot 0 10)
+  (rem 50 10)
+  (quot 50 10)
+
   (map #(str "F" (u-sub-char %)) (concat (range 11) [0.2 -3])) ; last 3 s/b empty since nil
   (map #(str "F" (u-sup-char %)) (concat (range 11) [0.2 -3])) ; last 3 s/b empty since nil
+
+  ;; Tip: don't stick a zero at beginning--then it's octal.
+  (u-sup-chars 123456789012345)
+  (apply str "Z" (u-sup-chars 123456789012345))
+
+
 )
 
 ;;TODO Make string versions of above that take arbitrary positive integers
