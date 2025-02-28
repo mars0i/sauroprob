@@ -15,6 +15,10 @@
 ;; [xmin x-max] is the first arg, for use with -> , because it's likely
 ;; that different fns will share same x coords.
 (defn fn2dataset
+  "Generates a TMD dataset of points in which the coordinates are (x, f(x))
+  from x-min to x-max, with an additional field named catkey, with a single
+  value catval.  This key/val pair can be used to identify these coordinates
+  after they are merged into another dataset."
   [[x-min x-max] catkey catval f & {:keys [steps]}] 
   (let [x-increment (/ (double (- x-max x-min))
                        (or steps plot-steps))
@@ -53,7 +57,7 @@
 
 (kind/tex "x^2=\\alpha")
 
-(def f2 (kind/tex "f^2"))
+(def f2 (kind/tex "\\sum_{i=0}^\\infty \\mu \\frac{f^2}{Q_{32}}"))
 
 f2
 
