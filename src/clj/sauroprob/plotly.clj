@@ -30,63 +30,63 @@
   (-> plot
       plotly/plot
       (assoc-in [:layout :yaxis :scaleanchor] :x)
-      (assoc-in [:layout :yaxis :scaleratio] 1)
+      ;(assoc-in [:layout :yaxis :scaleratio] 1)
       ;; make same grid lines?  not this, doesn't work:
       ;(assoc-in [:layout :grid :xgap] 1)
       ;(assoc-in [:layout :grid :ygap] 1)
       ))
 
-(def all
+(def three
   (tc/concat
-    (-> (fn2dataset [-4.0 1.0] :fun :base
-                      (partial um/scaled-exp (- m/E))
-                      :keysuffix "1"))
-    (-> (fn2dataset [-4.0 1.0] :fun :comp2
-                      (msc/n-comp (partial um/scaled-exp (- m/E)) 2)
-                      :keysuffix "2"))
-    (-> (fn2dataset [-4.0 1.0] :fun :comp3
-                      (msc/n-comp (partial um/scaled-exp (- m/E)) 3)
-                      :keysuffix "3"))))
+    (tc/dataset {:x [-4 1], :y [-4 1], :fun :y=x})
+    (fn2dataset [-4.0 1.0] :fun :base
+                      (partial um/scaled-exp (- m/E)))
+    (fn2dataset [-4.0 1.0] :fun :comp2
+                      (msc/n-comp (partial um/scaled-exp (- m/E)) 2))
+    (fn2dataset [-4.0 1.0] :fun :comp3
+                      (msc/n-comp (partial um/scaled-exp (- m/E)) 3))))
 
-(-> all
+(-> three
+    (plotly/base {:=height 600 :=width 600})
     (plotly/layer-line {:=x :x, :=y, :y :=color :fun})
     equalize-display-units)
 
+(kind/tex "x^2=\\alpha")
 
-(comment
-         ;; old version
-         (defn fn-dataset
-           [[x-min x-max] [y-min y-max] f & {:keys [steps keysuffix]}] 
-           (let [x-increment (/ (- x-max x-min) (double (or steps plot-steps)))
-                 xs (msc/irange x-min x-max x-increment)
-                 ys (map f xs)
-                 xkey (keyword (str "x" (or keysuffix "")))
-                 ykey (keyword (str "y" (or keysuffix "")))]
-             (-> {xkey xs, ykey ys}
-                 tc/dataset)))
+(def f2 (kind/tex "f^2"))
 
-         (-> (fn-dataset [-4.0 1.0] [-4.0 1.0] (partial um/scaled-exp (- m/E)))
-             (plotly/layer-line {:=x :x, :=y, :y}))
+f2
 
-         (-> (fn-dataset [-4.0 1.0] [-4.0 1.0]
-                         (msc/n-comp (partial um/scaled-exp (- m/E)) 2))
-             (plotly/layer-line {:=x :x, :=y, :y}))
+(kind/pprint f2)
 
-         (def all
-           (tc/concat
-             (-> (fn-dataset [-4.0 1.0] [-4.0 1.0]
-                             (partial um/scaled-exp (- m/E))
-                             :keysuffix "1"))
-             (-> (fn-dataset [-4.0 1.0] [-4.0 1.0]
-                             (msc/n-comp (partial um/scaled-exp (- m/E)) 2)
-                             :keysuffix "2"))
-             (-> (fn-dataset [-4.0 1.0] [-4.0 1.0]
-                             (msc/n-comp (partial um/scaled-exp (- m/E)) 3)
-                             :keysuffix "3"))))
+(meta f2)
 
-         (-> all
-             (plotly/layer-line {:=x :x1, :=y, :y1})
-             (plotly/layer-line {:=x :x2, :=y, :y2})
-             (plotly/layer-line {:=x :x3, :=y, :y3}))
 
-)
+(def two
+  (let [λ (- (- m/E) 2.0)
+        f (partial um/scaled-exp λ)]
+    (tc/concat
+      (tc/dataset {:x [-7 0.5], :y [-7 0.5], :fun "y=x"})
+      (fn2dataset [-7.0 0.5] :fun "f(x)=λe^x" f)
+      (fn2dataset [-7.0 0.5] :fun "f^2" (msc/n-comp f 2)))))
+
+(-> two
+    ;(plotly/base {:=height 600 :=width 600})
+    (plotly/layer-line {:=x :x, :=y, :y :=color :fun})
+    ;equalize-display-units
+    )
+
+(def rickers
+  (let [r 2.25
+        f (um/normalized-ricker r)]
+    (tc/concat
+      (tc/dataset {:x [0 2], :y [0 2], :fun "y=x"})
+      (fn2dataset [0 3] :fun "f" f)
+      (fn2dataset [0 3] :fun "f^2" (msc/n-comp f 2))
+      (fn2dataset [0 3] :fun "f^4" (msc/n-comp f 4)))))
+
+(-> rickers
+    ;(plotly/base {:=height 600 :=width 600})
+    (plotly/layer-line {:=x :x, :=y, :y :=color :fun})
+    equalize-display-units
+    )
