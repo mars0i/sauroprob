@@ -67,20 +67,60 @@ f2
 
 (meta f2)
 
+(def lf2 ^{:kindly{:kind :kind/tex, :options nil}}
+  [
+  "<math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"block\">
+  <munderover>
+    <mo data-mjx-texclass=\"OP\">&#x2211;</mo>
+    <mrow data-mjx-texclass=\"ORD\">
+      <mi>i</mi>
+      <mo>=</mo>
+      <mn>0</mn>
+    </mrow>
+    <mi mathvariant=\"normal\">&#x221E;</mi>
+  </munderover>
+  <mi>&#x3BC;</mi>
+  <mfrac>
+    <msup>
+      <mi>f</mi>
+      <mn>2</mn>
+    </msup>
+    <msub>
+      <mi>Q</mi>
+      <mrow data-mjx-texclass=\"ORD\">
+        <mn>32</mn>
+      </mrow>
+    </msub>
+  </mfrac>
+</math>"])
+
+lf2
+(meta lf2)
+
 
 (def two
   (let [λ (- (- m/E) 2.0)
         f (partial um/scaled-exp λ)]
     (tc/concat
-      (tc/dataset {:x [-7 0.5], :y [-7 0.5], :fun "y=x"})
-      (fn2dataset [-7.0 0.5] :fun "f(x)=λe^x" f)
-      (fn2dataset [-7.0 0.5] :fun (apply str "f" (st/u-sup-chars 2)) (msc/n-comp f 2)))))
+      (tc/dataset {:x [-7 0.5], :y [-7 0.5], :fun "<em>y</em>=<em>x</em>"}) ; Look! You can use simple html!
+      (fn2dataset [-7.0 0.5] :fun "f(x)=λe<sup>x</sup>" f)
+      (fn2dataset [-7.0 0.5] :fun "f<sub>20</sub>" (msc/n-comp f 2))
+    )))
+      ;(fn2dataset [-7.0 0.5] :fun (apply str "f" (st/u-sup-chars 2)) (msc/n-comp f 2))
+      ;(fn2dataset [-7.0 0.5] :fun lf2 (msc/n-comp f 3)) ; not what's intended
 
 (-> two
     ;(plotly/base {:=height 600 :=width 600})
     (plotly/layer-line {:=x :x, :=y, :y :=color :fun})
     ;equalize-display-units
     )
+
+(let [λ (- m/E)
+      f (partial um/scaled-exp λ)]
+  (-> (tc/concat
+        (tc/dataset {:x [-7 0.5], :y [-7 0.5], :fun "<em>y</em>=<em>x</em>"})
+        (fn2dataset [-7.0 0.5] :fun "f(x)=λe<sup>x</sup>" f))
+      (plotly/layer-line {:=x :x, :=y, :y :=color :fun})))
 
 (def rickers
   (let [r 2.25
