@@ -27,6 +27,7 @@
     (-> {:x xs, :y ys, catkey catval}
         tc/dataset)))
 
+;; FIXME It's not working.  Maybe it can't.  wtf.  Or is Tableplot messing it up?
 (defn equalize-display-units
   "Given a Tableplot plot (in either Hanami-key form or full Plotly EDN),
   adds Plotly settings to force the displayed x and y units to be equal."
@@ -34,7 +35,7 @@
   (-> plot
       plotly/plot
       (assoc-in [:layout :yaxis :scaleanchor] :x)
-      ;(assoc-in [:layout :yaxis :scaleratio] 1)
+      (assoc-in [:layout :yaxis :scaleratio] 1)
       ;; make same grid lines?  not this, doesn't work:
       ;(assoc-in [:layout :grid :xgap] 1)
       ;(assoc-in [:layout :grid :ygap] 1)
