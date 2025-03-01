@@ -24,15 +24,19 @@
           :else nil)))
 
 (defn u-sup-chars
+  "If n is non-negative integer, returns a sequence of Unicode superscript
+  characters for n's digits.  Otherwise returns nil."
   [n]
-  (when (and (integer? n) (>= n 0) (>= n 10))
-    (loop [curr-chars (), this-n n]
-      (let [next-char (u-sup-char (rem this-n 10))
-            next-chars (cons next-char curr-chars)
-            next-n (quot this-n 10)]
-        (if (zero? next-n)
-          next-chars
-          (recur next-chars next-n))))))
+  (when (and (integer? n) (>= n 0))
+    (if (< n 10)
+      [(u-sup-char n)] ; Don't go into the loop with 0; might as well special-case all single-digits
+      (loop [curr-chars (), this-n n] ; terminates when quot returns 0
+        (let [next-char (u-sup-char (rem this-n 10))
+              next-chars (cons next-char curr-chars)
+              next-n (quot this-n 10)]
+          (if (zero? next-n)
+            next-chars
+            (recur next-chars next-n)))))))
 
 
 
@@ -51,6 +55,9 @@
   ;; Tip: don't stick a zero at beginning--then it's octal.
   (u-sup-chars 123456789012345)
   (apply str "Z" (u-sup-chars 123456789012345))
+
+  (u-sup-char 0)
+  (u-sup-chars 0)
 
 
 )
