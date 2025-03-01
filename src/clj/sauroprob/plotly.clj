@@ -120,7 +120,27 @@ lf2
   (-> (tc/concat
         (tc/dataset {:x [-7 0.5], :y [-7 0.5], :fun "<em>y</em>=<em>x</em>"})
         (fn2dataset [-7.0 0.5] :fun "f(x)=λe<sup>x</sup>" f))
-      (plotly/layer-line {:=x :x, :=y, :y :=color :fun})))
+      (plotly/layer-line {:=x :x, :=y, :y :=color :fun})
+      (equalize-display-units)))
+
+
+;; This illustrates a method for replacing values at the last step in order
+;; to change how they are displayed.  Using an array index seems fragile.
+(let [λ (- m/E)
+      f (partial um/scaled-exp λ)]
+  (-> (tc/concat
+        (tc/dataset {:x [-7 0.5], :y [-7 0.5], :fun "y=x"})
+        (fn2dataset [-7.0 0.5] :fun "scaled-exp" f))
+      (plotly/layer-line {:=x :x, :=y, :y :=color :fun})
+      (plotly/plot)
+      ;; This works but it's fragile, and only replaces one value:
+      ;(assoc-in [:data 1 :name] "f(x)=λe<sup>x</sup>") ; #(if (= % "scaled-exp") "f(x)=λe<sup>x</sup>" %))
+      ;; This works but it's too complicated (cleaner with pre-defined fns):
+      (update :data (fn [v] (mapv
+                              (fn [m] (update m :name #(if (= % "scaled-exp") "f(x)=λe<sup>x</sup>" %)))
+                              v)))                    ;; use `cond` for more replacements
+      (kind/pprint)
+      ))
 
 (def rickers
   (let [r 2.25
