@@ -6,6 +6,7 @@
             ;[scicloj.kindly.v4.api :as kindly]
             [tablecloth.api :as tc]
             [utils.misc :as msc]
+            [utils.string :as st]
             [utils.math :as um]
            ))
 
@@ -73,7 +74,7 @@ f2
     (tc/concat
       (tc/dataset {:x [-7 0.5], :y [-7 0.5], :fun "y=x"})
       (fn2dataset [-7.0 0.5] :fun "f(x)=λe^x" f)
-      (fn2dataset [-7.0 0.5] :fun "f^2" (msc/n-comp f 2)))))
+      (fn2dataset [-7.0 0.5] :fun (apply str "f" (st/u-sup-chars 2)) (msc/n-comp f 2)))))
 
 (-> two
     ;(plotly/base {:=height 600 :=width 600})
