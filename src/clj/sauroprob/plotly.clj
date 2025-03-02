@@ -64,18 +64,6 @@
        (#(assoc % catkey catval)) ; since threading last
        tc/dataset))
 
-;; Does same thing, but stylistically different, maybe less efficient:
-(defn iter-lines-alt
-  "ADD DOCSTRING"
-  [init-x iters catkey catval f]
-  (let [f-iterates (take iters (iterate f init-x))
-        next-pairs (partition 2 1 f-iterates)
-        vert-segs (map next-vert-seg next-pairs)
-        coords (apply merge-with into vert-segs)]
-    (-> coords
-        (assoc catkey catval)
-        tc/dataset)))
-
 (comment
   (iter-lines1 0.75 5 :fun "ya" (um/normalized-ricker 2.7))
   (iter-lines 0.75 5 :fun "ya" (um/normalized-ricker 2.7))
