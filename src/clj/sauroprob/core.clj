@@ -1,20 +1,41 @@
 ^:kindly/hide-code
 (ns sauroprob.core
   (:require [clojure.math :as m] ; new in Clojure 1.11 
+            [scicloj.tableplot.v1.plotly :as plotly]
             [scicloj.kindly.v4.kind :as kind]
             [scicloj.clay.v2.api :as clay] ; needed for clay eval keymappings
-            ;[oz.core :as oz]
-            ;[aerial.hanami.common :as hc]
-            ;[aerial.hanami.templates :as ht]
-            ;[utils.json :as json]
-            ;[utils.string :as st]
+            [tablecloth.api :as tc]
             [utils.misc :as msc]
             [utils.math :as um]
             [sauroprob.hanami :as sh]
+            [sauroprob.plotly :as sp]
             ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; ## Plotly examples
+
+(let [μ 4, f (um/logistic μ)]
+  (->
+    (tc/concat
+      (tc/dataset {:x [0 1], :y [0 1], :fun "y=x"})
+      (sp/fn2dataset [0 1] :fun "f" f)
+      (sp/iter-lines 0.05 12 :fun "iter" f))
+    (plotly/base {:=height 420 :=width 700})
+    (plotly/layer-line {:=x :x, :=y, :y :=color :fun})
+    (plotly/plot)
+    (assoc-in [:data 0 :line :dash] "dot") ; https://plotly.com/javascript/reference/scatter/#scatter-line-dash 
+    (assoc-in [:data 0 :name] "<em>y=x</em>") ; https://plotly.com/javascript/reference/scatter/#scatter-name
+    (assoc-in [:data 1 :line :width] 1) ; default is 2.  https://plotly.com/javascript/reference/scatter/#scatter-line-width
+    (assoc-in [:data 1 :name] "<em>f(x)=xe<sup>r(1-x)</sup></em>") ; 1 shouldn't really be italicized
+    (assoc-in [:data 2 :line :dash] "dot")
+    (sp/equalize-display-units) ; If display dimensions don't fit data, extra space in plot
+    ;(kind/pprint)
+    ))
+
+
+
+;; ## Vega-lite/Hanami examples
 
 (kind/vega-lite (sh/make-vl-spec [0.0 3.0] um/normalized-ricker [2.5] [1] [0.6] 60))
 (kind/vega-lite (sh/vl-plot-seq "stuff" (take 100 (iterate (um/normalized-ricker 2.5) 0.6))))
