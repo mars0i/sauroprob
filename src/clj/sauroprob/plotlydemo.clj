@@ -68,5 +68,6 @@
      {:=x :sepal-width
       :=y :sepal-length
       :=color :species
-      :=mark-size 20
+      :=size :species
+      ;:=mark-size 20
       :=mark-opacity 0.6}))

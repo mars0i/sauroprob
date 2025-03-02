@@ -45,17 +45,19 @@
 (def three
   (tc/concat
     (tc/dataset {:x [-4 1], :y [-4 1], :fun :y=x})
-    (fn2dataset [-4.0 1.0] :fun :base
-                      (partial um/scaled-exp (- m/E)))
-    (fn2dataset [-4.0 1.0] :fun :comp2
-                      (msc/n-comp (partial um/scaled-exp (- m/E)) 2))
-    (fn2dataset [-4.0 1.0] :fun :comp3
-                      (msc/n-comp (partial um/scaled-exp (- m/E)) 3))))
+    (fn2dataset [-4.0 1.0] :fun :base (partial um/scaled-exp (- m/E)))
+    (fn2dataset [-4.0 1.0] :fun :comp2 (msc/n-comp (partial um/scaled-exp (- m/E)) 2))
+    (fn2dataset [-4.0 1.0] :fun :comp3 (msc/n-comp (partial um/scaled-exp (- m/E)) 3))))
 
 (-> three
     (plotly/base {:=height 600 :=width 600})
+    (plotly/layer-point {:=x :x, :=y, :y, :=color :fun, :=size :fun, :=mark-opacity 0.2,
+                        :=name "Yow"})
     (plotly/layer-line {:=x :x, :=y, :y :=color :fun})
-    equalize-display-units)
+    equalize-display-units
+    (plotly/plot)
+    ;(kind/pprint)
+    )
 
 (kind/tex "x^2=\\alpha")
 
