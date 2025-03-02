@@ -89,7 +89,7 @@
     (assoc-in [:data 0 :name] "<em>y=x</em>") ; https://plotly.com/javascript/reference/scatter/#scatter-name
     (assoc-in [:data 1 :line :dash] "dot")
     (assoc-in [:data 2 :line :width] 3) ; default is 2.  https://plotly.com/javascript/reference/scatter/#scatter-line-width
-    (assoc-in [:data 2 :name] "<em>f(x)=xe<sup>r(1-x)</sup></em>")
+    (assoc-in [:data 2 :name] "<em>f(x)=xe<sup>r(1-x)</sup></em>") ; 1 shouldn't really be italicized
     (assoc-in [:data 3 :name] "<em>f<sup>2</sup></em>")
     (assoc-in [:data 4 :name] "<em>f<sup>4</sup></em>")
     (equalize-display-units) ; If display dimensions don't fit data, extra space in plot
