@@ -28,19 +28,87 @@
     (-> {:x xs, :y ys, catkey catval}
         tc/dataset)))
 
-;; FIXME It's not working.  Maybe it can't.  wtf.  Or is Tableplot messing it up?
 (defn equalize-display-units
   "Given a Tableplot plot (in either Hanami-key form or full Plotly EDN),
-  adds Plotly settings to force the displayed x and y units to be equal."
+  adds Plotly settings to force the displayed x and y units to be equal.
+  (Note if the plot's display dimensions are too large in one dimension,
+  there will be extra space in the plot outside of the plotted data.)"
   [plot]
   (-> plot
       plotly/plot
       (assoc-in [:layout :yaxis :scaleanchor] :x)
-      (assoc-in [:layout :yaxis :scaleratio] 1)
-      ;; make same grid lines?  not this, doesn't work:
-      ;(assoc-in [:layout :grid :xgap] 1)
-      ;(assoc-in [:layout :grid :ygap] 1)
-      ))
+      (assoc-in [:layout :yaxis :scaleratio] 1)))
+
+;(defn next-iter-seg
+;  [f x]
+;  {:x [x x]
+;   :y [x (f x)]})
+
+(defn next-vert-seg
+  "ADD DOCSTRING"
+  [[x next-x]]
+  {:x [x x]
+   :y [x next-x]})
+
+;; We only construct vertical segments explicitly; by chaining
+;; these together, the lines that connect them are the horizontal
+;; segments.
+(defn iter-lines
+  "ADD DOCSTRING"
+  [init-x iters catkey catval f]
+  (->> (iterate f init-x)
+       (take iters)
+       (partition 2 1)
+       (map next-vert-seg)
+       (apply merge-with into)
+       (#(assoc % catkey catval)) ; since threading last
+       tc/dataset))
+
+;; Does same thing, but stylistically different, maybe less efficient:
+(defn iter-lines-alt
+  "ADD DOCSTRING"
+  [init-x iters catkey catval f]
+  (let [f-iterates (take iters (iterate f init-x))
+        next-pairs (partition 2 1 f-iterates)
+        vert-segs (map next-vert-seg next-pairs)
+        coords (apply merge-with into vert-segs)]
+    (-> coords
+        (assoc catkey catval)
+        tc/dataset)))
+
+(comment
+  (iter-lines1 0.75 5 :fun "ya" (um/normalized-ricker 2.7))
+  (iter-lines 0.75 5 :fun "ya" (um/normalized-ricker 2.7))
+)
+
+(def rickers
+  (let [r 2.7
+        f (um/normalized-ricker r)]
+    (tc/concat
+      (tc/dataset {:x [0 2.1], :y [0 2.1], :fun "y=x"})
+      (iter-lines 0.75 8 :fun "iter" f)
+      (fn2dataset [0 3] :fun "f" f)
+      (fn2dataset [0 3] :fun "f^2" (msc/n-comp f 2))
+      (fn2dataset [0 3] :fun "f^4" (msc/n-comp f 4)))))
+
+;; It would be simpler to embed the HTML in the vals, but this illustrates
+;; the option of adding them in the final stage.
+(-> rickers
+    (plotly/base {:=height 420 :=width 700})
+    (plotly/layer-line {:=x :x, :=y, :y :=color :fun})
+    (plotly/plot)
+    (assoc-in [:data 0 :line :dash] "dash") ; https://plotly.com/javascript/reference/scatter/#scatter-line-dash 
+    (assoc-in [:data 0 :name] "<em>y=x</em>") ; https://plotly.com/javascript/reference/scatter/#scatter-name
+    (assoc-in [:data 1 :line :dash] "dot")
+    (assoc-in [:data 2 :line :width] 3) ; default is 2.  https://plotly.com/javascript/reference/scatter/#scatter-line-width
+    (assoc-in [:data 2 :name] "<em>f(x)=xe<sup>r(1-x)</sup></em>")
+    (assoc-in [:data 3 :name] "<em>f<sup>2</sup></em>")
+    (assoc-in [:data 4 :name] "<em>f<sup>4</sup></em>")
+    (equalize-display-units) ; If display dimensions don't fit data, extra space in plot
+    ;(kind/pprint)
+   )
+
+
 
 (def three
   (tc/concat
@@ -101,20 +169,22 @@ lf2
 
 
 (def two
-  (let [λ (- (- m/E) 2.0)
-        f (partial um/scaled-exp λ)]
+  (let [λ1 (- (- m/E) 2.0)
+        f1 (partial um/scaled-exp λ1)
+        λ2 (- (- m/E) 3.0)
+        f2 (partial um/scaled-exp λ2)]
     (tc/concat
-      (tc/dataset {:x [-7 0.5], :y [-7 0.5], :fun "<em>y</em>=<em>x</em>"}) ; Look! You can use simple html!
-      (fn2dataset [-7.0 0.5] :fun "f(x)=λe<sup>x</sup>" f)
-      (fn2dataset [-7.0 0.5] :fun "f<sub>20</sub>" (msc/n-comp f 2))
+      (tc/dataset {:x [-7 0.5], :y [-7 0.5], :fun "y=x"})
+      (fn2dataset [-7.0 0.5] :fun "f<sub>1</sub>(x)=λ<sub>1</sub>e<sup>x</sup>" f1)
+      (fn2dataset [-7.0 0.5] :fun "f<sub>1</sub><sub>2</sub>" (msc/n-comp f1 2))
+      (fn2dataset [-7.0 0.5] :fun "f<sub>2</sub>(x)=λ<sub>1</sub>e<sup>x</sup>" f2)
+      (fn2dataset [-7.0 0.5] :fun "f<sub>2</sub><sub>2</sub>" (msc/n-comp f2 2))
     )))
-      ;(fn2dataset [-7.0 0.5] :fun (apply str "f" (st/u-sup-chars 2)) (msc/n-comp f 2))
-      ;(fn2dataset [-7.0 0.5] :fun lf2 (msc/n-comp f 3)) ; not what's intended
 
 (-> two
-    ;(plotly/base {:=height 600 :=width 600})
+    (plotly/base {:=height 600 :=width 600})
     (plotly/layer-line {:=x :x, :=y, :y :=color :fun})
-    ;equalize-display-units
+    (equalize-display-units)
     )
 
 (let [λ (- m/E)
@@ -136,25 +206,10 @@ lf2
       (plotly/layer-line {:=x :x, :=y, :y :=color :fun})
       (plotly/plot)
       ;; This works but it's fragile, and only replaces one value:
-      ;(assoc-in [:data 1 :name] "f(x)=λe<sup>x</sup>") ; #(if (= % "scaled-exp") "f(x)=λe<sup>x</sup>" %))
+      (assoc-in [:data 1 :name] "f(x)=λe<sup>x</sup>")
       ;; This works but it's too complicated (cleaner with pre-defined fns):
-      (update :data (fn [v] (mapv
-                              (fn [m] (update m :name #(if (= % "scaled-exp") "f(x)=λe<sup>x</sup>" %)))
-                              v)))                    ;; use `cond` for more replacements
+      ;(update :data (fn [v] (mapv
+      ;                        (fn [m] (update m :name #(if (= % "scaled-exp") "f(x)=λe<sup>x</sup>" %)))
+      ;                        v)))                    ;; use `cond` for more replacements
       (kind/pprint)
       ))
-
-(def rickers
-  (let [r 2.25
-        f (um/normalized-ricker r)]
-    (tc/concat
-      (tc/dataset {:x [0 2], :y [0 2], :fun "y=x"})
-      (fn2dataset [0 3] :fun "f" f)
-      (fn2dataset [0 3] :fun "f^2" (msc/n-comp f 2))
-      (fn2dataset [0 3] :fun "f^4" (msc/n-comp f 4)))))
-
-(-> rickers
-    ;(plotly/base {:=height 600 :=width 600})
-    (plotly/layer-line {:=x :x, :=y, :y :=color :fun})
-    equalize-display-units
-    )
