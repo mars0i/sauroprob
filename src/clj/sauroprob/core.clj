@@ -20,17 +20,22 @@
     (tc/concat
       (tc/dataset {:x [0 1], :y [0 1], :fun "y=x"})
       (sp/fn2dataset [0 1] :fun "f" f)
-      (sp/iter-lines 0.05 12 :fun "iter" f))
-    (plotly/base {:=height 420 :=width 700})
+      (sp/iter-lines 0.05 12 :fun "iteration" f))
+    (plotly/base {:=height 420 :=width 550})
     (plotly/layer-line {:=x :x, :=y, :y :=color :fun})
     (plotly/plot)
-    (assoc-in [:data 0 :line :dash] "dot") ; https://plotly.com/javascript/reference/scatter/#scatter-line-dash 
-    (assoc-in [:data 0 :name] "<em>y=x</em>") ; https://plotly.com/javascript/reference/scatter/#scatter-name
-    (assoc-in [:data 1 :line :width] 1) ; default is 2.  https://plotly.com/javascript/reference/scatter/#scatter-line-width
-    (assoc-in [:data 1 :name] "<em>f(x)=xe<sup>r(1-x)</sup></em>") ; 1 shouldn't really be italicized
+    ;; Set properties of lines:
+    (assoc-in [:data 0 :line :width] 1.5) ; default is 2.  https://plotly.com/javascript/reference/scatter/#scatter-line-width
+    (assoc-in [:data 1 :line :width] 1)
+    (assoc-in [:data 2 :line :width] 1.5)
+    (assoc-in [:data 0 :line :dash] "dash") ; https://plotly.com/javascript/reference/scatter/#scatter-line-dash 
     (assoc-in [:data 2 :line :dash] "dot")
-    (sp/equalize-display-units) ; If display dimensions don't fit data, extra space in plot
-    ;(kind/pprint)
+    ;; Set legend and rollover labels to something other than value of :fun :
+    (assoc-in [:data 0 :name] "<em>y=x</em>") ; https://plotly.com/javascript/reference/scatter/#scatter-name
+    (assoc-in [:data 1 :name] "<em>f(x)=xe<sup>μ(1-x)</sup></em>") ; 1 shouldn't really be italicized
+    ;; Force displayed distances to be equal in x and y directions:
+    (assoc-in [:layout :yaxis :scaleanchor] :x)
+    (assoc-in [:layout :yaxis :scaleratio] 1)
     ))
 
 
