@@ -4,6 +4,7 @@
             [scicloj.tableplot.v1.plotly :as plotly]
             [scicloj.kindly.v4.kind :as kind]
             [scicloj.clay.v2.api :as clay] ; needed for clay eval keymappings
+            [scicloj.metamorph.ml.rdatasets :as rdatasets]
             [tablecloth.api :as tc]
             [utils.misc :as msc]
             [utils.math :as um]
@@ -15,29 +16,53 @@
 
 ;; ## Plotly examples
 
-(let [μ 4, f (um/logistic μ)]
-  (->
+(def logistic-iter-data
+  (let [μ 4, f (um/logistic μ)]
     (tc/concat
       (tc/dataset {:x [0 1], :y [0 1], :fun "y=x"})
       (sp/fn2dataset [0 1] :fun "f" f)
-      (sp/iter-lines 0.05 12 :fun "iteration" f))
+      (sp/iter-lines 0.05 12 :fun "iteration" f))))
+
+;; cf. https://scicloj.github.io/tablecloth/#select-1
+(-> logistic-iter-data
+    (tc/select-rows (comp #(= "y=x" %) :fun))
+    (plotly/layer-line {:=x :x, :=y, :y :=name "Yow" :=color :fun})
+    (sp/equalize-display-units))
+
+(-> logistic-iter-data
     (plotly/base {:=height 420 :=width 550})
-    (plotly/layer-line {:=x :x, :=y, :y :=color :fun})
+    (plotly/layer-line {:=x :x, :=y, :y :=name "Yow" :=color :fun})
     (plotly/plot)
     ;; Set properties of lines:
-    (assoc-in [:data 0 :line :width] 1.5) ; default is 2.  https://plotly.com/javascript/reference/scatter/#scatter-line-width
+    (assoc-in [:data 0 :line :width] 1.5) ; default is 2. 
     (assoc-in [:data 1 :line :width] 1)
     (assoc-in [:data 2 :line :width] 1.5)
-    (assoc-in [:data 0 :line :dash] "dash") ; https://plotly.com/javascript/reference/scatter/#scatter-line-dash 
+    (assoc-in [:data 0 :line :dash] "dash") 
     (assoc-in [:data 2 :line :dash] "dot")
-    ;; Set legend and rollover labels to something other than value of :fun :
-    (assoc-in [:data 0 :name] "<em>y=x</em>") ; https://plotly.com/javascript/reference/scatter/#scatter-name
+    ;; Set legend and rollover labels to something other than the value of :fun :
+    (assoc-in [:data 0 :name] "<em>y=x</em>")
     (assoc-in [:data 1 :name] "<em>f(x)=xe<sup>μ(1-x)</sup></em>") ; 1 shouldn't really be italicized
     ;; Force displayed distances to be equal in x and y directions:
     (assoc-in [:layout :yaxis :scaleanchor] :x)
     (assoc-in [:layout :yaxis :scaleratio] 1)
-    ))
+    )
+;; https://plotly.com/javascript/reference/scatter/#scatter-name
+;; https://plotly.com/javascript/reference/scatter/#scatter-line-dash 
+;; https://plotly.com/javascript/reference/scatter/#scatter-line-width
 
+
+;; Doesn't work as intended:
+(let [μ 4, f (um/logistic μ)]
+  (-> (tc/dataset {:x [0 1], :y [0 1], :fun "y=x"})
+      (plotly/base {:=height 420 :=width 550})
+      (plotly/layer-line {:=x :x, :=y, :y :=color :fun}))
+  (-> (sp/iter-lines 0.05 12 :fun "iteration" f)
+      (plotly/base {:=height 420 :=width 550})
+      (plotly/layer-line {:=x :x, :=y, :y :=color :fun}))
+  (-> (sp/fn2dataset [0 1] :fun "f" f)
+      (plotly/base {:=height 420 :=width 550})
+      (plotly/layer-line {:=x :x, :=y, :y :=color :fun}))
+  )
 
 
 ;; ## Vega-lite/Hanami examples
