@@ -14,18 +14,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;; ## MWE
-
-(-> (tc/concat
-      (tc/dataset {:x [0 1], :y [0 1], :equation "y = x"})
-      (tc/dataset {:x [0 1], :y [1 0], :equation "y = -x"}))
-    (plotly/layer-line {:=x :x, :=y, :y :=color :equation})
-    (plotly/plot)
-    (assoc-in [:data 0 :line :width] 1) ; default is 2. 
-    (assoc-in [:data 1 :line :width] 3)
-    (assoc-in [:data 0 :line :dash] "dash") 
-    (assoc-in [:data 1 :line :dash] "dot"))
-
 ;; ## Plotly examples
 
 (def logistic-iter-data
@@ -35,15 +23,13 @@
       (sp/fn2dataset [0 1] :fun "f" f)
       (sp/iter-lines 0.05 12 :fun "iteration" f))))
 
-;; cf. https://scicloj.github.io/tablecloth/#select-1
-(-> logistic-iter-data
-    (tc/select-rows (comp #(= "y=x" %) :fun))
-    (plotly/layer-line {:=x :x, :=y, :y :=name "Yow" :=color :fun})
-    (sp/equalize-display-units))
+
+;    (sp/equalize-display-units)
 
 (-> logistic-iter-data
     (plotly/base {:=height 420 :=width 550})
     (plotly/layer-line {:=x :x, :=y, :y :=name "Yow" :=color :fun})
+    (sp/equalize-display-units)
     (plotly/plot)
     ;; Set properties of lines:
     (assoc-in [:data 0 :line :width] 1.5) ; default is 2. 
@@ -54,27 +40,10 @@
     ;; Set legend and rollover labels to something other than the value of :fun :
     (assoc-in [:data 0 :name] "<em>y=x</em>")
     (assoc-in [:data 1 :name] "<em>f(x)=xe<sup>μ(1-x)</sup></em>") ; 1 shouldn't really be italicized
-    ;; Force displayed distances to be equal in x and y directions:
-    (assoc-in [:layout :yaxis :scaleanchor] :x)
-    (assoc-in [:layout :yaxis :scaleratio] 1)
     )
 ;; https://plotly.com/javascript/reference/scatter/#scatter-name
 ;; https://plotly.com/javascript/reference/scatter/#scatter-line-dash 
 ;; https://plotly.com/javascript/reference/scatter/#scatter-line-width
-
-
-;; Doesn't work as intended:
-(let [μ 4, f (um/logistic μ)]
-  (-> (tc/dataset {:x [0 1], :y [0 1], :fun "y=x"})
-      (plotly/base {:=height 420 :=width 550})
-      (plotly/layer-line {:=x :x, :=y, :y :=color :fun}))
-  (-> (sp/iter-lines 0.05 12 :fun "iteration" f)
-      (plotly/base {:=height 420 :=width 550})
-      (plotly/layer-line {:=x :x, :=y, :y :=color :fun}))
-  (-> (sp/fn2dataset [0 1] :fun "f" f)
-      (plotly/base {:=height 420 :=width 550})
-      (plotly/layer-line {:=x :x, :=y, :y :=color :fun}))
-  )
 
 
 ;; ## Vega-lite/Hanami examples
@@ -122,8 +91,44 @@
                              :addl-plots [(sh/horiz 1.0)]))
 )
 
+;; How to select a specific curve from dataset
+;; (cf. https://scicloj.github.io/tablecloth/#select-1):
+(-> logistic-iter-data
+    (tc/select-rows (comp #(= "f" %) :fun))
+    (plotly/layer-line {:=x :x, :=y, :y})
+    (sp/equalize-display-units))
+
 ^:kindly/hide-code
 (comment
   (require 'clojure.repl)
   (clojure.repl/pst)
 )
+
+;; ## MWE
+
+(-> (tc/concat
+      (tc/dataset {:x [0 1], :y [0 1], :equation "y = x"})
+      (tc/dataset {:x [0 1], :y [1 0], :equation "y = -x"}))
+    (plotly/layer-line {:=x :x, :=y, :y :=color :equation})
+    (plotly/plot)
+    (assoc-in [:data 0 :line :width] 1) ; default is 2. 
+    (assoc-in [:data 1 :line :width] 3)
+    (assoc-in [:data 0 :line :dash] "dash") 
+    (assoc-in [:data 1 :line :dash] "dot"))
+
+
+;; This version avoids the fragility of using array indexes but is worse in
+;; other respects:
+(merge-with into
+            (-> (tc/dataset {:x [0 1], :y [0 1], :equation "y = x"})
+                (plotly/layer-line {:=x :x, :=y, :y :color :equation})
+                (plotly/plot)
+                (assoc-in [:data 0 :line :width] 1)
+                (assoc-in [:data 0 :line :dash] "dash")
+                (assoc-in [:data 0 :name] "y = x"))
+            (-> (tc/dataset {:x [0 1], :y [1 0], :equation "y = -x"})
+                (plotly/layer-line {:=x :x, :=y, :y :color :equation})
+                (plotly/plot)
+                (assoc-in [:data 0 :line :width] 3)
+                (assoc-in [:data 0 :line :dash] "dot")
+                (assoc-in [:data 0 :name] "y = -x")))
