@@ -4,7 +4,7 @@
             [scicloj.tableplot.v1.plotly :as plotly]
             [scicloj.kindly.v4.kind :as kind]
             [scicloj.clay.v2.api :as clay] ; needed for clay eval keymappings
-            [scicloj.metamorph.ml.rdatasets :as rdatasets]
+            ;[scicloj.metamorph.ml.rdatasets :as rdatasets]
             [tablecloth.api :as tc]
             [utils.misc :as msc]
             [utils.math :as um]
