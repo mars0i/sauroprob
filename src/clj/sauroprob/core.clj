@@ -14,6 +14,18 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; ## MWE
+
+(-> (tc/concat
+      (tc/dataset {:x [0 1], :y [0 1], :equation "y = x"})
+      (tc/dataset {:x [0 1], :y [1 0], :equation "y = -x"}))
+    (plotly/layer-line {:=x :x, :=y, :y :=color :equation})
+    (plotly/plot)
+    (assoc-in [:data 0 :line :width] 1) ; default is 2. 
+    (assoc-in [:data 1 :line :width] 3)
+    (assoc-in [:data 0 :line :dash] "dash") 
+    (assoc-in [:data 1 :line :dash] "dot"))
+
 ;; ## Plotly examples
 
 (def logistic-iter-data
