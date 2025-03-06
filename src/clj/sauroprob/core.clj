@@ -83,19 +83,24 @@
 (nil? '())
 (nil? nil)
 
+(type [])
+(type {})
+
 (defn deep-merge2
   "Recursively merges maps and vectors."
   [& xs]
-  (->> xs
-       (remove nil?)
-       (reduce (fn m [a b]
-                 (cond (and (map? a) (map? b)) (merge-with m a b)
-                       (and (vector? a) (vector? b)) (mapv* a b)
-                       :else b))
-               {})))
+  (let [first-coll (first xs)
+        init-output (if (vector? first-coll) [] {})]
+    (->> xs
+         (remove nil?)
+         (reduce (fn m [a b]
+                   (cond (and (map? a) (map? b)) (merge-with m a b)
+                         (and (vector? a) (vector? b)) (mapv* m a b)
+                         :else b))
+                 init-output))))
 
 (deep-merge2 {:data {0 {:line {:width 1}}}}
-                    {:data {0 {:line {:dash "dot"}}}})
+             {:data {0 {:line {:dash "dot"}}}})
 ;=> {:data {0 {:line {:width 1, :dash "dot"}}}}
 
 (deep-merge2 {:data [{:line {:width 1}}]}
@@ -103,7 +108,7 @@
 ;=> {:data [{:line {:dash "dot"}}]}
 
 (deep-merge2 {:data [:blah :ble]}
-                    {:data [:zo :ze]})
+             {:data [:zo :ze]})
 
 
 ;; ## Plotly examples
