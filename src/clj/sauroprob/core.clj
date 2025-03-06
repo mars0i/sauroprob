@@ -48,6 +48,64 @@
 
 (map2vec vmap)
 
+(defn mapv*
+  "Like mapv, returns a vector that results from applying f to the elements
+  of supplied vectors, but if one vector is longer than the other, its
+  elements are added to the end of the resulting vector.  Because of this
+  behavior, mapv* is limited to exactly two vector arguments."
+  [f v0 v1]
+  (let [v0-len (count v0)
+        v1-len (count v1)
+        extra (cond (> v0-len v1-len) (drop v1-len v0)
+                    (> v1-len v0-len) (drop v0-len v1)
+                    :else [])
+        combined (mapv f v0 v1)]
+    (into combined extra)))
+
+(defn vec2map
+  [v]
+  (zipmap (range) v))
+
+(mapv* + [1 2 3 4] [5 6 7 8 9 10])
+(mapv* + [5 6 7 8 9 10] [1 2 3 4])
+
+;; This shows what's problematic about the above definition:
+(mapv* / [1 2 3 4] [5 6 7 8 9 10])
+;; Then again, merge-with has the same problem.
+
+(kindly/deep-merge {:a 1 :b 2} [3 4 5])
+(kindly/deep-merge [3 4 5] {:a 1 :b 2})
+
+(empty? [])
+(empty? '())
+(empty? nil)
+(nil? [])
+(nil? '())
+(nil? nil)
+
+(defn deep-merge2
+  "Recursively merges maps and vectors."
+  [& xs]
+  (->> xs
+       (remove nil?)
+       (reduce (fn m [a b]
+                 (cond (and (map? a) (map? b)) (merge-with m a b)
+                       (and (vector? a) (vector? b)) (mapv* a b)
+                       :else b))
+               {})))
+
+(deep-merge2 {:data {0 {:line {:width 1}}}}
+                    {:data {0 {:line {:dash "dot"}}}})
+;=> {:data {0 {:line {:width 1, :dash "dot"}}}}
+
+(deep-merge2 {:data [{:line {:width 1}}]}
+             {:data [{:line {:dash "dot"}}]})
+;=> {:data [{:line {:dash "dot"}}]}
+
+(deep-merge2 {:data [:blah :ble]}
+                    {:data [:zo :ze]})
+
+
 ;; ## Plotly examples
 
 (def logistic-iter-data

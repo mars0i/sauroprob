@@ -2,41 +2,6 @@
   (:require [scicloj.kindly.v4.kind :as kind]
             [scicloj.clay.v2.api :as clay]))
 
-(defn mapv*
-  "Like mapv, returns a vector that results from applying f to the elements
-  of supplied vectors, but if one vector is longer than the other, its
-  elements are added to the end of the resulting vector.  Because of this
-  behavior, mapv* is limited to exactly two vector arguments."
-  [f v0 v1]
-  (let [v0-cnt (count v0)
-        v1-cnt (count v1)
-        extra (cond (> v0-cnt v1-cnt) (drop v1-cnt v0)
-                    (> v1-cnt v0-cnt) (drop v0-cnt v1)
-                    :else [])
-        combined (mapv f v0 v1)]
-    (into combined extra)))
-
-(defn vec2map
-  [v]
-  (zipmap (range) v))
-
-;; This shows what's problematic about the above definition:
-(mapv* / [1 2 3 4] [5 6 7 8 9 10])
-;; Then again, merge-with has the same problem.
-
-(defn deep-merge2
-  "Recursively merges maps and vectors."
-  [& xs]
-  (->> xs
-       (remove nil?)
-       (reduce (fn m [a b]
-                 (cond (and (map? a) (map? b)) (merge-with2 m a b)
-                       (and (vector? a) (vector? b)) (mapv* a b)
-                       (and (vector? a) (map? b)) (merge-with2 (vec2map a) b)
-                       (and (map? a) (vector? b)) (merge-with2 a (vec2map b))))
-                   b)
-               {}))
-
 ^:kindly/hide-code
 (def plot1
   {:layer
