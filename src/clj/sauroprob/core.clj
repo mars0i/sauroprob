@@ -3,6 +3,7 @@
   (:require [clojure.math :as m] ; new in Clojure 1.11 
             [scicloj.tableplot.v1.plotly :as plotly]
             [scicloj.kindly.v4.kind :as kind]
+            [scicloj.kindly.v4.api :as kindly]
             [scicloj.clay.v2.api :as clay] ; needed for clay eval keymappings
             ;[scicloj.metamorph.ml.rdatasets :as rdatasets]
             [tablecloth.api :as tc]
@@ -13,6 +14,39 @@
             ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Re https://clojurians.zulipchat.com/#narrow/channel/422115-clay-dev/topic/Plotly.20line.20attributes
+
+(kindly/deep-merge {:data {0 {:line {:width 1}}}}
+                   {:data {0 {:line {:dash "dot"}}}})
+;=> {:data {0 {:line {:width 1, :dash "dot"}}}}
+
+(kindly/deep-merge {:data [{:line {:width 1}}]}
+                   {:data [{:line {:dash "dot"}}]})
+;=> {:data [{:line {:dash "dot"}}]}
+
+(kindly/deep-merge {:data [:blah :ble]}
+                   {:data [:zo :ze]})
+
+(map? [1 2 3])
+
+(merge-with + {:a 1 :b 2} {:b 14 :a 23})
+
+;(merge-with + [1 2] [23 14])
+
+;(into (sorted-map) [1 2 3 4])
+
+(defn vec2map
+  [v]
+  (into {} (map #(vector %1 %2) (range) v)))
+
+(def vmap (vec2map [:a :b :c :d]))
+
+(defn map2vec
+  [m]
+  (vec (vals m)))
+
+(map2vec vmap)
 
 ;; ## Plotly examples
 
