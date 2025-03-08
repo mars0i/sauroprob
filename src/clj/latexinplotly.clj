@@ -19,7 +19,9 @@
     (assoc-in [:data 0 :name] "y<sup>2</sup> = -x")
     (assoc-in [:data 1 :name] "$y^2 = -x$"))
 
+;; $x$
+
 (comment
-;; Here's the same LaTeX again: $\sum_{i=0}^\infty \frac{x^i}{N}$
+;; Here is some LaTeX: $\sum_{i=0}^\infty \frac{x^i}{N}$
 )
 
