@@ -22,6 +22,7 @@
     (tc/concat
       (tc/dataset {:x [0 2], :y [0 2], :fun "y=x"})
       (sp/fn2dataset [0 2] :fun "f" f)
+      (sp/fn2dataset [0 2] :fun "f<sup>2</sup>" (msc/n-comp f 2))
       ;(sp/iter-lines 0.05 12 :fun "iteration" f)
       )))
 
