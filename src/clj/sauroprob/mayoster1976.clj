@@ -1,5 +1,7 @@
 ;; Plots illustrating ideas from May and Oster's "Bifurcations and dynamical
 ;; complexity in simple ecological models", _The American Naturalist_ 1976.
+
+^:kindly/hide-code
 (ns sauroprob.mayoster1976
   (:require [clojure.math :as m] ; new in Clojure 1.11 
             [scicloj.kindly.v4.kind :as kind]

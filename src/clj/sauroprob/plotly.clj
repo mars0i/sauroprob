@@ -64,6 +64,12 @@
        (#(assoc % catkey catval)) ; since threading last
        tc/dataset))
 
+;(defn plot-seq
+;  "Simple function that generates a Plotly plot of the values in ys,
+;  with each plotted at a subsequent integer x value.  ys should be
+;  of finite length."
+;  [ys]
+
 (comment
   (iter-lines1 0.75 5 :fun "ya" (um/normalized-ricker 2.7))
   (iter-lines 0.75 5 :fun "ya" (um/normalized-ricker 2.7))
