@@ -23,9 +23,9 @@
       x-max 1.0
       μ 3.99
       f (um/logistic μ)
-      init-x 0.5
+      init-x 0.3475
       iterates (iterate f init-x)
-      n-iter-lines 20
+      n-iter-lines 60
       n-plot-iterates 400
       n-hist-iterates 30000
       ]
