@@ -1,5 +1,5 @@
 ^:kindly/hide-code
-(ns sauroprob.core
+(ns scratch
   (:require [clojure.math :as m] ; new in Clojure 1.11 
             [scicloj.tableplot.v1.plotly :as plotly]
             [scicloj.kindly.v4.kind :as kind]
