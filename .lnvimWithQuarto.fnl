@@ -26,7 +26,7 @@
     {:origin "custom-clay-wrapper"
      :code (str.join
              ""
-             ["(scicloj.clay.v2.api/make! {:source-path \"" (nvim.fn.expand "%.") "\" :single-form `" (a.get (extract.form {:root? true}) :content) " :format [:html]})"])}))
+             ["(scicloj.clay.v2.api/make! {:source-path \"" (nvim.fn.expand "%.") "\" :single-form `" (a.get (extract.form {:root? true}) :content) " :format [:quarto :html]})"])}))
 
 ;; In theory it would make sense to run the `require-clay-if-needed`
 ;; function below in the `on-filetype` function, and that does work.
@@ -42,7 +42,7 @@
     {:origin "custom-clay-wrapper"
      :code (str.join
              ""
-             ["(scicloj.clay.v2.api/make! {:source-path \"" (nvim.fn.expand "%.") "\" :format [:html]})"])}))
+             ["(scicloj.clay.v2.api/make! {:source-path \"" (nvim.fn.expand "%.") "\" :format [:quarto :html]})"])}))
 
 (defn on-filetype []
   "Map <localleader>ev to eval-clojure-for-form-viz and <localleader>env to
