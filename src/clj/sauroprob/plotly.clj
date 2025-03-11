@@ -1,6 +1,6 @@
 ^:kindly/hide-code
 (ns sauroprob.plotly
-  (:require [clojure.math :as m] ; new in Clojure 1.11 
+  (:require [clojure.math :as m] ; new in Clojure 1.11
             [scicloj.tableplot.v1.plotly :as plotly]
             [scicloj.kindly.v4.kind :as kind]
             ;[scicloj.kindly.v4.api :as kindly]
@@ -8,7 +8,7 @@
             [utils.misc :as msc]
             [utils.string :as st]
             [utils.math :as um]
-           ))
+            ))
 
 
 (def plot-steps 400)
@@ -38,6 +38,19 @@
       plotly/plot
       (assoc-in [:layout :yaxis :scaleanchor] :x)
       (assoc-in [:layout :yaxis :scaleratio] 1)))
+
+(defn set-line-width
+  "Sets the ith Plotly plot in :data to have width (default: 2)."
+  [plot i width]
+  (assoc-in plot [:data i :line :width] width))
+
+(defn set-line-dash
+  "Sets the ith Plotly plot in :data to have dash value dashed which should
+  be a string. See
+  https://plotly.com/javascript/reference/scatter/#scatter-line-dash for
+  possible values."
+  [plot i dashed]
+  (assoc-in plot [:data i :line :dash] dashed))
 
 ;(defn next-iter-seg
 ;  [f x]
