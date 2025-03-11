@@ -40,7 +40,9 @@
       (assoc-in [:layout :yaxis :scaleratio] 1)))
 
 (defn set-line-width
-  "Sets the ith Plotly plot in :data to have width (default: 2)."
+  "Sets the ith Plotly plot in :data to have width (default: 2).  (Note
+  that you can set the default line width by including the key `:=mark-sze`
+  with a numeric value in the map passed to plotly/layer-line.)"
   [plot i width]
   (assoc-in plot [:data i :line :width] width))
 
