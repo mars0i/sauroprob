@@ -18,9 +18,16 @@
     (plotly/layer-line {:=x :x, :=y :y, :=size :my-size}))
 
 (def data (-> (tc/concat
-                (tc/dataset {:x [0 1], :y [0 1], :fun "y=x"})
-                (tc/dataset {:x [0 1], :y [1 0], :fun "y=-x"}))
+                (tc/dataset {:x [0 1], :y [0 1], :fun "y=x" :my-size 10})
+                (tc/dataset {:x [0 1], :y [1 0], :fun "y=-x" :my-size 50}))
               (tc/add-columns {:line-width #(map (fn [v] (if (= v "y=x") 1 10)) (% :fun))})))
+
+(-> data
+    (plotly/layer-point {:=x :x, :=y :y, :=color :fun, :=mark-size [50 100 150]})
+    (plotly/layer-line {:=x :x, :=y :y, :=color :fun, :=size 10})
+    (plotly/plot)
+    ;(kind/pprint)
+    )
 
 
 (def aplot (-> data
