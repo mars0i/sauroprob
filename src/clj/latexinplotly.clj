@@ -13,25 +13,62 @@
 
 ;; ## Plots
 
-(def aplot (-> (tc/concat
-                 (tc/dataset {:x [0 1], :y [0 1], :fun "10"})
-                 (tc/dataset {:x [0 1], :y [1 0], :fun "1"}))
-               (plotly/layer-line {:=x :x, :=y, :y :=color :fun
-                                   ;; This idea of using a function does work, but the if 
-                                   ;; conditions fail.  There's no :fun key at the top level in x.
-                                   ; :=mark-size (fn [x] (if (= (:fun x) "10") 10 1))
-                                   ; :=mark-size (fn [x] (if (= (:name x) "10") 10 1))
-                                   ; :=mark-size (fn [x] (Integer/parseInt (:fun x)))
-                                   })
+(-> (tc/dataset {:x [0 1], :y [1 0] :my-size [20 30]})
+    (plotly/layer-point {:=x :x, :=y :y, :=size :my-size})
+    (plotly/layer-line {:=x :x, :=y :y, :=size :my-size}))
+
+(def data (-> (tc/concat
+                (tc/dataset {:x [0 1], :y [0 1], :fun "y=x"})
+                (tc/dataset {:x [0 1], :y [1 0], :fun "y=-x"}))
+              (tc/add-columns {:line-width #(map (fn [v] (if (= v "y=x") 1 10)) (% :fun))})))
+
+
+(def aplot (-> data
+               ;(tc/add-columns {:line-width #(map (fn [v] (if (= v "y=x") 1 10)) (% :fun))})
+               (plotly/layer-line {:=x :x, :=y :y, :=color :fun})
+               ;(plotly/layer-line {:=x :x, :=y :y, :=color :fun, :=mark-size :line-width, :=size-type :quantitative})
+               ;(plotly/layer-line {:=x :x, :=y :y, :=color :fun, :size [10 20]})
+               ;(plotly/layer-line {:=x :x, :=y :y, :=color :fun, :=mark-size 20})
+               ;(plotly/layer-point {:=x :x, :=y :y, :=color :fun, 
+               ;                    :=mark-size [100 200 250 150]})
                (plotly/plot)
-               (assoc-in [:data 1 :name] "$y^2 = -x$")
                (assoc-in [:data 0 :line :dash] "dot")
-               (assoc-in [:data 0 :line :width] 1)
+               ;(assoc-in [:data 0 :line :width] 25)
+               (assoc-in [:data 1 :name] "$y^2 = -x$")
                ))
 
 aplot
 
 (kind/pprint aplot)
+
+(comment
+  (data :line-width)
+
+  (tc/select-rows data (fn [row] (= (:fun row) "y=x")))
+  (tc/select-rows data #(= (:fun %) "y=-x"))
+
+  (clojure.repl/pst)
+)
+
+;; This is a way to set different line widths semantically.  But it's a pain.
+(def bplot (-> data
+               (tc/select-rows #(= (:fun %) "y=x"))
+               (plotly/layer-line {:=x :x, :=y :y, :=color :fun :=mark-size 10})
+               (plotly/plot)))
+
+(def cplot (-> data
+               (tc/select-rows #(= (:fun %) "y=-x"))
+               (plotly/layer-line {:=x :x, :=y :y, :=color :fun :=mark-size 20})
+               (plotly/plot)))
+
+;; plotly/plot needed in next line to add kind metadata:
+(def dplot (plotly/plot
+             {:data (vec (concat (:data bplot) (:data cplot)))
+              :layout (:layout bplot)}))
+;; Is there some way to use merge-with?
+
+
+dplot
 
 ;; ### $\LaTeX\!\!:$
 
@@ -55,3 +92,15 @@ aplot
 ;;(kind/html "<script type=\"text/javascript\" async src=\"https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AM_CHTML\">")
 
 
+
+(comment
+  (tc/add-columns data {:V1 #(map inc (% :x))
+                        :V5 #(map (comp keyword str) (% :y))
+                        :V6 11
+                        :lw #(map (fn [v] (if (= v "y=x") 25 42)) (% :fun))})
+
+  (tc/add-columns data {:lw #(map (fn [v] (if (= v "y=x") 25 42)) (% :fun))})
+
+  ;; fails--the map brackets are necessary:
+  (tc/add-columns data :lw #(map (fn [v] (if (= v "y=x") 25 42)) (% :fun)))
+)
