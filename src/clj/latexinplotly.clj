@@ -7,25 +7,31 @@
             [scicloj.tableplot.v1.plotly :as plotly]
             [tablecloth.api :as tc]))
 
-;; ### Setup
+;; ## Setup
 
 (kind/hiccup [:script {:src "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"}])
 
-;; ^:kindly/hide-code
-;; Based on https://community.plotly.com/t/latex-not-working/1735/2?u=mars0i
-;;(kind/html "<script type=\"text/javascript\" async src=\"https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG\">")
-;;(kind/html "<script type=\"text/javascript\" async src=\"https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AM_CHTML\">")
+;; ## Plots
 
-;; ### Plots
+(def aplot (-> (tc/concat
+                 (tc/dataset {:x [0 1], :y [0 1], :fun "10"})
+                 (tc/dataset {:x [0 1], :y [1 0], :fun "1"}))
+               (plotly/layer-line {:=x :x, :=y, :y :=color :fun
+                                   ;; This idea of using a function does work, but the if 
+                                   ;; conditions fail.  There's no :fun key at the top level in x.
+                                   ; :=mark-size (fn [x] (if (= (:fun x) "10") 10 1))
+                                   ; :=mark-size (fn [x] (if (= (:name x) "10") 10 1))
+                                   ; :=mark-size (fn [x] (Integer/parseInt (:fun x)))
+                                   })
+               (plotly/plot)
+               (assoc-in [:data 1 :name] "$y^2 = -x$")
+               (assoc-in [:data 0 :line :dash] "dot")
+               (assoc-in [:data 0 :line :width] 1)
+               ))
 
-;; Why is this section getting eaten?
+aplot
 
-(-> (tc/concat
-      (tc/dataset {:x [0 1], :y [0 1], :fun "$y=x^2$"})
-      (tc/dataset {:x [0 1], :y [1 0], :fun "y=-x"}))
-    (plotly/layer-line {:=x :x, :=y, :y :=color :fun})
-    (plotly/plot)
-    (assoc-in [:data 1 :name] "$y^2 = -x$"))
+(kind/pprint aplot)
 
 ;; ### $\LaTeX\!\!:$
 
@@ -40,3 +46,12 @@
   (clay/make! {:source-path ["src/clj/latexinplotly.clj"] :format [:quarto :html]})
   (clay/make! {:source-path ["src/clj/latexinplotly.clj"] :format [:html]})
 )
+
+;; This eats things that come after it:
+
+;; ^:kindly/hide-code
+;; Based on https://community.plotly.com/t/latex-not-working/1735/2?u=mars0i
+;;(kind/html "<script type=\"text/javascript\" async src=\"https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG\">")
+;;(kind/html "<script type=\"text/javascript\" async src=\"https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AM_CHTML\">")
+
+

@@ -35,16 +35,16 @@
     (sp/equalize-display-units)
     (plotly/plot)
     ;; Set properties of lines:
-;    (assoc-in [:data 0 :line :width] 1.5) ; default is 2. 
-;    (assoc-in [:data 1 :line :width] 1)
-;    (assoc-in [:data 2 :line :width] 1.5)
-;    (assoc-in [:data 0 :line :dash] "dash") 
-;    (assoc-in [:data 2 :line :dash] "dot")
+    (assoc-in [:data 0 :line :width] 1.5) ; default is 2. 
+    (assoc-in [:data 1 :line :width] 1)
+    (assoc-in [:data 2 :line :width] 1.5)
+    (assoc-in [:data 0 :line :dash] "dash") 
+    (assoc-in [:data 2 :line :dash] "dot")
     ;; Set legend and rollover labels to something other than the value of :fun :
-;    (assoc-in [:data 0 :name] "<em>y=x</em>")
-;    (assoc-in [:data 1 :name] "<em>f(x)=xe<sup>μ(1-x)</sup></em>") ; 1 shouldn't really be italicized
-    ;(kind/pprint)
-    )
+    (assoc-in [:data 0 :name] "<em>y=x</em>")
+    (assoc-in [:data 1 :name] "<em>f(x)=xe<sup>μ(1-x)</sup></em>") ; 1 shouldn't really be italicized
+    (kind/pprint)
+)
 ;; https://plotly.com/javascript/reference/scatter/#scatter-name
 ;; https://plotly.com/javascript/reference/scatter/#scatter-line-dash 
 ;; https://plotly.com/javascript/reference/scatter/#scatter-line-width
