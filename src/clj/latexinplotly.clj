@@ -5,6 +5,7 @@
 (ns latexinplotly
   (:require [scicloj.kindly.v4.kind :as kind]
             [scicloj.tableplot.v1.plotly :as plotly]
+                        [scicloj.metamorph.ml.rdatasets :as rdatasets]
             [tablecloth.api :as tc]))
 
 ;; ## Setup
@@ -12,6 +13,8 @@
 (kind/hiccup [:script {:src "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"}])
 
 ;; ## Plots
+
+(tc/head (rdatasets/datasets-mtcars))
 
 (-> (tc/dataset {:x [0 1], :y [1 0] :my-size [20 30]})
     (plotly/layer-point {:=x :x, :=y :y, :=size :my-size})
@@ -23,11 +26,9 @@
               (tc/add-columns {:line-width #(map (fn [v] (if (= v "y=x") 1 10)) (% :fun))})))
 
 (-> data
-    (plotly/layer-point {:=x :x, :=y :y, :=color :fun, :=mark-size [50 100 150]})
+    (plotly/layer-point {:=x :x, :=y :y, :=color :fun, :=size :my-size})
     (plotly/layer-line {:=x :x, :=y :y, :=color :fun, :=size 10})
-    (plotly/plot)
-    ;(kind/pprint)
-    )
+    (plotly/plot))
 
 
 (def aplot (-> data
