@@ -8,9 +8,14 @@
             (tc/dataset {:x [0.5 0.5 0.5], :y [0 0.5 1], :fun "y=x" :my-size 400})
             (tc/dataset {:x [0 1], :y [1 0], :fun "y=-x" :my-size 800})))
 
-(def data2 (tc/concat
-             (tc/dataset {:x [0 1], :y [0 1], :fun "y=x" :my-size 50})
-             (tc/dataset {:x [0 1], :y [1 0], :fun "y=-x" :my-size 50})))
+(->
+  (tc/concat
+    (tc/dataset {:x [0 1], :y [0 1], :fun "y=x" :my-size 1001})
+    (tc/dataset {:x [0 1], :y [1 0], :fun "y=-x" :my-size 1000}))
+  (plotly/layer-point {:=x :x, :=y :y, :=size :my-size}))
+
+  (-> data2
+      (plotly/layer-point {:=x :x, :=y :y, :=size :my-size}))
 
 ;; This plot displays as expected:
 (-> data1
