@@ -14,9 +14,12 @@
 ;; Make LaTeX work in Plotly labels:
 (kind/hiccup [:script {:src "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"}])
 
-(fns/three-plots {:x-max 2.5
-                  :f (um/normalized-ricker 2.70)
-                  :init-x 0.90475
-                  :n-iter-lines 60
-                  :n-plot-iterates 400
-                  :n-hist-iterates 1000000})
+(let [f (um/normalized-ricker 2.70)
+      comps [1 2 3]]
+  (fns/three-plots {:x-max 2.5
+                    :fs (map (partial msc/n-comp f) comps)
+                    :labels (map (fn [n] (str "$f^" n "$")) comps)
+                    :init-x 0.90475
+                    :n-iter-lines 20
+                    :n-plot-iterates 400
+                    :n-hist-iterates 1000000}))
