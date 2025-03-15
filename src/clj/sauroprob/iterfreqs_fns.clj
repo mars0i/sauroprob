@@ -56,7 +56,7 @@
   [n iterates]
   (-> (tc/dataset {:x (range n)
                    :y (take n iterates)})
-      (plotly/base {:=height 400 :=width 800})
+      (plotly/base {:=height 400 :=width 900})
       (plotly/layer-line {:=x :x, :=y, :y})
       plotly/plot
       (assoc-in [:data 0 :line :width] 1)))
@@ -72,7 +72,7 @@
   infinite or longer than n."
   [n iterates]
   (-> (tc/dataset {:x (take n iterates)})
-      (plotly/base {:=height 400 :=width 800})
+      (plotly/base {:=height 600 :=width 800})
       (plotly/layer-histogram {:=x :x, :=histogram-nbins 200})))
 
 
