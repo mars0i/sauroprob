@@ -12,9 +12,12 @@
 ;; Make LaTeX work in Plotly labels:
 (kind/hiccup [:script {:src "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"}])
 
+;; Previously I used "iter-lines" for the paths that make something into a
+;; cobweb diagram: https://en.wikipedia.org/wiki/Cobweb_plot
+;; (I didn't know the term for this.)
 
 ;; TIP: Helper function for three plots that's also intended to be used on its own.
-(defn plot-fns-with-iter-lines
+(defn plot-fns-with-cobweb
   "Displays a plot of a function and compositions of itself with itself,
   possibly with iteration lines.
   Parameters:
@@ -22,14 +25,14 @@
   fs:     functions to plot
   labels: labels corresponding to functions
   init-x: initial x val for iterations--Uses the first element in fs.
-  n-iter-lines:  how many iteration lines in fn plot"
+  n-cobweb:  how many iteration lines in fn plot"
   [& {:keys [x-max  ; max x val in function plot (also max y)
              fs     ; functions to plot
              labels ; labels corresponding to functions
              init-x ; initial x val for iterations--Uses the first element in fs.
-             n-iter-lines]}] ; number of iteration lines
+             n-cobweb]}] ; number of cobweb lines
   (let [basef (first fs)]
-    (-> (tc/concat (sp/iter-lines init-x n-iter-lines :fun "iteration" basef)
+    (-> (tc/concat (sp/cobweb init-x n-cobweb :fun "iteration" basef)
                    (tc/dataset {:x [0 x-max], :y [0 x-max], :fun "$y=x$"})
                    (apply tc/concat ; maybe there's a more elegant way to do this
                           (map (fn [label f] (sp/fn2dataset [0 x-max] :fun label f))
@@ -87,21 +90,21 @@
   fs:     functions to plot
   labels: labels corresponding to functions
   init-x: initial x val for iterations--Uses the first element in fs.
-  n-iter-lines:  how many iteration lines in fn plot
+  n-cobweb:  how many iteration lines in fn plot
   n-plot-iterates:  how many iterations in plot of iteration values
   n-hist-iterates:  how many iterations in histogram?"
   [& {:keys [x-max  ; max x val in function plot (also max y)
              fs     ; functions to plot
              labels ; labels corresponding to functions
              init-x ; initial x val for iterations--Uses the first element in fs.
-             n-iter-lines ; how many iteration lines in fn plot
+             n-cobweb ; how many cobweb lines in fn plot
              n-plot-iterates ; how many iterations in plot of iteration values
              n-hist-iterates] ; how many iterations in histogram?
       :as args}] ; how many iterations to collect in histogram
   (let [basef (first fs)
         iterates (iterate basef init-x)]
     (kind/fragment [(kind/md ["Plot of the function, with sample iterations beginning from " init-x ":"])
-                    (plot-fns-with-iter-lines args) ; unused args can be ignored
+                    (plot-fns-with-cobweb args) ; unused args can be ignored
                     (kind/md ["Plot of a sequence of values of the function beginning from " init-x ":"])
                     (plot-iterates n-plot-iterates iterates)
                     (kind/md ["Distribution of values beginning from " init-x ":"])

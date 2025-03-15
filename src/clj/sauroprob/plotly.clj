@@ -68,7 +68,8 @@
 ;; We only construct vertical segments explicitly; by chaining
 ;; these together, the lines that connect them are the horizontal
 ;; segments.
-(defn iter-lines
+;; re name see https://en.wikipedia.org/wiki/Cobweb_plot
+(defn cobweb
   "ADD DOCSTRING"
   [init-x iters catkey catval f]
   (->> (iterate f init-x)
@@ -86,6 +87,6 @@
 ;  [ys]
 
 (comment
-  (iter-lines1 0.75 5 :fun "ya" (um/normalized-ricker 2.7))
-  (iter-lines 0.75 5 :fun "ya" (um/normalized-ricker 2.7))
+  (cobweb1 0.75 5 :fun "ya" (um/normalized-ricker 2.7))
+  (cobweb 0.75 5 :fun "ya" (um/normalized-ricker 2.7))
 )
