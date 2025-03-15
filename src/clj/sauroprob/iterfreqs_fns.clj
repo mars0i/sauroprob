@@ -85,30 +85,9 @@
         iterates (iterate basef init-x)]
     (kind/fragment [(kind/md ["Plot of the function, with sample iterations beginning from " init-x ":"])
                     (plot-fns-with-iter-lines args)
-                    ;(-> (tc/concat (sp/iter-lines init-x n-iter-lines :fun "iteration" basef)
-                    ;               (tc/dataset {:x [0 x-max], :y [0 x-max], :fun "$y=x$"})
-                    ;               (apply tc/concat ; maybe there's a more elegant way to do this
-                    ;                      (map (fn [label f] (sp/fn2dataset [0 x-max] :fun label f))
-                    ;                           labels fs)))
-                    ;    (plotly/base {:=height 400 :=width 550})
-                    ;    (plotly/layer-line {:=x :x, :=y, :y :=color :fun})
-                    ;    (sp/equalize-display-units) ; runs plotly/plot
-                    ;    (sp/set-line-width 0 1.5)
-                    ;    (sp/set-line-dash 0 "dot")
-                    ;    (sp/set-line-dash 1 "dash"))
 
                     (kind/md ["Plot of a sequence of values of the function beginning from " init-x ":"])
                     (plot-iterates n-plot-iterates iterates)
-                    ;(-> (tc/dataset {:x (range n-plot-iterates)
-                    ;                 :y (take n-plot-iterates iterates)})
-                    ;    (plotly/base {:=height 400 :=width 800})
-                    ;    (plotly/layer-line {:=x :x, :=y, :y})
-                    ;    plotly/plot
-                    ;    (assoc-in [:data 0 :line :width] 1))
 
                     (kind/md ["Distribution of values beginning from " init-x ":"])
-                    (iterates-histogram n-hist-iterates iterates)
-                    ;(-> (tc/dataset {:x (take n-hist-iterates iterates)})
-                    ;    (plotly/base {:=height 400 :=width 800})
-                    ;    (plotly/layer-histogram {:=x :x, :=histogram-nbins 200}))
-                    ])))
+                    (iterates-histogram n-hist-iterates iterates)])))
