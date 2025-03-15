@@ -30,9 +30,9 @@
              fs     ; functions to plot
              labels ; labels corresponding to functions
              init-x ; initial x val for iterations--Uses the first element in fs.
-             n-cobweb]}] ; number of cobweb lines
+             n-cobweb]}] ; number of cobweb line pairs
   (let [basef (first fs)]
-    (-> (tc/concat (sp/cobweb init-x n-cobweb :fun "iteration" basef)
+    (-> (tc/concat (sp/cobweb-dataset init-x n-cobweb :fun "iteration" basef)
                    (tc/dataset {:x [0 x-max], :y [0 x-max], :fun "$y=x$"})
                    (apply tc/concat ; maybe there's a more elegant way to do this
                           (map (fn [label f] (sp/fn2dataset [0 x-max] :fun label f))
@@ -97,7 +97,7 @@
              fs     ; functions to plot
              labels ; labels corresponding to functions
              init-x ; initial x val for iterations--Uses the first element in fs.
-             n-cobweb ; how many cobweb lines in fn plot
+             n-cobweb ; how many cobweb line pairs in fn plot
              n-plot-iterates ; how many iterations in plot of iteration values
              n-hist-iterates] ; how many iterations in histogram?
       :as args}] ; how many iterations to collect in histogram

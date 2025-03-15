@@ -69,7 +69,7 @@
 ;; these together, the lines that connect them are the horizontal
 ;; segments.
 ;; re name see https://en.wikipedia.org/wiki/Cobweb_plot
-(defn cobweb
+(defn cobweb-dataset
   "ADD DOCSTRING"
   [init-x iters catkey catval f]
   (->> (iterate f init-x)
@@ -80,13 +80,6 @@
        (#(assoc % catkey catval)) ; since threading last
        tc/dataset))
 
-;(defn plot-seq
-;  "Simple function that generates a Plotly plot of the values in ys,
-;  with each plotted at a subsequent integer x value.  ys should be
-;  of finite length."
-;  [ys]
-
 (comment
-  (cobweb1 0.75 5 :fun "ya" (um/normalized-ricker 2.7))
   (cobweb 0.75 5 :fun "ya" (um/normalized-ricker 2.7))
 )
