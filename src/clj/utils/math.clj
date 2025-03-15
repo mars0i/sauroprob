@@ -100,6 +100,15 @@
 ;; "Ricker" functions
 ;; See docstrings for explanation.
 
+;; May and Oster 1976, p. 594, table 2 say that 2.6924 is an "exact value" for
+;; this, but it's clearly just the 4-digit approximation, and using it in
+;; experiments shows that you don't easily get chaos.  Or maybe it takes
+;; many iterations to get there.  Or maybe it's just a bit of chaos.
+(def ricker-chaos-min 
+  "Minimum parameter value for r at which a canonical Ricker function (e.g.
+  `ricker` or `normalized-ricker`) becomes chaotic."
+  2.6924) ; "exact value" of r_c, May and Oster 1976, p. 594, table 2
+
 (defn pre-ricker
   "Equation (7) from Ricker 1954 \"Stock and recruitment\", p. 611. Here w
   is the ratio between two log survival rates s2 in situation 2 and s1 in
