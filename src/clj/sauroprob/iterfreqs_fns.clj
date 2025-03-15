@@ -13,7 +13,7 @@
 (kind/hiccup [:script {:src "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"}])
 
 
-
+;; TIP: Helper function for three plots that's also intended to be used on its own.
 (defn plot-fns-with-iter-lines
   "Displays a plot of a function and compositions of itself with itself,
   possibly with iteration lines.
