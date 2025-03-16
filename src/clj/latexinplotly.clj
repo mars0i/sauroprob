@@ -5,30 +5,44 @@
 (ns latexinplotly
   (:require [scicloj.kindly.v4.kind :as kind]
             [scicloj.tableplot.v1.plotly :as plotly]
-                        [scicloj.metamorph.ml.rdatasets :as rdatasets]
+            [scicloj.metamorph.ml.rdatasets :as rdatasets]
             [tablecloth.api :as tc]))
 
 ;; ## Setup
 
 (kind/hiccup [:script {:src "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"}])
 
+;; ### $\LaTeX\!\!:$
+
+;; Here is some LaTeX, $X + Y$ which might appear on a separate line.
+
+;; $\text{Here is some more LaTeX: }X + Y\text{.  Did it appear on a separate line?}$
+;; If not, that shows how to embed text in LaTeX for KaTeX using `\text`.
+
+(comment
+;; This is a test of the effects of LaTeX $\sum_{i=0}^\infty \frac{x^i}{N}$ ! That was a sum.
+  (require '[scicloj.clay.v2.api :as clay])
+  (clay/make! {:source-path ["src/clj/latexinplotly.clj"] :format [:quarto :html]})
+  (clay/make! {:source-path ["src/clj/latexinplotly.clj"] :format [:html]})
+)
+
 ;; ## Plots
 
-(tc/head (rdatasets/datasets-mtcars))
-
-(-> (tc/dataset {:x [0 1], :y [1 0] :my-size [20 30]})
-    (plotly/layer-point {:=x :x, :=y :y, :=size :my-size})
-    (plotly/layer-line {:=x :x, :=y :y, :=size :my-size}))
+;; (tc/head (rdatasets/datasets-mtcars))
 
 (def data (-> (tc/concat
                 (tc/dataset {:x [0 1], :y [0 1], :fun "y=x" :my-size 10})
                 (tc/dataset {:x [0 1], :y [1 0], :fun "y=-x" :my-size 50}))
               (tc/add-columns {:line-width #(map (fn [v] (if (= v "y=x") 1 10)) (% :fun))})))
 
-(-> data
-    (plotly/layer-point {:=x :x, :=y :y, :=color :fun, :=size :my-size})
-    (plotly/layer-line {:=x :x, :=y :y, :=color :fun, :=size 10})
-    (plotly/plot))
+(-> (tc/dataset {:x [0 1], :y [1 0] :my-size [20 30]})
+    (plotly/layer-point {:=x :x, :=y :y, :=size :my-size})
+    (plotly/layer-line {:=x :x, :=y :y, :=size :my-size}))
+
+;(-> data
+;    (plotly/layer-point {:=x :x, :=y :y, :=color :fun, :=size :my-size})
+;    (plotly/layer-line {:=x :x, :=y :y, :=color :fun, :=size 10})
+;    (plotly/plot))
 
 
 (def aplot (-> data
@@ -77,20 +91,6 @@ aplot
 
 
 dplot
-
-;; ### $\LaTeX\!\!:$
-
-;; Here is some LaTeX, $X + Y$ which might appear on a separate line.
-
-;; $\text{Here is some more LaTeX: }X + Y\text{.  Did it appear on a separate line?}$
-;; If not, that shows how to embed text in LaTeX for KaTeX using `\text`.
-
-(comment
-;; This is a test of the effects of LaTeX $\sum_{i=0}^\infty \frac{x^i}{N}$ ! That was a sum.
-  (require '[scicloj.clay.v2.api :as clay])
-  (clay/make! {:source-path ["src/clj/latexinplotly.clj"] :format [:quarto :html]})
-  (clay/make! {:source-path ["src/clj/latexinplotly.clj"] :format [:html]})
-)
 
 ;; This eats things that come after it:
 
