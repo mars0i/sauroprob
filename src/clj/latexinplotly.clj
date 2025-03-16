@@ -11,11 +11,6 @@
 
 (kind/hiccup [:script {:src "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"}])
 
-;; ^:kindly/hide-code
-;; Based on https://community.plotly.com/t/latex-not-working/1735/2?u=mars0i
-;;(kind/html "<script type=\"text/javascript\" async src=\"https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG\">")
-;;(kind/html "<script type=\"text/javascript\" async src=\"https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AM_CHTML\">")
-
 ;; ### Plots
 
 ;; Why is this section getting eaten?
@@ -40,3 +35,8 @@
   (clay/make! {:source-path ["src/clj/latexinplotly.clj"] :format [:quarto :html]})
   (clay/make! {:source-path ["src/clj/latexinplotly.clj"] :format [:html]})
 )
+
+;; ^:kindly/hide-code
+;; Based on https://community.plotly.com/t/latex-not-working/1735/2?u=mars0i
+;;(kind/html "<script type=\"text/javascript\" async src=\"https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG\">")
+;;(kind/html "<script type=\"text/javascript\" async src=\"https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AM_CHTML\">")
