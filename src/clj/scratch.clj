@@ -8,107 +8,65 @@
             [scicloj.metamorph.ml.rdatasets :as rdatasets]
             [tablecloth.api :as tc]))
 
-;; ## Setup
-
-(kind/hiccup [:script {:src "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"}])
-
-;; ### $\LaTeX\!\!:$
-
-;; Here is some LaTeX, $X + Y$ which might appear on a separate line.
-
-;; $\text{Here is some more LaTeX: }X + Y\text{.  Did it appear on a separate line?}$
-;; If not, that shows how to embed text in LaTeX for KaTeX using `\text`.
-
-(comment
-;; This is a test of the effects of LaTeX $\sum_{i=0}^\infty \frac{x^i}{N}$ ! That was a sum.
-  (require '[scicloj.clay.v2.api :as clay])
-  (clay/make! {:source-path ["src/clj/latexinplotly.clj"] :format [:quarto :html]})
-  (clay/make! {:source-path ["src/clj/latexinplotly.clj"] :format [:html]})
-)
-
-;; ## Plots
-
-;; (tc/head (rdatasets/datasets-mtcars))
-
-(def data (-> (tc/concat
-                (tc/dataset {:x [0 1], :y [0 1], :fun "y=x" :my-size 10})
-                (tc/dataset {:x [0 1], :y [1 0], :fun "y=-x" :my-size 50}))
-              (tc/add-columns {:line-width #(map (fn [v] (if (= v "y=x") 1 10)) (% :fun))})))
-
-(-> (tc/dataset {:x [0 1], :y [1 0] :my-size [20 30]})
-    (plotly/layer-point {:=x :x, :=y :y, :=size :my-size})
-    (plotly/layer-line {:=x :x, :=y :y, :=size :my-size}))
-
-;(-> data
-;    (plotly/layer-point {:=x :x, :=y :y, :=color :fun, :=size :my-size})
-;    (plotly/layer-line {:=x :x, :=y :y, :=color :fun, :=size 10})
-;    (plotly/plot))
-
-
-(def aplot (-> data
-               ;(tc/add-columns {:line-width #(map (fn [v] (if (= v "y=x") 1 10)) (% :fun))})
-               (plotly/layer-line {:=x :x, :=y :y, :=color :fun})
-               ;(plotly/layer-line {:=x :x, :=y :y, :=color :fun, :=mark-size :line-width, :=size-type :quantitative})
-               ;(plotly/layer-line {:=x :x, :=y :y, :=color :fun, :size [10 20]})
-               ;(plotly/layer-line {:=x :x, :=y :y, :=color :fun, :=mark-size 20})
-               ;(plotly/layer-point {:=x :x, :=y :y, :=color :fun, 
-               ;                    :=mark-size [100 200 250 150]})
-               (plotly/plot)
-               (assoc-in [:data 0 :line :dash] "dot")
-               ;(assoc-in [:data 0 :line :width] 25)
-               (assoc-in [:data 1 :name] "$y^2 = -x$")
-               ))
-
-aplot
-
-(kind/pprint aplot)
-
-(comment
-  (data :line-width)
-
-  (tc/select-rows data (fn [row] (= (:fun row) "y=x")))
-  (tc/select-rows data #(= (:fun %) "y=-x"))
-
-  (clojure.repl/pst)
-)
-
-;; This is a way to set different line widths semantically.  But it's a pain.
-(def bplot (-> data
-               (tc/select-rows #(= (:fun %) "y=x"))
-               (plotly/layer-line {:=x :x, :=y :y, :=color :fun :=mark-size 10})
-               (plotly/plot)))
-
-(def cplot (-> data
-               (tc/select-rows #(= (:fun %) "y=-x"))
-               (plotly/layer-line {:=x :x, :=y :y, :=color :fun :=mark-size 20})
-               (plotly/plot)))
-
-;; plotly/plot needed in next line to add kind metadata:
-(def dplot (plotly/plot
-             {:data (vec (concat (:data bplot) (:data cplot)))
-              :layout (:layout bplot)}))
-;; Is there some way to use merge-with?
-
-
-dplot
-
-;; This eats things that come after it:
-
-;; ^:kindly/hide-code
-;; Based on https://community.plotly.com/t/latex-not-working/1735/2?u=mars0i
-;;(kind/html "<script type=\"text/javascript\" async src=\"https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_SVG\">")
-;;(kind/html "<script type=\"text/javascript\" async src=\"https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AM_CHTML\">")
-
 
 
 (comment
-  (tc/add-columns data {:V1 #(map inc (% :x))
-                        :V5 #(map (comp keyword str) (% :y))
-                        :V6 11
-                        :lw #(map (fn [v] (if (= v "y=x") 25 42)) (% :fun))})
+  (require '[fastmath.core :as fc])
+  (require '[fastmath.random :as fr])
 
-  (tc/add-columns data {:lw #(map (fn [v] (if (= v "y=x") 25 42)) (% :fun))})
+  (fr/distribution :gamma)
 
-  ;; fails--the map brackets are necessary:
-  (tc/add-columns data :lw #(map (fn [v] (if (= v "y=x") 25 42)) (% :fun)))
+  (def nums         [5 7 9 2 3 4 1 1 2 3 2 4 2 3 5])
+  (sort nums)     ; (1 1 2 2 2 2 3 3 3 4 4 5 5 7 9)
+  ;; returns the indexes of the elements *in the original sequence*, after
+  ;; sorting the sequence.
+  (fc/order nums) ; (6 7 3 8 10 12 4 9 13 5 11 0 14 1 2)
+  (def nums         [5 7 9 2 3 4 1 1 2 3 2 4 2 3 5])
+  (map-indexed vector nums)
+  ; ([0 5] [1 7] [2 9] [3 2] [4 3] [5 4] [6 1] [7 1] [8 2] [9 3] [10 2] [11 4] [12 2] [13 3] [14 5])
+  (sort-by second < (map-indexed vector nums))
+  ; ([6 1] [7 1] [3 2] [8 2] [10 2] [12 2] [4 3] [9 3] [13 3] [5 4] [11 4] [0 5] [14 5] [1 7] [2 9])
+  (def si (fc/order nums))
+
+  (distinct nums)
+  (count nums)
+
+  ;; This works because vectors are functions of indexes
+  (map 
+    (vec (concat 
+           (repeat 5 (/ 1.0 5))
+           (repeat 10 (/ -1.0 10))))
+    si)
+
+  (vec '(1 2))
+
+  (defn subs-seqs
+    [xs]
+    (map take 
+         (range)
+         (repeat (count xs) xs)))
+
+  (defn subs-seqs2
+    [xs]
+    (let [n (count xs)]
+      (loop [m 0, acc []]
+        (if (= m n)
+          acc
+          (recur (inc m) 
+                 (conj acc (take m xs)))))))
+
+  (subs-seqs (range 6))
+  (subs-seqs2 (range 6))
+
+  (defn ecdf
+    [xs]
+    (let [sorted (sort xs)
+          subseqs (subs-seqs sorted)
+          counts (map count subseqs)] ; incorrect there are dupes?
+      (map vector sorted counts)))
+  
+  (ecdf [5 7 1 17 18 14 11])
+  (ecdf [5 7 7 1 17 18 14 11]) ; not right.  Or is it?  No.
+
+
 )
