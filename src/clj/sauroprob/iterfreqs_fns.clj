@@ -37,7 +37,7 @@
                    (apply tc/concat ; maybe there's a more elegant way to do this
                           (map (fn [label f] (sp/fn2dataset [0 x-max] :fun label f))
                                labels fs)))
-        (plotly/base {:=height 400 :=width 550})
+        (plotly/base {:=width 550})
         (plotly/layer-line {:=x :x, :=y, :y :=color :fun})
         (sp/equalize-display-units) ; runs plotly/plot, which is needed for next lines
         (sp/set-line-width 0 1.5)
@@ -56,7 +56,7 @@
   [n iterates]
   (-> (tc/dataset {:x (range n)
                    :y (take n iterates)})
-      (plotly/base {:=height 400 :=width 900})
+      (plotly/base {:=width 900})
       (plotly/layer-line {:=x :x, :=y, :y})
       plotly/plot
       (assoc-in [:data 0 :line :width] 1)))
@@ -72,7 +72,7 @@
   infinite or longer than n."
   [n iterates]
   (-> (tc/dataset {:x (take n iterates)})
-      (plotly/base {:=height 600 :=width 800})
+      (plotly/base {:=width 800})
       (plotly/layer-histogram {:=x :x, :=histogram-nbins 200})))
 
 
