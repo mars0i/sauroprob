@@ -95,8 +95,6 @@ um/ricker-chaos-min
                     :n-plot-iterates 400
                     :n-hist-iterates 1000000}))
 
-
-
 ;; This init is the fixed point:
 (let [f (um/normalized-ricker 3.0)
       comps [1]]
@@ -107,3 +105,4 @@ um/ricker-chaos-min
                     :n-cobweb 30
                     :n-plot-iterates 400
                     :n-hist-iterates 1000000}))
+
