@@ -52,10 +52,10 @@
 ;; rather than generalizing this one.
 (defn plot-iterates
   "Plot lines connecting n iterates as y values with x representing number of
-  iterations.  iterates should be infinite or longer than n."
-  [n iterates]
-  (-> (tc/dataset {:x (range n)
-                   :y (take n iterates)})
+  iterations.  iterates should not be infinite."
+  [iterates]
+  (-> (tc/dataset {:x (range (count iterates))
+                   :y iterates})
       (plotly/base {:=width 900})
       (plotly/layer-line {:=x :x, :=y, :y})
       plotly/plot
@@ -69,9 +69,9 @@
 ;; rather than generalizing this one.
 (defn iterates-histogram
   "Plot the values of n iterates in a histogram. iterates should be
-  infinite or longer than n."
-  [n iterates]
-  (-> (tc/dataset {:x (take n iterates)})
+  not be infinite."
+  [iterates]
+  (-> (tc/dataset {:x iterates})
       (plotly/base {:=width 800})
       (plotly/layer-histogram {:=x :x, :=histogram-nbins 200})))
 
@@ -106,7 +106,7 @@
     (kind/fragment [(kind/md ["Plot of the function, with sample iterations beginning from " init-x ":"])
                     (plot-fns-with-cobweb args) ; unused args can be ignored
                     (kind/md ["Plot of a sequence of values of the function beginning from " init-x ":"])
-                    (plot-iterates n-plot-iterates iterates)
+                    (plot-iterates (take n-plot-iterates iterates))
                     (kind/md ["Distribution of values beginning from " init-x ":"])
-                    (iterates-histogram n-hist-iterates iterates)])))
+                    (iterates-histogram (take n-hist-iterates iterates))])))
 
