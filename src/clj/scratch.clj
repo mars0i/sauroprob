@@ -6,67 +6,25 @@
   (:require [scicloj.kindly.v4.kind :as kind]
             [scicloj.tableplot.v1.plotly :as plotly]
             [scicloj.metamorph.ml.rdatasets :as rdatasets]
+            [fastmath.random :as fr]
             [tablecloth.api :as tc]))
 
 
+(def distr (fr/distribution :real-discrete-distribution 
+                            {:data [4.2 1.3 1.1 17.54 88.9 32.77 20.1 18]}))
 
-(comment
-  (require '[fastmath.core :as fc])
-  (require '[fastmath.random :as fr])
+;; I think the idea is that the first arg is what you're passing to the cdf
+;; fn.  You're asking what is the prob of values less than or equal to that.
+(def cd (partial fr/cdf distr))
+;; But what's the optional second arg?
 
-  (fr/distribution :gamma)
+(cd 20)
+(cd 88.8)
 
-  (def nums         [5 7 9 2 3 4 1 1 2 3 2 4 2 3 5])
-  (sort nums)     ; (1 1 2 2 2 2 3 3 3 4 4 5 5 7 9)
-  ;; returns the indexes of the elements *in the original sequence*, after
-  ;; sorting the sequence.
-  (fc/order nums) ; (6 7 3 8 10 12 4 9 13 5 11 0 14 1 2)
-  (def nums         [5 7 9 2 3 4 1 1 2 3 2 4 2 3 5])
-  (map-indexed vector nums)
-  ; ([0 5] [1 7] [2 9] [3 2] [4 3] [5 4] [6 1] [7 1] [8 2] [9 3] [10 2] [11 4] [12 2] [13 3] [14 5])
-  (sort-by second < (map-indexed vector nums))
-  ; ([6 1] [7 1] [3 2] [8 2] [10 2] [12 2] [4 3] [9 3] [13 3] [5 4] [11 4] [0 5] [14 5] [1 7] [2 9])
-  (def si (fc/order nums))
+(take 30 (map cd (range 0 100 0.5)))
 
-  (distinct nums)
-  (count nums)
+;; And then I think I plot that.
+;; i.e. so I'm not plotting steps between points, but just
+;; plotting a bunch of points run through the cdf.
 
-  ;; This works because vectors are functions of indexes
-  (map 
-    (vec (concat 
-           (repeat 5 (/ 1.0 5))
-           (repeat 10 (/ -1.0 10))))
-    si)
-
-  (vec '(1 2))
-
-  (defn subs-seqs
-    [xs]
-    (map take 
-         (range)
-         (repeat (count xs) xs)))
-
-  (defn subs-seqs2
-    [xs]
-    (let [n (count xs)]
-      (loop [m 0, acc []]
-        (if (= m n)
-          acc
-          (recur (inc m) 
-                 (conj acc (take m xs)))))))
-
-  (subs-seqs (range 6))
-  (subs-seqs2 (range 6))
-
-  (defn ecdf
-    [xs]
-    (let [sorted (sort xs)
-          subseqs (subs-seqs sorted)
-          counts (map count subseqs)] ; incorrect there are dupes?
-      (map vector sorted counts)))
-  
-  (ecdf [5 7 1 17 18 14 11])
-  (ecdf [5 7 7 1 17 18 14 11]) ; not right.  Or is it?  No.
-
-
-)
+(fr/pdf distr 1.100000000)
