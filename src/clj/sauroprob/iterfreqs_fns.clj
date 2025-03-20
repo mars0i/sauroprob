@@ -143,7 +143,6 @@
                     ;(kind/md ["Distribution of values beginning from " init-x ":"])
                     (iterates-histogram dist-iterates)
                     ;(kind/md ["cdf of values beginning from " init-x ":"])
-                    (plot-cdf x-max dist-iterates)
-                    ])))
+                    (plot-cdf x-max dist-iterates)])))
 
 ;(def three-plots plots) ; backward compatibility

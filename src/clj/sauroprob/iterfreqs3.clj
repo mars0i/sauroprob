@@ -11,6 +11,9 @@
             [sauroprob.plotly :as sp]
             [sauroprob.iterfreqs-fns :as fns]))
 
+;; Make LaTeX work in Plotly labels:
+(kind/hiccup [:script {:src "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"}])
+
 (def n-iterates 100000)
 
 ;; Better:
