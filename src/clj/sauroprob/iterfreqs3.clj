@@ -11,23 +11,23 @@
             [sauroprob.plotly :as sp]
             [sauroprob.iterfreqs-fns :as fns]))
 
-(def hist-iterates 100000)
+(def n-iterates 100000)
 
 ;; Better:
 (let [f um/logistic-4
       comps [1]]
-  (fns/three-plots {:x-max 1
+  (fns/plots {:x-max 1
                     :fs (map (partial msc/n-comp f) comps)
                     :labels (map (fn [n] (str "$f^" n "$")) comps)
                     :init-x 0.901
                     :n-cobweb 30
-                    :n-plot-iterates 400
-                    :n-hist-iterates hist-iterates}))
+                    :n-seq-iterates 400
+                    :n-dist-iterates n-iterates}))
 
 ^:kindly/hide-code
 (def l4iterates (iterate um/logistic-4 0.901))
 ^:kindly/hide-code
-(def l4dist (fr/distribution :real-discrete-distribution {:data (take hist-iterates l4iterates)}))
+(def l4dist (fr/distribution :real-discrete-distribution {:data (take n-iterates l4iterates)}))
 ^:kindly/hide-code
 (def l4cdf (partial fr/cdf l4dist))
 
@@ -41,50 +41,51 @@
       plotly/plot
       (assoc-in [:data 0 :line :width] 0.75)))
 
+(fns/plot-cdf 1 (take 100000 l4iterates))
 
 ;; Let's try a different init x:
 (let [f um/logistic-4
       comps [1]]
-  (fns/three-plots {:x-max 1
+  (fns/plots {:x-max 1
                     :fs (map (partial msc/n-comp f) comps)
                     :labels (map (fn [n] (str "$f^" n "$")) comps)
                     :init-x 0.4
                     :n-cobweb 30
-                    :n-plot-iterates 400
-                    :n-hist-iterates hist-iterates}))
+                    :n-seq-iterates 400
+                    :n-dist-iterates n-iterates}))
 
 
 
 ;; Again:
 (let [f um/logistic-4
       comps [1]]
-  (fns/three-plots {:x-max 1
+  (fns/plots {:x-max 1
                     :fs (map (partial msc/n-comp f) comps)
                     :labels (map (fn [n] (str "$f^" n "$")) comps)
                     :init-x 0.35
                     :n-cobweb 30
-                    :n-plot-iterates 400
-                    :n-hist-iterates hist-iterates}))
+                    :n-seq-iterates 400
+                    :n-dist-iterates n-iterates}))
 
 ;; Again again:
 (let [f um/logistic-4
       comps [1]]
-  (fns/three-plots {:x-max 1
+  (fns/plots {:x-max 1
                     :fs (map (partial msc/n-comp f) comps)
                     :labels (map (fn [n] (str "$f^" n "$")) comps)
                     :init-x 0.75
                     :n-cobweb 30
-                    :n-plot-iterates 400
-                    :n-hist-iterates hist-iterates}))
+                    :n-seq-iterates 400
+                    :n-dist-iterates n-iterates}))
 
 ;; This init is the fixed point:
 (let [f um/logistic-4
       comps [1]]
-  (fns/three-plots {:x-max 1
+  (fns/plots {:x-max 1
                     :fs (map (partial msc/n-comp f) comps)
                     :labels (map (fn [n] (str "$f^" n "$")) comps)
                     :init-x 1
                     :n-cobweb 30
-                    :n-plot-iterates 400
-                    :n-hist-iterates hist-iterates}))
+                    :n-seq-iterates 400
+                    :n-dist-iterates n-iterates}))
 
