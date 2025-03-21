@@ -62,21 +62,67 @@ multiplot
 
 ;; ---
 
-(def hist-iterates 100000)
+(def n-hist-iterates 100000)
 
-(let [f (um/normalized-ricker 3.0)
-      comps [1 4]]
-  (-> (fns/plot-fns-with-cobweb {:x-max 4
-                                 :fs (map (partial msc/n-comp f) comps)
-                                 :labels (map (fn [n] (str "$f^" n "$")) comps)
-                                 :init-x 2.1
-                                 :n-cobweb 10
-                                 :n-seq-iterates 400
-                                 :n-dist-iterates hist-iterates})
+(def uniricker
+  (let [f (um/normalized-ricker 3.0)
+        comps [1 4]]
+    (-> (fns/plot-fns-with-cobweb {:x-max 4
+                                   :fs (map (partial msc/n-comp f) comps)
+                                   :labels (map (fn [n] (str "$f^" n "$")) comps)
+                                   :init-x 2.1
+                                   :n-cobweb 10
+                                   :n-seq-iterates 400
+                                   :n-dist-iterates n-hist-iterates}))))
+
+(def multiricker
+  (-> uniricker
+      (assoc-in [:data 0 :xaxis] "x1") ; default--could be left out
+      (assoc-in [:data 0 :yaxis] "y1")
       (assoc-in [:data 1 :xaxis] "x2")
       (assoc-in [:data 1 :yaxis] "y2")
-      (assoc-in [:data 2 :xaxis] "x3")
-      (assoc-in [:data 2 :yaxis] "y3")
-      (assoc-in [:data 3 :xaxis] "x4")
-      (assoc-in [:data 3 :yaxis] "y4")
-      (assoc-in [:layout :grid] {:rows 2, :columns 2, :pattern "independent"})))
+      (assoc-in [:data 2 :xaxis] "x1")
+      (assoc-in [:data 2 :yaxis] "y1")
+      (assoc-in [:data 3 :xaxis] "x6")
+      (assoc-in [:data 3 :yaxis] "y6")
+      (assoc-in [:layout :grid] {:rows 3, :columns 2, :pattern "independent"})))
+
+multiricker
+
+(kind/pprint multiricker)
+
+;; ---
+
+
+(def f (um/normalized-ricker 3.0))
+(def init-x 2.1)
+(def iterates (iterate f init-x))
+
+(def cobthing
+  (let [comps [1 4]]
+    (-> (fns/plot-fns-with-cobweb {:x-max 4
+                                   :fs (map (partial msc/n-comp f) comps)
+                                   :labels (map (fn [n] (str "$f^" n "$")) comps)
+                                   :init-x init-x
+                                   :n-cobweb 10
+                                   :n-seq-iterates 400
+                                   :n-dist-iterates n-hist-iterates}))))
+
+
+;; Not right
+(def combothing
+  (plotly/plot ; add meta
+       {:layout (:layout cobthing)
+        :data (mapcat :data 
+                      [cobthing
+                       (fns/plot-iterates (take 400 iterates))
+                       (fns/iterates-histogram (take n-hist-iterates iterates))
+                       (fns/plot-cdf 4 (take n-hist-iterates iterates))])}))
+;(clojure.repl/pst)
+
+combothing
+
+(map class (:data combothing))
+
+;(kind/pprint combothing)
+
