@@ -11,6 +11,8 @@
 ;; Make LaTeX work in Plotly labels:
 (kind/hiccup [:script {:src "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"}])
 
+(def n-hist-iterates 100000)
+
 ;; Exploration of how to make general Plotly subplots (like lattice graphics)
 
 ;; For more info, including ways to provide additional customization see:
@@ -20,6 +22,8 @@
 ;; https://plotly.com/javascript/reference/layout/#layout-grid
 
 
+^:kindly/hide-code
+(comment
 (def data3 (tc/concat
              ;; These are going to be four distinct "traces" in the plotly config:
              (tc/dataset {:x [0], :y [0], :fun "line1" :my-size 20})
@@ -62,8 +66,6 @@ multiplot
 
 ;; ---
 
-(def n-hist-iterates 100000)
-
 (def uniricker
   (let [f (um/normalized-ricker 3.0)
         comps [1 4]]
@@ -90,6 +92,7 @@ multiplot
 multiricker
 
 (kind/pprint multiricker)
+)
 
 ;; ---
 
@@ -108,21 +111,46 @@ multiricker
                                    :n-seq-iterates 400
                                    :n-dist-iterates n-hist-iterates}))))
 
-
-;; Not right
 (def combothing
   (plotly/plot ; add meta
        {:layout (:layout cobthing)
-        :data (mapcat :data 
-                      [cobthing
-                       (fns/plot-iterates (take 400 iterates))
-                       (fns/iterates-histogram (take n-hist-iterates iterates))
-                       (fns/plot-cdf 4 (take n-hist-iterates iterates))])}))
+        :data (vec (mapcat :data 
+                           [cobthing
+                            (fns/plot-iterates (take 400 iterates))
+                            (fns/plot-iterates-histogram (take n-hist-iterates iterates))
+                            (fns/plot-cdf 4 (take n-hist-iterates iterates))]))}))
 ;(clojure.repl/pst)
 
-combothing
+;(class (:data combothing))
 
-(map class (:data combothing))
 
 ;(kind/pprint combothing)
 
+;; The values in in xn yn determines the order in the grid.
+(def multiplotthing
+  (-> combothing
+      (assoc-in [:data 0 :xaxis] "x1") ; default--could be left out
+      (assoc-in [:data 0 :yaxis] "y1")
+      (assoc-in [:data 1 :xaxis] "x1")
+      (assoc-in [:data 1 :yaxis] "y1")
+      (assoc-in [:data 2 :xaxis] "x1")
+      (assoc-in [:data 2 :yaxis] "y1")
+      (assoc-in [:data 3 :xaxis] "x1")
+      (assoc-in [:data 3 :yaxis] "y1")
+
+      (assoc-in [:data 4 :xaxis] "x2")
+      (assoc-in [:data 4 :yaxis] "y2")
+
+      (assoc-in [:data 6 :xaxis] "x3")
+      (assoc-in [:data 6 :yaxis] "y3")
+
+      (assoc-in [:data 5 :xaxis] "x4")
+      (assoc-in [:data 5 :yaxis] "y4")
+
+      (assoc-in [:layout :grid] {:rows 2, :columns 2, :pattern "independent"})
+
+      (assoc-in [:layout :width] 1000)
+      (assoc-in [:layout :height] 600)
+  ))
+
+multiplotthing
