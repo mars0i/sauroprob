@@ -1,5 +1,40 @@
 (ns utils.misc)
 
+;; For something fancier, possibly resort to using Nathan Marz's Specter. (Hanami uses it, btw.)
+(defn multi-assoc-in
+  "Like assoc-in, but replaces values of multiple terminal keys of equal
+  depth with the same new value. Specifically, performs assoc-in to the map
+  m and the result of previous applications of assoc-in. The key sequences
+  for subsequent applications of assoc-in are constructed by conj'ing each
+  element of final-keys to initial-keys. The replacement value v is used in
+  each application of assoc-in."
+  [m initial-keys final-keys v]
+  (let [key-seqs (map (fn [k] (conj (vec initial-keys) k))
+                      final-keys)]
+    (reduce (fn [m' ks] (assoc-in m' ks v))
+            m key-seqs)))
+
+(comment 
+  (def mymap {:a {:b 1
+                  :c {:d 2 :e 3}
+                  :f {:z 25 :e 54}}
+              :g {:h 5
+                  :c {:z 7}
+                  :l 8}
+              :m 9})
+  (multi-assoc-in mymap [:a :c] [:e :z] 101)
+  (multi-assoc-in mymap [:a :f] [:e :z] 101)
+  ;; Works with vector treated as a map:
+  (def map-with-vec {:a [{:b 1
+                          :c {:d 2 :e 3}},
+                         {:h 5
+                          :c {:z 7}
+                          :l 8}]
+                     :m 9})
+  (multi-assoc-in map-with-vec [:a 0 :c] [:e :z] 101)
+  (multi-assoc-in map-with-vec [:a 1 :c] [:e :z] 101)
+)
+
 ;; By John Collins at https://stackoverflow.com/a/68476365/1455243
 (defn irange
   "Inclusive range function: end element is included."
