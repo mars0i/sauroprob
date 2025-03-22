@@ -98,7 +98,7 @@ multiricker
 
 
 (def f (um/normalized-ricker 3.0))
-(def init-x 2.1)
+(def init-x 0.3)
 (def iterates (iterate f init-x))
 
 (def cobthing
