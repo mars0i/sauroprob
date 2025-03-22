@@ -42,7 +42,7 @@
                    (apply tc/concat ; maybe there's a more elegant way to do this
                           (map (fn [label f] (sp/fn2dataset [0 x-max] :fun label f))
                                labels fs)))
-        (plotly/base {:=width 550})
+        ;(plotly/base {:=width 550})
         (plotly/layer-line {:=x :x, :=y, :y :=color :fun})
         (sp/equalize-display-units) ; runs plotly/plot, which is needed for next lines
         (sp/set-line-width 0 1.5)
@@ -61,7 +61,7 @@
   [iterates]
   (-> (tc/dataset {:x (range (count iterates))
                    :y iterates})
-      (plotly/base {:=width 900})
+      ;(plotly/base {:=width 900})
       (plotly/layer-line {:=x :x, :=y, :y})
       plotly/plot
       (assoc-in [:data 0 :line :width] 1)))
@@ -72,13 +72,14 @@
 ;; simple function; if more flexibility is needed for standalone use, it
 ;;  would be better to write a separate function or make a plot by hand 
 ;; rather than generalizing this one.
-(defn iterates-histogram
+(defn plot-iterates-histogram
   "Plot the values of n iterates in a histogram. iterates should be
   not be infinite."
   [iterates]
   (-> (tc/dataset {:x iterates})
-      (plotly/base {:=width 800})
-      (plotly/layer-histogram {:=x :x, :=histogram-nbins 200})))
+      ;(plotly/base {:=width 800})
+      (plotly/layer-histogram {:=x :x, :=histogram-nbins 200})
+      plotly/plot)) ; for consistency with other fns
 
 ;; cf. https://clojurians.zulipchat.com/#narrow/channel/203279-scicloj-org/topic/Empirical.20CDF.20in.20fastmath.3F
 ;; From https://generateme.github.io/fastmath/clay/random.html#discrete:
@@ -152,7 +153,7 @@
                     ;(kind/md ["Plot of a sequence of values of the function beginning from " init-x ":"])
                     (plot-iterates seq-iterates)
                     ;(kind/md ["Distribution of values beginning from " init-x ":"])
-                    (iterates-histogram dist-iterates)
+                    (plot-iterates-histogram dist-iterates)
                     ;(kind/md ["cdf of values beginning from " init-x ":"])
                     (plot-cdf x-max dist-iterates)])))
 
