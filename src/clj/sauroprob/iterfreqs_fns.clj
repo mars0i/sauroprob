@@ -79,7 +79,8 @@
   (-> (tc/dataset {:x iterates})
       ;(plotly/base {:=width 800})
       (plotly/layer-histogram {:=x :x, :=histogram-nbins 200})
-      plotly/plot)) ; for consistency with other fns
+      plotly/plot
+      (assoc-in [:data 0 :line :width] 0.7)))
 
 ;; cf. https://clojurians.zulipchat.com/#narrow/channel/203279-scicloj-org/topic/Empirical.20CDF.20in.20fastmath.3F
 ;; From https://generateme.github.io/fastmath/clay/random.html#discrete:

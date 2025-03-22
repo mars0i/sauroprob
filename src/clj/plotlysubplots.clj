@@ -116,7 +116,7 @@ multiricker
        {:layout (:layout cobthing)
         :data (vec (mapcat :data 
                            [cobthing
-                            (fns/plot-iterates (take 400 iterates))
+                            (fns/plot-iterates (take 150 iterates))
                             (fns/plot-iterates-histogram (take n-hist-iterates iterates))
                             (fns/plot-cdf 4 (take n-hist-iterates iterates))]))}))
 ;(clojure.repl/pst)
@@ -151,6 +151,8 @@ multiricker
 
       (assoc-in [:layout :width] 1000)
       (assoc-in [:layout :height] 600)
+
+      (assoc-in [:data 4 :line :width] 0.5)
   ))
 
 multiplotthing
