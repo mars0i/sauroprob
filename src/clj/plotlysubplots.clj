@@ -22,6 +22,78 @@
 ;; https://plotly.com/javascript/reference/layout/#layout-grid
 
 
+(def f (um/normalized-ricker 2.9))
+(def init-x 0.3)
+(def iterates (iterate f init-x))
+
+(def cobthing
+  (let [comps [1]]
+    (-> (fns/plot-fns-with-cobweb {:x-max 3
+                                   :fs (map (partial msc/n-comp f) comps)
+                                   :labels (map (fn [n] (str "$f^" n "$")) comps)
+                                   :init-x init-x
+                                   :n-cobweb 16
+                                   :n-seq-iterates 400
+                                   :n-dist-iterates n-hist-iterates}))))
+
+;; A plot with three traces in cobthing, and three other traces
+(def combothing
+  (plotly/plot ; add meta
+       {:layout (:layout cobthing)
+        ;; merge the traces:
+        :data (vec (mapcat :data 
+                           [cobthing
+                            (fns/plot-iterates (take 250 iterates))
+                            (fns/plot-iterates-histogram (take n-hist-iterates iterates))
+                            (fns/plot-cdf 3 (take n-hist-iterates iterates))]))}))
+
+;; Split the traces into a grid of plots:
+;; The values in in xn yn determines the order in the grid.
+(def multiplotthing
+  (-> combothing
+      ;; the cobweb plot
+      (assoc-in [:data 0 :xaxis] "x1") ; default--could be left out
+      (assoc-in [:data 0 :yaxis] "y1")
+      (assoc-in [:data 1 :xaxis] "x1")
+      (assoc-in [:data 1 :yaxis] "y1")
+      (assoc-in [:data 2 :xaxis] "x1")
+      (assoc-in [:data 2 :yaxis] "y1")
+
+      ;; iterating the function over n steps
+      (assoc-in [:data 3 :xaxis] "x2")
+      (assoc-in [:data 3 :yaxis] "y2")
+
+      ;; the cumulative dist function
+      (assoc-in [:data 5 :xaxis] "x3")
+      (assoc-in [:data 5 :yaxis] "y3")
+
+      ;; histogram
+      (assoc-in [:data 4 :xaxis] "x4")
+      (assoc-in [:data 4 :yaxis] "y4")
+
+      ;; Split the preceding into four subplots
+      (assoc-in [:layout :grid] {:rows 2, :columns 2, :pattern "independent"})
+
+      ;; Adjust widths of subplots
+
+      ;; Overall width and height of the grid of plots:
+      (assoc-in [:layout :width] 1000)
+      (assoc-in [:layout :height] 600)
+      ;; Make left column narrower:
+      (assoc-in [:layout :xaxis] {:anchor "y1", :domain [0, 0.25]})
+      (assoc-in [:layout :xaxis3] {:anchor "y3", :domain [0, 0.25]})
+      ;; Start right plots to the right of the left plots:
+      (assoc-in [:layout :xaxis2] {:anchor "y2", :domain [0.3, 1.0]}) ; why are axis bars shifted left?
+      (assoc-in [:layout :xaxis4] {:anchor "y4", :domain [0.3, 1.0]})
+
+      ;(assoc-in [:data 0 :line :width] 0.5) ; s/b the diagonal y=x line
+  ))
+
+multiplotthing
+
+;; ---
+
+
 ^:kindly/hide-code
 (comment
 (def data3 (tc/concat
@@ -93,81 +165,5 @@ multiricker
 
 (kind/pprint multiricker)
 )
-
-;; ---
-
-
-(def f (um/normalized-ricker 3.0))
-(def init-x 0.3)
-(def iterates (iterate f init-x))
-
-(def cobthing
-  (let [comps [1]]
-    (-> (fns/plot-fns-with-cobweb {:x-max 3
-                                   :fs (map (partial msc/n-comp f) comps)
-                                   :labels (map (fn [n] (str "$f^" n "$")) comps)
-                                   :init-x init-x
-                                   :n-cobweb 16
-                                   :n-seq-iterates 400
-                                   :n-dist-iterates n-hist-iterates}))))
-
-(def combothing
-  (plotly/plot ; add meta
-       {:layout (:layout cobthing)
-        ;; merge the traces:
-        :data (vec (mapcat :data 
-                           [cobthing
-                            (fns/plot-iterates (take 250 iterates))
-                            (fns/plot-iterates-histogram (take n-hist-iterates iterates))
-                            (fns/plot-cdf 3 (take n-hist-iterates iterates))]))}))
-;(clojure.repl/pst)
-
-;(class (:data combothing))
-
-
-;(kind/pprint combothing)
-
-;; The values in in xn yn determines the order in the grid.
-(def multiplotthing
-  (-> combothing
-      ;; the cobweb plot
-      (assoc-in [:data 0 :xaxis] "x1") ; default--could be left out
-      (assoc-in [:data 0 :yaxis] "y1")
-      (assoc-in [:data 1 :xaxis] "x1")
-      (assoc-in [:data 1 :yaxis] "y1")
-      (assoc-in [:data 2 :xaxis] "x1")
-      (assoc-in [:data 2 :yaxis] "y1")
-
-      ;; iterating the function over n steps
-      (assoc-in [:data 3 :xaxis] "x2")
-      (assoc-in [:data 3 :yaxis] "y2")
-
-      ;; the cumulative dist function
-      (assoc-in [:data 5 :xaxis] "x3")
-      (assoc-in [:data 5 :yaxis] "y3")
-
-      ;; histogram
-      (assoc-in [:data 4 :xaxis] "x4")
-      (assoc-in [:data 4 :yaxis] "y4")
-
-      ;; Split the preceding into four subplots
-      (assoc-in [:layout :grid] {:rows 2, :columns 2, :pattern "independent"})
-
-      ;; Adjust widths of subplots
-
-      ;; Overall width and height of the grid of plots:
-      (assoc-in [:layout :width] 1000)
-      (assoc-in [:layout :height] 600)
-      ;; Make left column narrower:
-      (assoc-in [:layout :xaxis] {:anchor "y1", :domain [0, 0.25]})
-      (assoc-in [:layout :xaxis3] {:anchor "y3", :domain [0, 0.25]})
-      ;; Start right plots to the right of the left plots:
-      (assoc-in [:layout :xaxis2] {:anchor "y2", :domain [0.3, 1.0]})
-      (assoc-in [:layout :xaxis4] {:anchor "y4", :domain [0.3, 1.0]})
-
-      ;(assoc-in [:data 0 :line :width] 0.5) ; s/b the diagonal y=x line
-  ))
-
-multiplotthing
 
 ;; ---
