@@ -47,6 +47,7 @@
         (sp/equalize-display-units) ; runs plotly/plot, which is needed for next lines
         (sp/set-line-width 0 1.5)
         (sp/set-line-dash 0 "dot")
+        (sp/set-line-width 1 1.0)
         (sp/set-line-dash 1 "dash"))))
 
 
