@@ -45,6 +45,15 @@
   (reduce (fn [p idx] (assoc-into-trace p idx ks v))
           plot trace-idxs))
 
+(defn set-subplot-order
+  [plot trace-idxs subplot-order]
+  (let [x-order-str (str "x" subplot-order)
+        y-order-str (str "y" subplot-order)]
+    (-> plot
+        (assoc-into-traces trace-idxs [:xaxis] x-order-str)
+        (assoc-into-traces trace-idxs [:yaxis] y-order-str))))
+
+;; -----------------------------------------------
 
 ;; [xmin x-max] is the first arg, for use with -> , because it's likely
 ;; that different fns will share same x coords.
