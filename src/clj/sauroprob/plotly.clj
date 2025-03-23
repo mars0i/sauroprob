@@ -13,6 +13,39 @@
 
 (def plot-steps 400)
 
+(defn assoc-into-trace
+  "Given a Plotly plot EDN, and an index for one of its traces (i.e. one of
+  the maps in the vector that's the value of :data), Uses assoc-in to add
+  or replace the value of the sequence of keys in ks with v."
+  [plot trace-idx ks v]
+  (assoc-in plot
+            (into [:data trace-idx] ks)
+            v))
+
+(comment
+  (def fake-plot {:data [{:x [1 2 3],
+                          :y [4 5 6],
+                          :xaxis3 {:anchor "y1"}}
+                         {:x [10 20 30],
+                          :y [40 50 60],
+                          :xaxis {:anchor "y1"}}]
+                  :layout {}})
+
+  (-> fake-plot
+      (assoc-into-trace 0 [:xaxis3 :anchor] "x4")
+      (assoc-into-trace 0 [:xaxis3 :domain] [0.3 0.95]))
+)
+
+(defn assoc-into-traces
+  "Applies the same insertion/addition to several traces using
+  assoc-into-trace. trace-idxs is a sequence of indexes into the traces in
+  the vector that's the value of :data in plot. See that assoc-into-trace
+  for more info."
+  [plot trace-idxs ks v]
+  (reduce (fn [p idx] (assoc-into-trace p idx ks v))
+          plot trace-idxs))
+
+
 ;; [xmin x-max] is the first arg, for use with -> , because it's likely
 ;; that different fns will share same x coords.
 (defn fn2dataset
