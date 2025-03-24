@@ -1,6 +1,6 @@
 {:paths ["src/clj"] 
  :deps {org.clojure/clojure {:mvn/version "1.12.0"}
-        org.scicloj/noj {:mvn/version "2-beta11.1"} ; includes fastmath, Hanami, Clay
+        org.scicloj/noj {:mvn/version "2-beta13"} ; includes fastmath, Hanami, Clay
 
         ;metasoarous/oz {:mvn/version "1.6.0-alpha36"}
         ;metasoarous/oz {:mvn/version "2.0.0-alpha5"}
