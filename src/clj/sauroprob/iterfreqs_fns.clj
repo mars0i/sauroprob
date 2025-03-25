@@ -1,7 +1,6 @@
 ;; Ad-hoc functions for use in iterfreqs.clj
 (ns sauroprob.iterfreqs-fns
   (:require ;[clojure.math :as m]
-            [fastmath.random :as fr]
             [scicloj.tableplot.v1.plotly :as plotly]
             [scicloj.kindly.v4.kind :as kind]
             [scicloj.kindly.v4.api :as kindly]

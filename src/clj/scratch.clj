@@ -7,6 +7,7 @@
             [scicloj.tableplot.v1.plotly :as plotly]
             [scicloj.metamorph.ml.rdatasets :as rdatasets]
             [fastmath.random :as fr]
+            [fastmath.stats :as fs]
             [tablecloth.api :as tc]))
 
 
@@ -28,3 +29,5 @@
 ;; plotting a bunch of points run through the cdf.
 
 (fr/pdf distr 1.100000000)
+
+fs/ks-test-two-samples
