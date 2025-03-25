@@ -5,29 +5,26 @@
 (ns latexinplotly
   (:require [scicloj.kindly.v4.kind :as kind]
             [scicloj.tableplot.v1.plotly :as plotly]
-            [scicloj.metamorph.ml.rdatasets :as rdatasets]
             [fastmath.random :as fr]
             [fastmath.stats :as fs]
-            [tablecloth.api :as tc]))
+            [tablecloth.api :as tc]
+            [utils.math :as um]
+            [sauroprob.plotly :as sp]
+            [sauroprob.iterfreqs-fns :as ifn]))
 
-
-(def distr (fr/distribution :real-discrete-distribution 
-                            {:data [4.2 1.3 1.1 17.54 88.9 32.77 20.1 18]}))
-
-;; I think the idea is that the first arg is what you're passing to the cdf
-;; fn.  You're asking what is the prob of values less than or equal to that.
-(def cd (partial fr/cdf distr))
-;; But what's the optional second arg?
-
-(cd 20)
-(cd 88.8)
-
-(take 30 (map cd (range 0 100 0.5)))
-
-;; And then I think I plot that.
-;; i.e. so I'm not plotting steps between points, but just
-;; plotting a bunch of points run through the cdf.
-
-(fr/pdf distr 1.100000000)
+(kind/hiccup [:script {:src "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"}])
 
 fs/ks-test-two-samples
+
+(def logisticvals1 (iterate um/logistic-4 0.14))
+(def logisticvals2 (iterate um/logistic-4 0.17))
+
+
+(map #(ifn/plots-grid {:x-max 1.0 
+                  :fs [um/logistic-4] 
+                  :labels [(str "r=" %)]
+                  :init-x %
+                  :n-cobweb 14
+                  :n-seq-iterates 300
+                  :n-dist-iterates 1000})
+     [0.14 0.16 0.41])
