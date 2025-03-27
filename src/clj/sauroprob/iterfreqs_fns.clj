@@ -4,6 +4,7 @@
             [scicloj.tableplot.v1.plotly :as plotly]
             [scicloj.kindly.v4.kind :as kind]
             [scicloj.kindly.v4.api :as kindly]
+            [fastmath.random :as fr]
             [tablecloth.api :as tc]
             [utils.misc :as msc]
             [utils.math :as um]
