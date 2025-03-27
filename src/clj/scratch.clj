@@ -19,6 +19,11 @@
 (def logisticvals2 (iterate um/logistic-4 0.16))
 (def logisticvals3 (iterate um/logistic-4 0.41))
 
+(def logisticvals2after180 (drop 180 logisticvals2))
+
+(def logisticvals2after180init (first logisticvals2after180))
+
+
 
 (map #(ifn/plots-grid {:x-max 1.0 
                   :fs [um/logistic-4] 
@@ -27,8 +32,21 @@
                   :n-cobweb 14
                   :n-seq-iterates 300
                   :n-dist-iterates 10000})
-     [0.14 0.16 0.41])
+     [0.14 0.41 0.16 logisticvals2after180init])
 
+;; Look at that last sequence plot (upper right). The beginning goes:
+^:kindly/hide-code
+(take 12 logisticvals2after180)
+
+;; i.e. after the 4th value, which is almost 1, it jumps down to almost zero,
+;; where it stays for several steps.  You can see this in the cobweb diagram.
+
+;; Look at how small the smallest value is: 1.25E-6, close to 1/million.  
+;; So e.g. with clonal reproduction, you'd have to have a pop size of a million for 
+;; that not to count as extinction.  
+;; With sexual reproduction, the pop size would have to be at least two million.
+
+(comment
 ;; When I compared 0.14 and 0.17 init values, 
 ;; the p-values below were all near 0.1, give or take, which is not very good.
 ;; The K-S statistic varies between about 1.8 and around 5.5.  What's that
@@ -56,4 +74,5 @@
   (fs/ks-test-two-samples 
     (take N logisticvals1)
     (take N logisticvals2)))
+)
 
