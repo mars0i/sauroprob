@@ -1,21 +1,19 @@
 {:paths ["src/clj"] 
  :deps {org.clojure/clojure {:mvn/version "1.12.0"}
-        org.scicloj/noj {:mvn/version "2-beta13"} ; includes fastmath, Hanami, Clay
 
-        ;metasoarous/oz {:mvn/version "1.6.0-alpha36"}
-        ;metasoarous/oz {:mvn/version "2.0.0-alpha5"}
-        ;aerial.hanami/aerial.hanami {:mvn/version "0.20.1"}
-        ;generateme/fastmath {:mvn/version "2.1.8"} ; or 2.1.9-SNAPSHOT
-        ;generateme/fitdistr {:mvn/version "1.0.4"}
+        ;org.scicloj/noj {:mvn/version "2-beta13"} ; includes fastmath, Hanami, Clay
+
+        ;; noj 2-beta13 uses Clay 2-beta36. Overrride that to get Clay 2-beta37,
+        ;; which fixes bug that restricts plots to a fixed standard height.
+        ;; Go back to simple Noj inclusion when Noj includes newer a Clay version.
+        org.scicloj/noj {:mvn/version "2-beta13" :exclusions [org.scicloj/clay]}
+        org.scicloj/clay {:mvn/version "2-beta37"}
+
 
         org.scicloj/metamorph.ml {:mvn/version "1.1.1"} ; for tablecloth examples
 
         org.clojure/data.json {:mvn/version "2.4.0"}
         metosin/jsonista {:mvn/version "0.3.7"} ; generate json from edn for debugging
-        ;cljplot/cljplot {:mvn/version "0.0.2a-SNAPSHOT"} ; also by generateme
-        ;techascent/tech.viz {:mvn/version "6.00-beta-16-4"}
-        ;io.github.nextjournal/clerk {:mvn/version "0.12.707"}
-        ;; Has trouble with Java 23, but Java 17, 19, 21 seem to work:
        }
 
  :aliases {:nrepl-server {:extra-deps {nrepl/nrepl {:mvn/version "1.0.0"}} ; see note above
