@@ -11,6 +11,7 @@
 
 (ns mwe4
   (:require [scicloj.tableplot.v1.plotly :as plotly]
+            [scicloj.kindly.v4.kind :as kind]
             [tablecloth.api :as tc]))
 
 ;; With default height, no overlap:
