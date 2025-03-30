@@ -11,7 +11,9 @@
             [sauroprob.plotly :as sp]))
 
 ;; Make LaTeX work in Plotly labels:
-(kind/hiccup [:script {:src "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"}])
+;(kind/hiccup [:script {:src "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"}])
+;; I'm stopping using this because when labels are long, the Plotly
+;; legend interferes with the plot.  See mwe5.clj for details.
 
 ;; Used to generate steps when we need to plot a function
 ;; over arbitrary x values.
@@ -38,7 +40,7 @@
              n-cobweb]}] ; number of cobweb line pairs
   (let [basef (first fs)]
     (-> (tc/concat (sp/cobweb-dataset init-x n-cobweb :fun "iteration" basef)
-                   (tc/dataset {:x [0 x-max], :y [0 x-max], :fun "$y=x$"})
+                   (tc/dataset {:x [0 x-max], :y [0 x-max], :fun "y=x"}) ; Removed LaTeX since Plotly bug "$y=x$"
                    (apply tc/concat ; maybe there's a more elegant way to do this
                           (map (fn [label f] (sp/fn2dataset [0 x-max] :fun label f))
                                labels fs)))

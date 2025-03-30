@@ -12,53 +12,46 @@
             [sauroprob.plotly :as sp]
             [sauroprob.iterfreqs-fns :as ifn]))
 
-(kind/hiccup [:script {:src "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"}])
+;; Make LaTeX work in Plotly labels:
+;(kind/hiccup [:script {:src "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"}])
+;; I'm stopping using this because when labels are long, the Plotly
+;; legend interferes with the plot.  See mwe5.clj for details.
 
 
 (def logisticvals1 (iterate um/logistic-4 0.14))
 (def logisticvals2 (iterate um/logistic-4 0.16))
 (def logisticvals3 (iterate um/logistic-4 0.41))
+(def logisticvals4 (drop 180 logisticvals2)) ; The last sequence starts at a small value.
 
-(def logisticvals2after180 (drop 180 logisticvals2))
+;; From most recent version of fastmath (since current release 3.0.0-alpha3):
+;; ks-test-two-samples returns:
+;;   A map with the following keys:
+;;   - `:n`: Effective sample size.
+;; [Note: in the examples below, this seems to be half the size of both pops.]
+;;   - `:nx`: Number of observations in `xs`.
+;;   - `:ny`: Number of observations in `ys`.
+;;   - `:dp`: Maximum positive difference between empirical cumulative distribution functions.
+;;   - `:dn`: Maximum negative difference between empirical cumulative distribution functions.
+;;   - `:d`: The maximum absolute difference between ECDFs.
+;;   - `:stat`: KS statistic, scaled `d` for asymptotic method.
+;;   - `:KS`: Alias for `:stat`.
+;;   - `:sides`: The alternative hypothesis used.
+;;   - `:p-value`: The computed p-value indicating the significance of the test.
 
-(def logisticvals2after180init (first logisticvals2after180))
+(defn dist-and-pval
+  [& {:keys [:d :p-value]}]
+  {:d d, :p-value p-value})
 
-
-
-(map #(ifn/plots-grid {:x-max 1.0 
-                  :fs [um/logistic-4] 
-                  :labels [(str "r=" %)]
-                  :init-x %
-                  :n-cobweb 14
-                  :n-seq-iterates 300
-                  :n-dist-iterates 10000})
-     [0.14 0.41 0.16 logisticvals2after180init])
-
-;; Look at that last sequence plot (upper right). The beginning goes:
-^:kindly/hide-code
-(take 12 logisticvals2after180)
-
-;; i.e. after the 4th value, which is almost 1, it jumps down to almost zero,
-;; where it stays for several steps.  You can see this in the cobweb diagram.
-
-;; Look at how small the smallest value is: 1.25E-6, close to 1/million.  
-;; So e.g. with clonal reproduction, you'd have to have a pop size of a million for 
-;; that not to count as extinction.  
-;; With sexual reproduction, the pop size would have to be at least two million.
-
-(comment
-;; When I compared 0.14 and 0.17 init values, 
-;; the p-values below were all near 0.1, give or take, which is not very good.
-;; The K-S statistic varies between about 1.8 and around 5.5.  What's that
-;; about?  i.e. it's changing as I extend the very same sequence.
-
-;; Below I compare 0.14 and 0.16.  Still large p-values, and fluctuating
-;; K-S statistics as I extend the sequence:
+(defn my-ks-test
+  [xs1 xs2]
+  (dist-and-pval
+    (fs/ks-test-two-samples xs1 xs2)))
 
 (let [N 1000]
+  (dist-and-pvalue
   (fs/ks-test-two-samples 
     (take N logisticvals1)
-    (take N logisticvals2)))
+    (take N logisticvals2))))
 
 (let [N 10000]
   (fs/ks-test-two-samples 
@@ -70,9 +63,21 @@
     (take N logisticvals1)
     (take N logisticvals2)))
 
+(comment
 (let [N 1000000]
   (fs/ks-test-two-samples 
     (take N logisticvals1)
     (take N logisticvals2)))
 )
 
+
+(comment
+(map #(ifn/plots-grid {:x-max 1.0 
+                  :fs [um/logistic-4] 
+                  :labels [(str "r=" %)]
+                  :init-x %
+                  :n-cobweb 14
+                  :n-seq-iterates 300
+                  :n-dist-iterates 10000})
+     [0.14 0.41 0.16 logisticvals2after180init])
+)

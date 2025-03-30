@@ -12,7 +12,7 @@
     (plotly/layer-line {:=x :x, :=y :y, :=color :fun})
     plotly/plot)
 
-;; ### Example 2--long label causes legend to squeeze the plot.
+;; ### Example 2--long label causes the legend to squeeze the plot.
 ;; I think this is Plotly's intended default behavior.
 (-> (tc/concat (tc/dataset {:x [0 1], :y [0 1], :fun "r"})
                (tc/dataset {:x [0 1], :y [1 0], :fun "s-------------------------------------------"}))
