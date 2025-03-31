@@ -48,7 +48,7 @@
     (fs/ks-test-two-samples xs1 xs2)))
 
 (let [N 1000]
-  (dist-and-pvalue
+  (dist-and-pval
   (fs/ks-test-two-samples 
     (take N logisticvals1)
     (take N logisticvals2))))
@@ -64,6 +64,7 @@
     (take N logisticvals2)))
 
 (comment
+  ;; takes a long time
 (let [N 1000000]
   (fs/ks-test-two-samples 
     (take N logisticvals1)
