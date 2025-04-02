@@ -53,9 +53,39 @@
           {:value y :period (- i prev-idx) :starts-at prev-idx}  ; old version: [y (- i prev-idx) prev-idx]
           (recur (rest ys) (inc i) (assoc seen y i)))))))
 
+;; You can restrict inputs to fractions of K by adding round or floor,
+;; etc., to the function passed in. (?)
 (defn normalize
+  "Wraps a function f of a \"carrying capacity\" K, returning a function
+  from x in [0,1] to a result (typically) in [0,1], more or less
+  representing a relative frequency relative to K.  (It's the job of the
+  user to make sure that f and K are appropriately related.)"
+  [f K]
+  (fn [x]  ; x should be in [0,1]
+    (let [n (* x K) ; multiply carrying capacity K by x to get (possibly non-integer) pop size n
+          ;; NOTE If inputs should be restricted to integers, this is where that could happen.
+          ;; i.e. the function f could floor/round at this point.
+          ;; BUT if the input x was a rational over denominator K, it's not needed.
+          result (double (f n))] ; result is a new pop size on the K scale
+      (/ result K)))) ; so we divide by K
+      ;; This will be a double representing a rational with K as
+      ;; denominator if f restricted output to integers.
+      ;; so that'S what will go into the next iteration.
+
+(comment
+  (def rick (ricker 50 3.0))
+  (def nick (normalize rick 50)) ; note K is the same for rick and normalize
+
+  (take 5 (iterate rick (* 0.85 50)))
+  (take 20 (iterate nick 0.85))
+  (map #(/ % 50) (take 20 (iterate rick (* 0.85 50))))
+)
+
+
+;; old version
+(defn normalize-with-params
   "Wraps a function f of a \"carrying capacity\" K and additional
-  parameters, and a population size N, returning instead a a function from
+  parameters, and a population size N, returning instead a function from
   x in [0,1] to a result (typically) in [0,1], more or less representing a
   relative frequency of N relative to K."
   [f K & params]
@@ -144,11 +174,33 @@
   ([r] (partial normalized-ricker r))
   ([r x] (* x (m/exp (* r (- 1 x))))))
 
+;; NOTE CONSIDER USING `rint` (m/rint 5.0)
+
+(defn rounding
+  [f]
+  (fn [x] (m/round (f x))))
+
+(defn flooring
+  [f]
+  (fn [x] (m/floor (f x))))
+
+(defn ceiling
+  [f]
+  (fn [x] (m/ceil (f x))))
+
 (defn floored-ricker
-  "Ricker function wrapped in floor so it rounds down to the nearest
-  integer as a double."
+  "Ricker function wrapped in floor so it rounds the result down to the
+  nearest integer as a double.  (Wrap in normalize to make a normalied
+  Ricker."
   ([K r] (partial floored-ricker K r))
   ([K r N] (m/floor (ricker K r N))))
+
+(defn rounded-ricker
+  "Ricker function wrapped in floor so it rounds the result to the nearest
+  integer up or town as a double.  (Wrap in normalize to make a normalied
+  Ricker."
+  ([K r] (partial rounded-ricker K r))
+  ([K r N] (m/round (ricker K r N))))
 
 (comment
   (defn foo [x y] [y x])
@@ -156,13 +208,13 @@
 
   (ricker 100 3.5 50)
   (normalized-ricker 3.5 0.5)
-  ((normalize ricker 100 3.5) 0.5)
+  ((normalize-with-params ricker 100 3.5) 0.5)
 
   (ricker 100 3.5 50)
   (floored-ricker 100 3.5 50)
   (normalized-ricker 3.5 0.5)
   ;; This puts the result of the floored function back on the x in [0,1] scale:
-  ((normalize floored-ricker 100 3.5) 0.5)
+  ((normalize-with-params floored-ricker 100 3.5) 0.5)
 )
 
 
