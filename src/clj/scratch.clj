@@ -78,6 +78,7 @@
   (my-ks-test 
     (take N logisticvals1)
     (take N logisticvals2)))
+^:kindly/hide-code
 ; =>
 ; {:d 0.16, :p-value 0.15453805538450638, :stat 1.131370849898476}
 
@@ -85,6 +86,7 @@
   (my-ks-test 
     (take N logisticvals1)
     (take N logisticvals2)))
+^:kindly/hide-code
 ; =>
 ; {:d 0.04900000000000004,
 ;  :p-value 0.18111964545948345,
@@ -94,6 +96,7 @@
   (my-ks-test 
     (take N logisticvals1)
     (take N logisticvals2)))
+^:kindly/hide-code
 ; =>
 ; {:d 0.008800000000000002,
 ;  :p-value 0.8335174206375168,
@@ -103,6 +106,7 @@
   (my-ks-test 
     (take N logisticvals1)
     (take N logisticvals2))) 
+^:kindly/hide-code
 ; =>
 ; {:d 0.0024500000000000056,
 ;  :p-value 0.924972889869936,
@@ -114,6 +118,7 @@
   (my-ks-test 
     (take N logisticvals1)
     (take N logisticvals2)))
+^:kindly/hide-code
 ; =>
 ; {:d 0.001263999999999993,
 ;  :p-value 0.4013717039125356,
@@ -127,6 +132,7 @@
   (my-ks-test 
     (take N logisticvals1)
     (take N logisticvals3))) 
+^:kindly/hide-code
 ; {:d 0.0025200000000000057,
 ;  :p-value 0.9086338760487859,
 ;  :stat 0.5634891303299483}
@@ -135,6 +141,7 @@
   (my-ks-test 
     (take N logisticvals2)
     (take N logisticvals3))) 
+^:kindly/hide-code
 ; {:d 0.002250000000000005,
 ;  :p-value 0.9619176463457608,
 ;  :stat 0.5031152949374538}
@@ -143,6 +150,7 @@
   (my-ks-test 
     (take N logisticvals1)
     (take N logisticvals3))) 
+^:kindly/hide-code
 ; {:d 0.0025200000000000057,
 ;  :p-value 0.9086338760487859,
 ;  :stat 0.5634891303299483}
@@ -151,6 +159,7 @@
   (my-ks-test 
     (take N logisticvals2)
     (take N logisticvals3))) 
+^:kindly/hide-code
 ; {:d 0.002250000000000005,
 ;  :p-value 0.9619176463457608,
 ;  :stat 0.5031152949374538}
@@ -159,6 +168,7 @@
   (my-ks-test 
     (take N logisticvals3)
     (take N logisticvals4))) 
+^:kindly/hide-code
 ; {:d 0.002270000000000005,
 ;  :p-value 0.9588836280837709,
 ;  :stat 0.5075874308924534}
@@ -168,6 +178,7 @@
   (my-ks-test 
     (take N logisticvals3)
     (take N (iterate um/logistic-4 0.75)))) ; returns 0.75, 0.75, 0.75, ...
+^:kindly/hide-code
 ; {:d 0.6672299999995982,
 ;  :p-value 0.76486718255575,
 ;  :stat 0.6672266638746192}
@@ -188,6 +199,7 @@
   (my-ks-test 
     (take N (iterate (um/normalized-ricker 3.0) 0.16))
     (take N (iterate (um/normalized-ricker 3.0) 0.965))))
+^:kindly/hide-code
 ; {:d 0.0032800000000000077,
 ;  :p-value 0.6551009372314645,
 ;  :stat 0.7334302966199328}
