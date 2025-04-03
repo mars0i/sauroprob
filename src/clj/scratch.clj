@@ -12,24 +12,34 @@
 
 ;; See clojisr-example for tips e.g. syntax for optional args in R.
 
-^:kindly/hide-code
 (R/require-r '[stats :refer [ks.test]])
-^:kindly/hide-code
 (R/require-r '[dgof :refer [ks.test]])
 
-;; exact because sample size small:
-(R/r->clj (r.stats/ks-test (range 30) (range 30)))
-(R/r->clj (r.dgof/ks-test (range 30) (range 30)))
-(fs/ks-test-two-samples (range 30) (range 30))
 
-(R/r->clj (r.stats/ks-test (range 100) (range 100)))
-(R/r->clj (r.dgof/ks-test (range 100) (range 100)))
-(fs/ks-test-two-samples (range 100) (range 100))
+(def logisticvals1 (iterate um/logistic-4 0.14))
+(def logisticvals2 (iterate um/logistic-4 0.16))
+(def logisticvals3 (iterate um/logistic-4 0.41))
+(def logisticvals2after180 (drop 180 logisticvals2))
 
-(R/r->clj (r.stats/ks-test (range 1000) (range 1000)))
-(R/r->clj (r.dgof/ks-test (range 1000) (range 1000)))
-(fs/ks-test-two-samples (range 1000) (range 1000))
+(def ricker1 (iterate um/logistic-4 0.14))
+(def ricker2 (iterate um/logistic-4 0.16))
+(def ricker3 (iterate um/logistic-4 0.41))
+(def ricker4 (iterate um/logistic-4 1.41))
+(def ricker5 (iterate um/logistic-4 2.41))
 
-(R/r->clj (r.stats/ks-test (range 100000) (range 100000)))
-(R/r->clj (r.dgof/ks-test (range 100000) (range 100000)))
-(fs/ks-test-two-samples (range 100000) (range 100000))
+(defn testem
+  [xs ys]
+  (let [rstats-result (R/r->clj (r.stats/ks-test xs ys))
+        dgof-result (R/r->clj (r.dgof/ks-test xs ys))
+        fastmath-result (fs/ks-test-two-samples xs ys)]
+   ; {:rstats {:ks (:statistic rstats-result), :pval (:p.value rstats-result)}
+   ;  :dgof {:ks (:statistic dgof-result), :pval (:p.value dgof-result)}
+   ;  :fastmath {:ks (:stat fastmath-result)
+   ;             :absdiff (:d fastmath-result)
+   ;             :pval (:p-value fastmath-result)}}
+   [rstats-result dgof-result fastmath-result]
+    ))
+
+(let [N 1000]
+  (testem (take N logisticvals1)
+          (take N logisticvals2after180)))
