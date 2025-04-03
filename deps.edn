@@ -1,11 +1,11 @@
 {:paths ["src/clj"] 
  :deps {org.clojure/clojure {:mvn/version "1.12.0"}
 
-        org.scicloj/noj {:mvn/version "2-beta14"} ; includes fastmath, Hanami, Clay
+        ;org.scicloj/noj {:mvn/version "2-beta14"} ; includes fastmath, Hanami, Clay
+        org.scicloj/noj {:mvn/version "2-beta14" :exclusions [generateme/fastmath]}
+        generateme/fastmath {:mvn/version "3.0.0-alpha4-SNAPSHOT"}
 
-        ;; noj 2-beta13 uses Clay 2-beta36. Overrride that to get Clay 2-beta37,
-        ;; which fixes bug that restricts plots to a fixed standard height.
-        ;; Go back to simple Noj inclusion when Noj includes newer a Clay version.
+        ;; Example of how to override Noj defaults:
         ;org.scicloj/noj {:mvn/version "2-beta13" :exclusions [org.scicloj/clay]}
         ;org.scicloj/clay {:mvn/version "2-beta37"}
 
