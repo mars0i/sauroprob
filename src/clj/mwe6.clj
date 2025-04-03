@@ -21,6 +21,20 @@
 ;  :data.name [".MEM$xf7132ff626b54edb and .MEM$x8e56b4112bef4910"]}
 
 (fs/ks-test-two-samples (range 1000) (range 1000))
+;; New 3.0.0-alpha4-SNAPSHOT results:
+; {:stat 0.0,
+;  :method :approximate,
+;  :n 500.0,
+;  :p-value 1.0,
+;  :KS 0.0,
+;  :nx 1000,
+;  :dn -0.0,
+;  :sides :two-sided,
+;  :dp 0.0,
+;  :d 0.0,
+;  :ny 1000}
+;
+;; Old 3.0.0-alpha3 results:
 ; {:stat 0.022360679774997897,
 ;  :n 500.0,
 ;  :p-value 1.0,
