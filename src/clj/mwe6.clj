@@ -5,7 +5,7 @@
 (R/require-r '[stats :refer [ks.test]])
 (R/require-r '[dgof :refer [ks.test]])
 
-(R/r->clj (r.stats/ks-test (range 1000) (range 100)))
+(R/r->clj (r.stats/ks-test (range 1000) (range 1000)))
 ; {:statistic [0.0],
 ;  :p.value [1.0],
 ;  :alternative ["two-sided"],
@@ -13,14 +13,14 @@
 ;  :data.name [".MEM$xe81be2f1e96340b9 and .MEM$x976c5742a6c84322"],
 ;  :exact [false]}
 
-(R/r->clj (r.dgof/ks-test (range 1000) (range 100)))
+(R/r->clj (r.dgof/ks-test (range 1000) (range 1000)))
 ; {:statistic [0.0],
 ;  :p.value [1.0],
 ;  :alternative ["two-sided"],
 ;  :method ["Two-sample Kolmogorov-Smirnov test"],
 ;  :data.name [".MEM$xf7132ff626b54edb and .MEM$x8e56b4112bef4910"]}
 
-(fs/ks-test-two-samples (range 1000) (range 100))
+(fs/ks-test-two-samples (range 1000) (range 1000))
 ; {:stat 0.022360679774997897,
 ;  :n 500.0,
 ;  :p-value 1.0,
