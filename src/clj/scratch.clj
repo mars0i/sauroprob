@@ -2,7 +2,7 @@
 (ns scratch
   (:require [scicloj.kindly.v4.kind :as kind]
             [scicloj.tableplot.v1.plotly :as plotly]
-            [fastmath.random :as fr]
+            ;[fastmath.random :as fr]
             [fastmath.stats :as fs]
             [tablecloth.api :as tc]
             [clojisr.v1.r :as R]
@@ -21,6 +21,12 @@
 (def logisticvals2 (iterate um/logistic-4 0.16))
 (def logisticvals3 (iterate um/logistic-4 0.41))
 (def logisticvals2after180 (drop 180 logisticvals2))
+(def yo (iterate um/logistic-4 0.3085937081153858))
+
+(first logisticvals2)
+(first logisticvals2after180)
+(first yo)
+(= (take 1000 logisticvals2after180) (take 1000 yo))
 
 (def ricker1 (iterate um/logistic-4 0.14))
 (def ricker2 (iterate um/logistic-4 0.16))
@@ -30,24 +36,36 @@
 
 (defn testem
   [xs ys & {:keys [exact]}]
-  (let [rstats-result (R/r->clj (if exact 
-                                  (r.stats/ks-test xs ys :exact true)
-                                  (r.stats/ks-test xs ys :exact false)))
-        dgof-result (R/r->clj (if exact 
-                                (r.dgof/ks-test xs ys :exact true)
-                                (r.dgof/ks-test xs ys :exact false)))
-        fastmath-result (fs/ks-test-two-samples xs ys (if exact
-                                                        {:method :exact}
-                                                        {:method :approximate}))]
+  (let [rstats-result (R/r->clj (r.stats/ks-test xs ys :exact exact))
+        dgof-result (R/r->clj (r.dgof/ks-test xs ys :exact exact))
+        fastmath-result (fs/ks-test-two-samples xs ys {:method
+                                                       (if exact
+                                                        :exact
+                                                        :approximate)})]
+    (prn :exact exact)
+    {:rstats rstats-result 
+     :dgof dgof-result 
+     :fastmath fastmath-result}))
+
+(comment
+(let [N 600]
+  (testem  (take N logisticvals1)
+           (take N logisticvals2after180)
+          :exact true  ;; NOTE Fastmath's returning ##NaN as p-value with :exact true
+          ))
+
+(let [N 10000]
+  (testem  (range N)
+           (map #(+ % 0.5) (range N))
+          :exact true))
+
+)
+
     ;{:rstats {:ks (:statistic rstats-result), :pval (:p.value rstats-result)}
     ; :dgof {:ks (:statistic dgof-result), :pval (:p.value dgof-result)}
     ; :fastmath {:ks (:stat fastmath-result)
     ;            :absdiff (:d fastmath-result)
     ;            :pval (:p-value fastmath-result)}}
-    {:rstats rstats-result 
-     :dgof dgof-result 
-     :fastmath fastmath-result}
-    ))
 
 ;; dgof ks.test help says (paragraph 5 of "Details"):
 
@@ -65,12 +83,3 @@
 ; does that last thing, too.  So in any even dgof doesn't tell you whether
 ; it was exact or not.  You just have to know.
 
-
-(comment
-(let [N 1000]
-  (testem  (take N logisticvals1)
-           (take N logisticvals2after180)
-          :exact true  ;; NOTE Fastmath's returning ##NaN as p-value with :exact true
-          ))
-
-)
