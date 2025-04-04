@@ -12,6 +12,7 @@
 
 ;; See clojisr-example for tips e.g. syntax for optional args in R.
 
+
 (R/require-r '[stats :refer [ks.test]])
 (R/require-r '[dgof :refer [ks.test]])
 
@@ -28,18 +29,48 @@
 (def ricker5 (iterate um/logistic-4 2.41))
 
 (defn testem
-  [xs ys]
-  (let [rstats-result (R/r->clj (r.stats/ks-test xs ys))
-        dgof-result (R/r->clj (r.dgof/ks-test xs ys))
-        fastmath-result (fs/ks-test-two-samples xs ys)]
-   ; {:rstats {:ks (:statistic rstats-result), :pval (:p.value rstats-result)}
-   ;  :dgof {:ks (:statistic dgof-result), :pval (:p.value dgof-result)}
-   ;  :fastmath {:ks (:stat fastmath-result)
-   ;             :absdiff (:d fastmath-result)
-   ;             :pval (:p-value fastmath-result)}}
-   [rstats-result dgof-result fastmath-result]
+  [xs ys & {:keys [exact]}]
+  (let [rstats-result (R/r->clj (if exact 
+                                  (r.stats/ks-test xs ys :exact true)
+                                  (r.stats/ks-test xs ys :exact false)))
+        dgof-result (R/r->clj (if exact 
+                                (r.dgof/ks-test xs ys :exact true)
+                                (r.dgof/ks-test xs ys :exact false)))
+        fastmath-result (fs/ks-test-two-samples xs ys (if exact
+                                                        {:method :exact}
+                                                        {:method :approximate}))]
+    ;{:rstats {:ks (:statistic rstats-result), :pval (:p.value rstats-result)}
+    ; :dgof {:ks (:statistic dgof-result), :pval (:p.value dgof-result)}
+    ; :fastmath {:ks (:stat fastmath-result)
+    ;            :absdiff (:d fastmath-result)
+    ;            :pval (:p-value fastmath-result)}}
+    {:rstats rstats-result 
+     :dgof dgof-result 
+     :fastmath fastmath-result}
     ))
 
+;; dgof ks.test help says (paragraph 5 of "Details"):
+
+; If exact = NULL (the default), an exact p-value is computed if
+; the sample size is less than 100 in the one-sample case with y
+; continuous or if the sample size is less than or equal to 30 with
+; y discrete; or if the product of the sample sizes is less than
+; 10000 in the two-sample case for continuous y. Otherwise,
+; asymptotic distributions are used whose approximations may be
+;inaccurate in small samples.
+
+; In other words (?), for my two-sample non-continuous tests, dgof/ks.test
+; uses exact iff the sample size is <= 30?  Note that in that case the
+; output includes what appears to be the actual data.  Well stats/ks.test
+; does that last thing, too.  So in any even dgof doesn't tell you whether
+; it was exact or not.  You just have to know.
+
+
+(comment
 (let [N 1000]
-  (testem (take N logisticvals1)
-          (take N logisticvals2after180)))
+  (testem  (take N logisticvals1)
+           (take N logisticvals2after180)
+          :exact true  ;; NOTE Fastmath's returning ##NaN as p-value with :exact true
+          ))
+
+)
