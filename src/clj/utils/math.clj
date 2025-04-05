@@ -15,6 +15,7 @@
 ;; by f to f(f(x))], and so on.
 
 ;; https://stackoverflow.com/a/73829330/1455243
+;; SHOULD I USE with-precision INSTEAD?
 (defn round-to
   "Rounds 'x' to 'places' decimal places"
   [x places]
@@ -24,6 +25,21 @@
        .doubleValue))
 
 (comment (round-to 32.12545 3) )
+
+(defn round-to-rational
+  "Given a number e.g. between 0 and 1, round it to the nearest rational
+  number with K as denominator, and return as a double. (Wrap in rationalize
+  if you prefer a ratio.)"
+  [K x]
+  (-> x
+      (* K)     ; expand x on [0,1] scale to the K scale
+      m/round   ; round to the nearest K-scale long
+      double    ; convert back to a double
+      (/ K)))   ; reduce the double back to x's original scale
+
+(comment
+  (round-to-rational 10 0.25)
+)
 
 (defn iter-vals
   "Returns a lazy sequence of values resulting from iterating a 
@@ -53,8 +69,7 @@
           {:value y :period (- i prev-idx) :starts-at prev-idx}  ; old version: [y (- i prev-idx) prev-idx]
           (recur (rest ys) (inc i) (assoc seen y i)))))))
 
-;; You can restrict inputs to fractions of K by adding round or floor,
-;; etc., to the function passed in. (?)
+;; For tests and examples, see comment block after normalized-ricker
 (defn normalize
   "Wraps a function f of a \"carrying capacity\" K, returning a function
   from x in [0,1] to a result (typically) in [0,1], more or less
@@ -72,14 +87,6 @@
       ;; denominator if f restricted output to integers.
       ;; so that'S what will go into the next iteration.
 
-(comment
-  (def rick (ricker 50 3.0))
-  (def nick (normalize rick 50)) ; note K is the same for rick and normalize
-
-  (take 5 (iterate rick (* 0.85 50)))
-  (take 20 (iterate nick 0.85))
-  (map #(/ % 50) (take 20 (iterate rick (* 0.85 50))))
-)
 
 
 ;; old version
@@ -174,19 +181,23 @@
   ([r] (partial normalized-ricker r))
   ([r x] (* x (m/exp (* r (- 1 x))))))
 
-;; NOTE CONSIDER USING `rint` (m/rint 5.0)
+(comment
+  (def rick (ricker 50 3.0))
+  (def nick (normalize rick 50)) ; note K is the same for rick and normalize
 
-(defn rounding
-  [f]
-  (fn [x] (m/round (f x))))
+  ;; These produce nearly identical results (the difference is very small):
+  (take 27 (iterate (normalized-ricker 3.0) 0.85))
+  ;; These produce identical results:
+  (take 27 (iterate nick 0.85))
+  (map #(/ % 50) (take 27 (iterate rick (* 0.85 50))))
 
-(defn flooring
-  [f]
-  (fn [x] (m/floor (f x))))
+  (map #(* % 50) (take 27 (iterate nick 0.85)))
+  (rationalize (double 1/50))
+)
 
-(defn ceiling
-  [f]
-  (fn [x] (m/ceil (f x))))
+(defn rounding [f] (comp m/round f))
+(defn flooring [f] (comp m/floor f))
+(defn ceiling  [f] (comp m/ceil f))
 
 (defn floored-ricker
   "Ricker function wrapped in floor so it rounds the result down to the
