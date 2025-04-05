@@ -23,11 +23,6 @@
 (def logisticvals2after180 (drop 180 logisticvals2))
 (def yo (iterate um/logistic-4 0.3085937081153858))
 
-(first logisticvals2)
-(first logisticvals2after180)
-(first yo)
-(= (take 1000 logisticvals2after180) (take 1000 yo))
-
 (def ricker1 (iterate um/logistic-4 0.14))
 (def ricker2 (iterate um/logistic-4 0.16))
 (def ricker3 (iterate um/logistic-4 0.41))
