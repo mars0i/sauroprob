@@ -12,69 +12,50 @@
 
 ;; See clojisr-example for tips e.g. syntax for optional args in R.
 
-
 (R/require-r '[stats :refer [ks.test]])
 (R/require-r '[dgof :refer [ks.test]])
 
+(defn fs-ks-test
+  "Returns a map with the difference :d and the p-value :p of comparison of
+  sequences with initial value :x and with initial value :y.  Uses
+  fastmath's ks-test-two-samples."
+  [xs ys]
+  (let [result (fs/ks-test-two-samples xs ys {:method :exact})]
+    {:x (first xs), :y (first ys),
+     :d (:d result), :p (:p-value result)}))
+        ;; change this for the R versions
 
-(def logisticvals1 (iterate um/logistic-4 0.14))
-(def logisticvals2 (iterate um/logistic-4 0.16))
-(def logisticvals3 (iterate um/logistic-4 0.41))
-(def logisticvals2after180 (drop 180 logisticvals2))
-(def yo (iterate um/logistic-4 0.3085937081153858))
+(defn rdg-ks-test
+  "Returns a map with the difference :d and the p-value :p of comparison of
+  sequences with initial value :x and with initial value :y.  Uses R's
+  dgof/ks.test."
+  [xs ys]
+  (let [result (R/r->clj (r.dgof/ks-test xs ys :exact true))]
+    {:x (first xs), :y (first ys),
+     :d (first (:statistic result)), :p (first (:p.value result))}))
 
-(def ricker1 (iterate um/logistic-4 0.14))
-(def ricker2 (iterate um/logistic-4 0.16))
-(def ricker3 (iterate um/logistic-4 0.41))
-(def ricker4 (iterate um/logistic-4 1.41))
-(def ricker5 (iterate um/logistic-4 2.41))
+(def rick (um/normalized-ricker 3.0))
 
-(defn testem
-  [xs ys & {:keys [exact]}]
-  (let [rstats-result (R/r->clj (r.stats/ks-test xs ys :exact exact))
-        dgof-result (R/r->clj (r.dgof/ks-test xs ys :exact exact))
-        fastmath-result (fs/ks-test-two-samples xs ys {:method
-                                                       (if exact
-                                                        :exact
-                                                        :approximate)})]
-    (prn :exact exact)
-    {:rstats rstats-result 
-     :dgof dgof-result 
-     :fastmath fastmath-result}))
+(defn rick-iters 
+  [n-iters init]
+  (take n-iters (iterate rick init)))
+
+(def inits (range 0.01 3.0 0.01))
+(def n-iters 1000)
 
 (comment
-(let [N 600]
-  (testem  (take N logisticvals1)
-           (take N logisticvals2after180)
-          :exact true  ;; NOTE Fastmath's returning ##NaN as p-value with :exact true
-          ))
+  ;; Perform ks-test of the first distribution with all of the others:
 
-(let [N 10000]
-  (testem  (range N)
-           (map #(+ % 0.5) (range N))
-          :exact true))
+  (def first-iters (rick-iters n-iters (first inits)))
+  (def other-iters (map (partial rick-iters n-iters) (rest inits)))
 
+  ;; Remember that map and iterate are lazy, so these might return immediately 
+  ;; without having done any work:
+  (def ks-checks (map (partial fs-ks-test first-iters) other-iters))
+  (def ks-checks (map (partial rdg-ks-test first-iters) other-iters))
+
+  ;; none of the p-values indicate that the distributions are different:
+  (def min-pval (apply min (map :p ks-checks)))
+  ;; But the distances are not very close:
+  (def max-diff (apply max (map :d ks-checks)))
 )
-
-    ;{:rstats {:ks (:statistic rstats-result), :pval (:p.value rstats-result)}
-    ; :dgof {:ks (:statistic dgof-result), :pval (:p.value dgof-result)}
-    ; :fastmath {:ks (:stat fastmath-result)
-    ;            :absdiff (:d fastmath-result)
-    ;            :pval (:p-value fastmath-result)}}
-
-;; dgof ks.test help says (paragraph 5 of "Details"):
-
-; If exact = NULL (the default), an exact p-value is computed if
-; the sample size is less than 100 in the one-sample case with y
-; continuous or if the sample size is less than or equal to 30 with
-; y discrete; or if the product of the sample sizes is less than
-; 10000 in the two-sample case for continuous y. Otherwise,
-; asymptotic distributions are used whose approximations may be
-;inaccurate in small samples.
-
-; In other words (?), for my two-sample non-continuous tests, dgof/ks.test
-; uses exact iff the sample size is <= 30?  Note that in that case the
-; output includes what appears to be the actual data.  Well stats/ks.test
-; does that last thing, too.  So in any even dgof doesn't tell you whether
-; it was exact or not.  You just have to know.
-
