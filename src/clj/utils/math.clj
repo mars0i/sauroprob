@@ -38,7 +38,7 @@
       (/ K)))   ; reduce the double back to x's original scale
 
 (comment
-  (round-to-rational 10 0.25)
+  (round-to-rational 1000 0.257312)
 )
 
 (defn iter-vals
