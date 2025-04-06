@@ -6,6 +6,7 @@
             [fastmath.stats :as fs]
             [tablecloth.api :as tc]
             [clojisr.v1.r :as R]
+            ;[criterium.core :as crit]
             [utils.math :as um]
             [sauroprob.plotly :as sp]
             [sauroprob.iterfreqs-fns :as ifn]))
