@@ -2,6 +2,9 @@
   (:require [fastmath.stats :as fs]
             [clojisr.v1.r :as R]))
 
+(R/require-r '[stats :refer [ks.test]])
+(R/require-r '[dgof :refer [ks.test]])
+
 (defn ks-tests
   [xs ys & {:keys [exact]}]
   {:rstats-result (R/r->clj (r.stats/ks-test xs ys :exact exact))
