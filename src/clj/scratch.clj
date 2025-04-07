@@ -6,7 +6,7 @@
             [fastmath.stats :as fs]
             [tablecloth.api :as tc]
             [clojisr.v1.r :as R]
-            ;[criterium.core :as crit]
+            [criterium.core :as crit]
             [utils.math :as um]
             [sauroprob.plotly :as sp]
             [sauroprob.iterfreqs-fns :as ifn]))
@@ -48,12 +48,22 @@
   ;; Perform ks-test of the first distribution with all of the others:
 
   (def first-iters (rick-iters n-iters (first inits)))
-  (def other-iters (map (partial rick-iters n-iters) (rest inits)))
 
-  ;; Remember that map and iterate are lazy, so these might return immediately 
-  ;; without having done any work:
-  (def ks-checks (map (partial fs-ks-test first-iters) other-iters))
-  (def ks-checks (map (partial rdg-ks-test first-iters) other-iters))
+  ;; Remember that map and iterate are lazy, so without doall,
+  ;; these might return immediately without having done any work:
+  (crit/bench
+    (do
+      (def other-iters (map (partial rick-iters n-iters) (rest inits)))
+      (def ks-checks (doall (map (partial fs-ks-test first-iters) other-iters)))
+      )
+    )
+
+  (crit/bench
+    (do
+      (def other-iters (map (partial rick-iters n-iters) (rest inits)))
+      (def rdg-checks (doall (map (partial rdg-ks-test first-iters) other-iters)))
+      )
+    )
 
   ;; none of the p-values indicate that the distributions are different:
   (def min-pval (apply min (map :p ks-checks)))
