@@ -2,7 +2,7 @@
 (ns scratch
   (:require [scicloj.kindly.v4.kind :as kind]
             [scicloj.tableplot.v1.plotly :as plotly]
-            ;[fastmath.random :as fr]
+            [fastmath.random :as fr]
             [fastmath.stats :as fs]
             [tablecloth.api :as tc]
             [clojisr.v1.r :as R]
@@ -52,6 +52,44 @@
 
 (def inits (range 0.01 3.0 0.01))
 (def n-iters 1000)
+
+
+;; ----------
+;; https://clojurians.zulipchat.com/#narrow/channel/151924-data-science/topic/NaN.20from.20fastmath.20ks-test-two-samples/near/510752659
+
+(def yo0 [1 1 1 -1])
+(def yo1 [1 1 1 1 1 20])
+(- 1.0 1/6)
+(fs/ks-test-two-samples yo0 yo1)
+(dgof/ks-test yo0 yo1)
+(stats/ks-test yo0 yo1)
+
+(def yo0dist (fr/distribution :real-discrete-distribution {:data yo0}))
+(def xs0 (range -1.5 2 0.01))
+(def ys0 (map (partial fr/cdf yo0dist) xs0))
+(-> (tc/dataset {:x xs0, :y ys0})
+    (plotly/layer-line {:=x :x, :=y, :y}))
+
+(def yo1dist (fr/distribution :real-discrete-distribution {:data yo1}))
+(def xs1 (range -1.5 21 0.01))
+(def ys1 (map (partial fr/cdf yo1dist) xs1))
+(-> (tc/dataset {:x xs1, :y ys1})
+    (plotly/layer-line {:=x :x, :=y, :y}))
+
+(def yodist (tc/concat 
+              (tc/dataset {:x xs0, :y ys0 :fun "1st"})
+              (tc/dataset {:x xs1, :y ys1 :fun "2nd"})))
+                
+(-> yodist
+    (plotly/layer-line {:=x :x, :=y, :y :=color :fun})
+    plotly/plot
+    ;sp/equalize-display-units
+    (sp/set-line-width 0 1)
+    (sp/set-line-dash 1 "dash")
+    )
+
+
+;(clojure.repl/pst)
 
 (comment
   ;; Perform ks-test of the first distribution with all of the others:
