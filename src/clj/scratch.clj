@@ -26,6 +26,15 @@
      :d (:d result), :p (:p-value result)}))
         ;; change this for the R versions
 
+(defn rst-ks-test
+  "Returns a map with the difference :d and the p-value :p of comparison of
+  sequences with initial value :x and with initial value :y.  Uses R's
+  dgof/ks.test."
+  [xs ys]
+  (let [result (R/r->clj (r.stats/ks-test xs ys :exact true))]
+    {:x (first xs), :y (first ys),
+     :d (first (:statistic result)), :p (first (:p.value result))}))
+
 (defn rdg-ks-test
   "Returns a map with the difference :d and the p-value :p of comparison of
   sequences with initial value :x and with initial value :y.  Uses R's
@@ -47,21 +56,29 @@
 (comment
   ;; Perform ks-test of the first distribution with all of the others:
 
-  (def first-iters (rick-iters n-iters (first inits)))
+  (def first-iters (doall (rick-iters n-iters (first inits))))
 
   ;; Remember that map and iterate are lazy, so without doall,
   ;; these might return immediately without having done any work:
   (crit/bench
     (do
+      (doall (map (comp (partial fs-ks-test first-iters) 
+                        (partial rick-iters n-iters)) 
+                  (rest inits)))
+      )
+   )
+
+  (crit/bench
+    (do
       (def other-iters (map (partial rick-iters n-iters) (rest inits)))
-      (def ks-checks (doall (map (partial fs-ks-test first-iters) other-iters)))
+      (def rdg-checks (doall (map (partial rdg-ks-test first-iters) other-iters)))
       )
     )
 
   (crit/bench
     (do
       (def other-iters (map (partial rick-iters n-iters) (rest inits)))
-      (def rdg-checks (doall (map (partial rdg-ks-test first-iters) other-iters)))
+      (def rs-checks (doall (map (partial rst-ks-test first-iters) other-iters)))
       )
     )
 
