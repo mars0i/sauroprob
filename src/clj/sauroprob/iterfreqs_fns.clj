@@ -111,12 +111,6 @@
   "Constructs an empirical cumulative distribution function from iterates
   and plots it from x-min to x-max."
   [x-max iterates]
-  ;(let [x-min 0
-  ;      empir-dist (fr/distribution :real-discrete-distribution ; or :enumerated-real ?
-  ;                                  {:data iterates})
-  ;      empir-cdf (partial fr/cdf empir-dist)
-  ;      xs (range x-min x-max x-plot-increment)
-  ;      ys (map empir-cdf xs)]
     (-> (iterates-to-cdf-dataset x-max iterates)
         (plotly/layer-line {:=x :x, :=y, :y})
         plotly/plot
