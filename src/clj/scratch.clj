@@ -53,8 +53,7 @@
 (def inits (range 0.01 3.0 0.01))
 (def n-iters 1000)
 
-
-;; ----------
+(comment
 ;; https://clojurians.zulipchat.com/#narrow/channel/151924-data-science/topic/NaN.20from.20fastmath.20ks-test-two-samples/near/510752659
 
 (def yo0 [1 1 1 -1])
@@ -88,6 +87,7 @@
     (sp/set-line-dash 1 "dash")
     )
 
+)
 
 ;(clojure.repl/pst)
 
