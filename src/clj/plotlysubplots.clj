@@ -48,13 +48,14 @@
         ;; merge the traces:
         :data (vec (mapcat :data ; the order here determines trace indexes:
                            [(fns/plot-iterates (take 250 iterates))
-                            (fns/plot-cdf 3 (take n-hist-iterates iterates))
+                            (fns/plot-cdf (take n-hist-iterates iterates) 3)
                             (fns/plot-iterates-histogram (take n-hist-iterates iterates))
                             cobthing]))}))
                             ;; Put cobthing last because it uses multiple
                             ;; traces, and I may add and remove traces (i.e. f^2, f^3, etc.)
                             ;; By putting it last, indexes of the other traces needn't change.
 
+(clojure.repl/pst)
 
 ^:kindly/hide-code
 (-> combothing

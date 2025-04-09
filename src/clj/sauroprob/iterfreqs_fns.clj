@@ -98,9 +98,8 @@
 ;; [There's also :empirical, which uses a histogram as the basis for the distribution.]
 (defn iterates-to-cdf-dataset
   "Constructs an empirical cumulative distribution dataset from iterates."
-  [x-max iterates]
-  (let [x-min 0
-        empir-dist (fr/distribution :real-discrete-distribution ; or :enumerated-real ?
+  [iterates x-max x-min]
+  (let [empir-dist (fr/distribution :real-discrete-distribution ; or :enumerated-real ?
                                     {:data iterates})
         empir-cdf (partial fr/cdf empir-dist)
         xs (range x-min x-max x-plot-increment)
@@ -110,11 +109,12 @@
 (defn plot-cdf
   "Constructs an empirical cumulative distribution function from iterates
   and plots it from x-min to x-max."
-  [x-max iterates]
-    (-> (iterates-to-cdf-dataset x-max iterates)
-        (plotly/layer-line {:=x :x, :=y, :y})
-        plotly/plot
-        (assoc-in [:data 0 :line :width] 1.0))) ;)
+  ([iterates x-max] (plot-cdf iterates x-max 0))
+  ([iterates x-max x-min] 
+   (-> (iterates-to-cdf-dataset iterates x-max x-min)
+                              (plotly/layer-line {:=x :x, :=y, :y})
+                              plotly/plot
+                              (assoc-in [:data 0 :line :width] 1.0))))
 
 
 ;; TODO Should this be changed to allow layering of arbitrary plots in the
@@ -153,7 +153,7 @@
                     ;(kind/md ["Distribution of values beginning from " init-x ":"])
                     (plot-iterates-histogram dist-iterates)
                     ;(kind/md ["cdf of values beginning from " init-x ":"])
-                    (plot-cdf x-max dist-iterates)])))
+                    (plot-cdf dist-iterates x-max)])))
 
 (defn plots-grid
   "Displays a plot of a function and compositions of itself with itself,
@@ -169,7 +169,8 @@
   n-cobweb:  how many iteration lines in fn plot
   n-seq-iterates:  how many iterations in plot of iteration values
   n-dist-iterates:  how many iterations in histogram?"
-  [& {:keys [x-max  ; max x val in function plot (also max y)
+  [& {:keys [x-min
+             x-max  ; max x val in function plot (also max y)
              fs     ; functions to plot
              labels ; labels corresponding to functions
              init-x ; initial x val for iterations--Uses the first element in fs.
@@ -184,7 +185,7 @@
         cobweb-plot (plot-fns-with-cobweb args) ; unused args can be ignored
         seq-plot (plot-iterates seq-iterates)
         hist-plot (plot-iterates-histogram dist-iterates)
-        cdf-plot (plot-cdf x-max dist-iterates)
+        cdf-plot (plot-cdf dist-iterates x-max (if x-min x-min 0))
         combo-plot (plotly/plot
                      {:layout (:layout cobweb-plot)         ; combweb s/b last:
                       :data (vec (mapcat :data [seq-plot cdf-plot hist-plot cobweb-plot]))})
