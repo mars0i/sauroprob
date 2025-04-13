@@ -123,6 +123,20 @@
    Applies a logistic function with parameter r=4 to x."
   (partial logistic 4))
 
+(defn logistic-contin-deriv
+  "The derivative that defines an original continuous logistic function
+  (cf. Wimsatt 1980 p. 298)."
+  ([K r] (partial logistic-plus K r))
+  ([K r N] (* r N (- 1 (/ N K)))))
+
+(defn williams-bossert-deriv
+  "The derivative that defines an a modified continuous logistic function,
+  introduced by Wilson and Bossert (cf. Wimsatt 1980 p. 299)."
+  ([K C r] (partial logistic-plus K r))
+  ([K C r N] (* r N
+                (- 1 (/ N K))
+                (- 1 (/ C N)))))
+
 (defn logistic-plus
   "Like a K-scaled discrete logistic function, but adds N to the result of
   the logistic function, i.e. N' = N + rN(1 - N/K). See May 1973 book,
@@ -227,6 +241,7 @@
   ;; This puts the result of the floored function back on the x in [0,1] scale:
   ((normalize-with-params floored-ricker 100 3.5) 0.5)
 )
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
