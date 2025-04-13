@@ -1,8 +1,8 @@
 {:paths ["src/clj"] 
  :deps {org.clojure/clojure {:mvn/version "1.12.0"}
 
-        ;org.scicloj/noj {:mvn/version "2-beta14"} ; includes fastmath, Hanami, Clay
-        org.scicloj/noj {:mvn/version "2-beta14" :exclusions [generateme/fastmath]}
+        ;org.scicloj/noj {:mvn/version "2-beta15"} ; includes fastmath, Hanami, Clay
+        org.scicloj/noj {:mvn/version "2-beta15" :exclusions [generateme/fastmath]}
         generateme/fastmath {:mvn/version "3.0.0-alpha4-SNAPSHOT"}
 
         org.scicloj/metamorph.ml {:mvn/version "1.1.1"} ; for tablecloth examples
