@@ -126,13 +126,13 @@
 (defn logistic-contin-deriv
   "The derivative that defines an original continuous logistic function
   (cf. Wimsatt 1980 p. 298)."
-  ([K r] (partial logistic-plus K r))
+  ([K r] (partial logistic-contin-deriv K r))
   ([K r N] (* r N (- 1 (/ N K)))))
 
 (defn williams-bossert-deriv
   "The derivative that defines an a modified continuous logistic function,
   introduced by Wilson and Bossert (cf. Wimsatt 1980 p. 299)."
-  ([K C r] (partial logistic-plus K r))
+  ([K C r] (partial williams-bossert-deriv K r))
   ([K C r N] (* r N
                 (- 1 (/ N K))
                 (- 1 (/ C N)))))
