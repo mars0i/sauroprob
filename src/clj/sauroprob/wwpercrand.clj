@@ -1,9 +1,11 @@
+;; Code exploring ideas mentioned in Bill Wimsatt's
+;; "Randomness and Perceived-Randomness in Evolutionary Biology"
 ^:kindly/hide-code
-(ns scratch
+(ns sauroprob.wwpercrand
   (:require [clojure.math :as m] ; new in Clojure 1.11 
             [scicloj.tableplot.v1.plotly :as plotly]
             [scicloj.kindly.v4.kind :as kind]
-            [scicloj.kindly.v4.api :as kindly]
+            [scicloj.kindly.v4.ai :as kindly]
             [scicloj.clay.v2.api :as clay] ; needed for clay eval keymappings
             [tablecloth.api :as tc]
             [utils.misc :as msc]
