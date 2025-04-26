@@ -21,4 +21,4 @@
 (let [n 516]
   (ks-tests (take n (iterate logistic4 0.14))
             (take n (iterate logistic4 0.3085937081153858))
-            :exact true)) ; causes NaN for p-value
+            :exact true)) ; causes NaN for p-value with older versions of fastmath.stats
