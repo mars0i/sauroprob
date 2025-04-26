@@ -20,7 +20,7 @@
 (def iters (take 10000 (iterate (um/normalized-ricker 3) 2.1)))
 
 (def histplot (fns/plot-iterates-histogram iters))
-(def cdfplot (-> (fns/plot-cdf 3.5 iters)
+(def cdfplot (-> (fns/plot-cdf iters 3.5)
                  (assoc-in [:layout :title] "CDF, Baby!")
                  ))
 
@@ -38,23 +38,23 @@
 ;; Better:
 (let [f (um/normalized-ricker 3.0)
       comps [1]]
-  (fns/plots {:x-max 4
-              :fs (map (partial msc/n-comp f) comps)
-              :labels (map (fn [n] (str "f^" n)) comps) ; removed LaTeX see mwe5.clj
-              :init-x 2.1
-              :n-cobweb 10
-              :n-seq-iterates 400
-              :n-dist-iterates hist-iterates}))
+  (fns/plots-grid {:x-max 4
+                   :fs (map (partial msc/n-comp f) comps)
+                   :labels (map (fn [n] (str "f^" n)) comps) ; removed LaTeX see mwe5.clj
+                   :init-x 2.1
+                   :n-cobweb 10
+                   :n-seq-iterates 400
+                   :n-dist-iterates hist-iterates}))
 
 ;; Let's try a different init x:
 (let [f (um/normalized-ricker 3.0)
       comps [1]]
-  (fns/plots {:x-max 4
-              :fs (map (partial msc/n-comp f) comps)
-              :labels (map (fn [n] (str "f^" n)) comps) ; removed LaTeX seem mwe5.clj
-              :init-x 0.001
-              :n-cobweb 10
-              :n-seq-iterates 400
-              :n-dist-iterates hist-iterates}))
+  (fns/plots-grid {:x-max 4
+                   :fs (map (partial msc/n-comp f) comps)
+                   :labels (map (fn [n] (str "f^" n)) comps) ; removed LaTeX seem mwe5.clj
+                   :init-x 0.001
+                   :n-cobweb 10
+                   :n-seq-iterates 400
+                   :n-dist-iterates hist-iterates}))
 
 

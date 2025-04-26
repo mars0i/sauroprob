@@ -19,7 +19,7 @@
 ;; Better:
 (let [f um/logistic-4
       comps [1]]
-  (fns/plots {:x-max 1
+  (fns/plots-grid {:x-max 1
                     :fs (map (partial msc/n-comp f) comps)
                     :labels (map (fn [n] (str "$f^" n "$")) comps)
                     :init-x 0.901
@@ -30,7 +30,7 @@
 ;; Let's try a different init x:
 (let [f um/logistic-4
       comps [1]]
-  (fns/plots {:x-max 1
+  (fns/plots-grid {:x-max 1
                     :fs (map (partial msc/n-comp f) comps)
                     :labels (map (fn [n] (str "$f^" n "$")) comps)
                     :init-x 0.4
@@ -43,7 +43,7 @@
 ;; Again:
 (let [f um/logistic-4
       comps [1]]
-  (fns/plots {:x-max 1
+  (fns/plots-grid {:x-max 1
                     :fs (map (partial msc/n-comp f) comps)
                     :labels (map (fn [n] (str "$f^" n "$")) comps)
                     :init-x 0.35
@@ -54,7 +54,7 @@
 ;; Again again:
 (let [f um/logistic-4
       comps [1]]
-  (fns/plots {:x-max 1
+  (fns/plots-grid {:x-max 1
                     :fs (map (partial msc/n-comp f) comps)
                     :labels (map (fn [n] (str "$f^" n "$")) comps)
                     :init-x 0.75
@@ -65,7 +65,7 @@
 ;; This init is the fixed point:
 (let [f um/logistic-4
       comps [1]]
-  (fns/plots {:x-max 1
+  (fns/plots-grid {:x-max 1
                     :fs (map (partial msc/n-comp f) comps)
                     :labels (map (fn [n] (str "$f^" n "$")) comps)
                     :init-x 1
