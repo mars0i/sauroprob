@@ -112,9 +112,9 @@
   ([iterates x-max] (plot-cdf iterates x-max 0))
   ([iterates x-max x-min] 
    (-> (iterates-to-cdf-dataset iterates x-max x-min)
-                              (plotly/layer-line {:=x :x, :=y, :y})
-                              plotly/plot
-                              (assoc-in [:data 0 :line :width] 1.0))))
+       (plotly/layer-line {:=x :x, :=y, :y})
+       plotly/plot
+       (assoc-in [:data 0 :line :width] 1.0))))
 
 
 ;; TODO Should this be changed to allow layering of arbitrary plots in the
