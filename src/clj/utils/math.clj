@@ -28,8 +28,8 @@
 
 (defn round-to-rational
   "Given a number e.g. between 0 and 1, round it to the nearest rational
-  number with K as denominator, and return as a double. (Wrap in rationalize
-  if you prefer a ratio.)"
+  number with K as denominator, and returns that number as a double. (Wrap
+  in rationalize if you prefer a ratio.)"
   [K x]
   (-> x
       (* K)     ; expand x on [0,1] scale to the K scale
