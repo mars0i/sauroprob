@@ -209,37 +209,49 @@
   (rationalize (double 1/50))
 )
 
-(defn rounding [f] (comp m/round f))
-(defn flooring [f] (comp m/floor f))
-(defn ceiling  [f] (comp m/ceil f))
-
-(defn floored-ricker
-  "Ricker function wrapped in floor so it rounds the result down to the
-  nearest integer as a double.  (Wrap in normalize to make a normalied
-  Ricker."
-  ([K r] (partial floored-ricker K r))
-  ([K r N] (m/floor (ricker K r N))))
-
-(defn rounded-ricker
-  "Ricker function wrapped in floor so it rounds the result to the nearest
-  integer up or town as a double.  (Wrap in normalize to make a normalied
-  Ricker."
-  ([K r] (partial rounded-ricker K r))
-  ([K r N] (m/round (ricker K r N))))
+;; Note that to apply these, f should be a single-arg fn, where the
+;; arg is a current pop size.  i.e. the parameters baked should be already
+;; backed in e.g. by partial.
+(defn rounded [f] (comp m/round f))
+(defn floored [f] (comp m/floor f))
+(defn ceiled  [f] (comp m/ceil f))
 
 (comment
-  (defn foo [x y] [y x])
-  (apply foo [2 3])
+  ;; I tested that using the above defs is equivalent to earlier defs
+  ;; of ceiled-ricker, etc.
 
-  (ricker 100 3.5 50)
-  (normalized-ricker 3.5 0.5)
-  ((normalize-with-params ricker 100 3.5) 0.5)
+  (def cr (ceiled (ricker 10000 3.0143)))
+  (def cf (floored (ricker 10000 3.0143)))
 
-  (ricker 100 3.5 50)
-  (floored-ricker 100 3.5 50)
-  (normalized-ricker 3.5 0.5)
-  ;; This puts the result of the floored function back on the x in [0,1] scale:
-  ((normalize-with-params floored-ricker 100 3.5) 0.5)
+  (def init 10001)
+
+  (take 20 (iterate (ricker 10000 3.0143) init))
+  (take 20 (iterate cr init))
+  (take 20 (iterate cf init))
+
+  (def init 10.513)
+
+  (def cr100 (ceiled (ricker 100 3.0143)))
+  (def cf100 (floored (ricker 100 3.0143)))
+
+  (take 20 (iterate (ricker 100 3.0143) init))
+  (prn
+  (take 2000 (iterate (ricker 100 3.0143) init))
+  )
+  (take 20 (iterate cr100 init))
+  (take 20 (iterate cf100 init))
+
+  ;; With this init:
+  ;; ricker is nearly periodic but it's unstable, and eventually starts
+  ;; looking chaotic.
+  ;; cr looks more chaotic than ricker, from the start, though.
+  ;; cf goes straight to K=100.
+  (def init 99.9999)
+
+  (def init 0.9) ; cf doesn't go straight to zero
+  (def init 0.05) ; cf doesn't go straight to zero: next val is 1.0172069392401901
+  (def init 0.04) ; cf goes straight to zero: next val is 0.8140108817154104
+  (def init 0.01) ; cf goes straight to zero: next val is 0.20368682913519412
 )
 
 
