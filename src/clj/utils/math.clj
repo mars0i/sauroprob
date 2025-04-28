@@ -49,16 +49,42 @@
                 (/ K))))   ; reduce the double back to x's original scale
 
 (def round-to-ratl (to-ratl-mapper m/rint))
-(def ceil-to-ratl (to-ratl-mapper m/ceil))
 (def floor-to-ratl (to-ratl-mapper m/floor))
+(def ceil-to-ratl (to-ratl-mapper m/ceil))
+
+(defn rounded-to-ratl 
+  "Given a function f of one argument, returns a function that performs the
+  same computation, but then rounds the return value to the nearest
+  rational with denominator K, as a double."
+  [K f]
+  (comp (partial round-to-ratl K) f))
+
+(defn floored-to-ratl 
+  "Given a function f of one argument, returns a function that performs the
+  same computation, but then floors the return value to the nearest
+  rational with denominator K, as a double."
+  [K f]
+  (comp (partial floor-to-ratl K) f))
+
+(defn ceiled-to-ratl 
+  "Given a function f of one argument, returns a function that performs the
+  same computation, but then ceils the return value to the nearest
+  rational with denominator K, as a double."
+  [K f]
+  (comp (partial ceil-to-ratl K) f))
 
 (comment
-  (let [K 1717
+  (let [K 171789435
         x 0.257318654971]
     [;(obsolete-round-to-ratl K x)
      (round-to-ratl K x)
+     ((rounded-to-ratl K identity) x)
      (floor-to-ratl K x)
-     (ceil-to-ratl K x)])
+     ((floored-to-ratl K identity) x)
+     (ceil-to-ratl K x)
+     ((ceiled-to-ratl K identity) x)])
+  
+  ;; See below for examples wrapping Ricker functions.
 )
 
 (defn iter-vals
@@ -247,9 +273,7 @@
   (def cf100 (floored (ricker 100 3.0143)))
 
   (take 20 (iterate (ricker 100 3.0143) init))
-  (prn
   (take 2000 (iterate (ricker 100 3.0143) init))
-  )
   (take 20 (iterate cr100 init))
   (take 20 (iterate cf100 init))
 
@@ -264,6 +288,19 @@
   (def init 0.05) ; cf doesn't go straight to zero: next val is 1.0172069392401901
   (def init 0.04) ; cf goes straight to zero: next val is 0.8140108817154104
   (def init 0.01) ; cf goes straight to zero: next val is 0.20368682913519412
+
+  (def init 0.91)
+
+  (def nr (iterate (normalized-ricker 3.0143) init))
+  (def nrr1000 (iterate (rounded-to-ratl 1000 nr) init))
+  (def nrf1000 (iterate (floored-to-ratl 1000 nr) init))
+  (def nrc1000 (iterate (ceiled-to-ratl 1000 nr) init))
+
+  (take 20 nr)
+  (take 20 nrr1000)
+  (take 20 nrf1000)
+  (take 20 nrc1000)
+
 
 
 
