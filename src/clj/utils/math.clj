@@ -14,6 +14,15 @@
 ;; up, or down, to the f curve [since that shows how x=f(x) is mapped
 ;; by f to f(f(x))], and so on.
 
+
+;; Note that to apply these, f should be a single-arg fn, where the
+;; arg is a current pop size.  i.e. the parameters baked should be already
+;; backed in e.g. by partial.
+;; SEE COMMENT BLOCK BELOW for illustrations/tests using ricker.
+(defn rounded [f] (comp m/round f))
+(defn floored [f] (comp m/floor f))
+(defn ceiled  [f] (comp m/ceil f))
+
 ;; https://stackoverflow.com/a/73829330/1455243
 ;; SHOULD I USE with-precision INSTEAD?
 (defn round-to
@@ -26,24 +35,35 @@
 
 (comment (round-to 32.12545 3) )
 
-(defn round-to-rational
+;; Is there a more efficient way to do this?
+(defn to-ratl-mapper
   "Given a number e.g. between 0 and 1, round it to the nearest rational
   number with K as denominator, and returns that number as a double. (Wrap
   in rationalize if you prefer a ratio.)"
-  [K x]
-  (-> x
-      (* K)     ; expand x on [0,1] scale to the K scale
-      m/round   ; round to the nearest K-scale long
-      double    ; convert back to a double
-      (/ K)))   ; reduce the double back to x's original scale
+  [to-int-fn]
+  (fn [K x] (-> x
+                (* K)     ; expand x on [0,1] scale to the K scale
+                to-int-fn   ; round to the nearest K-scale long
+                ((fn [n] (prn x n K (/ n K)) n)) ; DEBUG
+                ; double   ; Not needed with floor, ceil, rint. Added to to-int-fn if necessary.
+                (/ K))))   ; reduce the double back to x's original scale
+
+(def round-to-ratl (to-ratl-mapper m/rint))
+(def ceil-to-ratl (to-ratl-mapper m/ceil))
+(def floor-to-ratl (to-ratl-mapper m/floor))
 
 (comment
-  (round-to-rational 1000 0.257312)
+  (let [K 1717
+        x 0.257318654971]
+    [;(obsolete-round-to-ratl K x)
+     (round-to-ratl K x)
+     (floor-to-ratl K x)
+     (ceil-to-ratl K x)])
 )
 
 (defn iter-vals
   "Returns a lazy sequence of values resulting from iterating a 
-  function with parameter param, beginning with given initial
+  function with parameter param, beginning with 0given initial
   value init."
  [f params initial]
   (iterate (apply f params) initial))
@@ -86,7 +106,6 @@
       ;; This will be a double representing a rational with K as
       ;; denominator if f restricted output to integers.
       ;; so that'S what will go into the next iteration.
-
 
 
 ;; old version
@@ -183,8 +202,8 @@
   ([K r] (partial ricker K r))
   ([K r N] (* N (m/exp (* r (- 1 (/ N K)))))))
 
-;;  This could be made using normalize, but it's considered a basic
-;;  function, so it's worth defining directly.
+;; This could be made using normalize, but it should be considered a 
+;; basic function, so it's worth defining directly.
 (defn normalized-ricker
   "Function from Ricker 1954 \"Stock and recruitment\"
   (https://en.wikipedia.org/wiki/Ricker_model), or May and Oster 1976
@@ -196,6 +215,7 @@
   ([r x] (* x (m/exp (* r (- 1 x))))))
 
 (comment
+  ;; Experiments with different ways to define a normalized Ricker function.
   (def rick (ricker 50 3.0))
   (def nick (normalize rick 50)) ; note K is the same for rick and normalize
 
@@ -209,16 +229,8 @@
   (rationalize (double 1/50))
 )
 
-;; Note that to apply these, f should be a single-arg fn, where the
-;; arg is a current pop size.  i.e. the parameters baked should be already
-;; backed in e.g. by partial.
-(defn rounded [f] (comp m/round f))
-(defn floored [f] (comp m/floor f))
-(defn ceiled  [f] (comp m/ceil f))
-
 (comment
-  ;; I tested that using the above defs is equivalent to earlier defs
-  ;; of ceiled-ricker, etc.
+  ;; Experiments with ceiled, floored, etc.
 
   (def cr (ceiled (ricker 10000 3.0143)))
   (def cf (floored (ricker 10000 3.0143)))
@@ -252,6 +264,10 @@
   (def init 0.05) ; cf doesn't go straight to zero: next val is 1.0172069392401901
   (def init 0.04) ; cf goes straight to zero: next val is 0.8140108817154104
   (def init 0.01) ; cf goes straight to zero: next val is 0.20368682913519412
+
+
+
+
 )
 
 
