@@ -31,21 +31,21 @@
 (kind/fragment [
   (fns/plots-grid {:x-max x-max
                    :fs (map (partial msc/n-comp f) comps)
-                   :labels (map (fn [n] (str "ricker^" n)) comps) ; removed LaTeX seem mwe5.clj
+                   :labels (map (fn [n] (str "ricker^" n)) comps)
                    :init-x init-x
                    :n-cobweb n-cobweb
                    :n-seq-iterates n-seq-iterates
                    :n-dist-iterates n-dist-iterates})
   (fns/plots-grid {:x-max x-max
                    :fs (map (partial msc/n-comp ceiled-f) comps)
-                   :labels (map (fn [n] (str "ceiled^" n)) comps) ; removed LaTeX seem mwe5.clj
+                   :labels (map (fn [n] (str "ceiled^" n)) comps)
                    :init-x init-x
                    :n-cobweb n-cobweb
                    :n-seq-iterates n-seq-iterates
                    :n-dist-iterates n-dist-iterates})
   (fns/plots-grid {:x-max x-max
                    :fs (map (partial msc/n-comp floored-f) comps)
-                   :labels (map (fn [n] (str "floored^" n)) comps) ; removed LaTeX seem mwe5.clj
+                   :labels (map (fn [n] (str "floored^" n)) comps)
                    :init-x init-x
                    :n-cobweb n-cobweb
                    :n-seq-iterates n-seq-iterates
