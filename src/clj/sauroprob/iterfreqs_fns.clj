@@ -106,6 +106,8 @@
         ys (map empir-cdf xs)]
     (tc/dataset {:x xs :y ys})))
 
+;; FIXME Can blow up when ... there are too many iterates?  Or they are too
+;; fine-grained?
 (defn plot-cdf
   "Constructs an empirical cumulative distribution function from iterates
   and plots it from x-min to x-max."
