@@ -1,5 +1,22 @@
 (ns utils.misc)
 
+(defmacro multidef
+  "bindings should be a list of alternating variable names and expressions.
+  The expressions will be evaluated to define the variables using `def`.
+  This can be used to quickly turn a long `let` binding list into a series
+  of `def`s, after removing the body of the let.
+  [bindings]
+  `(do
+     ~@(map (fn [[avar aval]] `(def ~avar ~aval))
+            (partition 2 bindings))))
+
+(comment
+  (macroexpand-1 '
+  (multidef [h (cons 'a [2 3])
+             j (* 6 7)])
+  )
+)
+
 ;; For something fancier, possibly resort to using Nathan Marz's Specter. (Hanami uses it, btw.)
 (defn multi-assoc-in
   "Like assoc-in, but replaces values of multiple terminal keys of equal
