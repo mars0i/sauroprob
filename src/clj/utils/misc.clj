@@ -4,7 +4,7 @@
   "bindings should be a list of alternating variable names and expressions.
   The expressions will be evaluated to define the variables using `def`.
   This can be used to quickly turn a long `let` binding list into a series
-  of `def`s, after removing the body of the let.
+  of `def`s, after removing the body of the let."
   [bindings]
   `(do
      ~@(map (fn [[avar aval]] `(def ~avar ~aval))
