@@ -17,7 +17,7 @@
 um/ricker-chaos-min
 
 (def n-dist-iters 10000)
-(def n-seq-iters 400)
+(def n-seq-iters 200)
 (def n-cob 10)
 
 ;; This is below the chaos min:
