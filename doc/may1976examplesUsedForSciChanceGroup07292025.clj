@@ -24,9 +24,11 @@
 
 
 ^:kindly/hide-code
-(kind/md "$X_{t+1} = aX_t(1-X_t)$")
+(kind/md "$aN(1-N)$")
 
 
+^:kindly/hide-code
+(kind/md "$a=2.0$")
 ^:kindly/hide-code
 (let [a 2.0
       f (um/logistic a)
@@ -37,10 +39,10 @@
                    :init-x init-x
                    :n-cobweb 8
                    :n-seq-iterates n-seq-iters
-                   :n-dist-iterates n-dist-iters
-                   :intro-label-md (str "$a=" a ":$") 
-                  }))
+                   :n-dist-iterates n-dist-iters}))
 
+^:kindly/hide-code
+(kind/md "$a=3.0$")
 ^:kindly/hide-code
 (let [a 3.0
       f (um/logistic a)
@@ -51,10 +53,10 @@
                    :init-x init-x
                    :n-cobweb 12
                    :n-seq-iterates n-seq-iters
-                   :n-dist-iterates n-dist-iters
-                   :intro-label-md (str "$a=" a ":$") 
-                  }))
+                   :n-dist-iterates n-dist-iters}))
 
+^:kindly/hide-code
+(kind/md "$a=3.5$")
 ^:kindly/hide-code
 (let [a 3.5
       f (um/logistic a)
@@ -65,10 +67,10 @@
                    :init-x init-x
                    :n-cobweb 20
                    :n-seq-iterates n-seq-iters
-                   :n-dist-iterates n-dist-iters
-                   :intro-label-md (str "$a=" a ":$") 
-                  }))
+                   :n-dist-iterates n-dist-iters}))
 
+^:kindly/hide-code
+(kind/md "$a=3.55$")
 ^:kindly/hide-code
 (let [a 3.55
       f (um/logistic a)
@@ -80,10 +82,10 @@
                    :init-x init-x
                    :n-cobweb 15
                    :n-seq-iterates n-seq-iters
-                   :n-dist-iterates n-dist-iters
-                   :intro-label-md (str "$a=" a ":$") 
-                  }))
+                   :n-dist-iterates n-dist-iters}))
 
+^:kindly/hide-code
+(kind/md "$a=3.8$")
 ^:kindly/hide-code
 (let [a 3.8
       f (um/logistic a)
@@ -94,10 +96,10 @@
                    :init-x init-x
                    :n-cobweb 20
                    :n-seq-iterates n-seq-iters
-                   :n-dist-iterates n-dist-iters
-                   :intro-label-md (str "$a=" a ":$") 
-                  }))
+                   :n-dist-iterates n-dist-iters}))
 
+^:kindly/hide-code
+(kind/md "$a=4.0$")
 ^:kindly/hide-code
 (let [a 4.0
       f (um/logistic a)
@@ -108,6 +110,4 @@
                    :init-x init-x
                    :n-cobweb 20
                    :n-seq-iterates n-seq-iters
-                   :n-dist-iterates n-dist-iters
-                   :intro-label-md (str "$a=" a ":$") 
-                  }))
+                   :n-dist-iterates n-dist-iters}))

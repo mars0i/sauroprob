@@ -178,7 +178,8 @@
              init-x ; initial x val for iterations--Uses the first element in fs.
              n-cobweb ; how many cobweb line pairs in fn plot
              n-seq-iterates ; how many iterations in plot of iteration values
-             n-dist-iterates] ; how many iterations in histogram?
+             n-dist-iterates ; how many iterations in histogram?
+             intro-label-md] ; informational Markdown string displayed above the plots--ignored if absent
       :as args}] ; how many iterations to collect in histogram
   (let [basef (first fs)
         iterates (iterate basef init-x)
@@ -192,16 +193,18 @@
                      {:layout (:layout cobweb-plot)         ; combweb s/b last:
                       :data (vec (mapcat :data [seq-plot cdf-plot hist-plot cobweb-plot]))})
         n-traces (count (:data combo-plot))] ; depends on what's in cobweb-plot
-    (-> combo-plot 
-        (assoc-in [:layout :width] 1000)
-        (assoc-in [:layout :height] 600)
-        (assoc-in [:layout :grid] {:rows 2, :columns 2, :pattern "independent"})
-        (sp/set-subplot-order [0] 2)     ; iterating the function over n steps
-        (sp/set-subplot-order [1] 3)     ; the cumulative dist function
-        (sp/set-subplot-order [2] 4)     ; histogram
-        (sp/set-subplot-order (msc/irange 3 n-traces) 1) ; remaining traces are for cobweb plot
-        (assoc-in [:layout :xaxis]  {:domain [0, 0.25]})
-        (assoc-in [:layout :xaxis3] {:domain [0, 0.25]})
-        (assoc-in [:layout :xaxis2] {:domain [0.3, 1.0]}) ; why are axis bars shifted left?
-        (assoc-in [:layout :xaxis4] {:domain [0.3, 1.0]}))))
+    (kind/fragment
+      [(kind/md intro-label-md) ; ignored if intro-md is nil
+       (-> combo-plot 
+           (assoc-in [:layout :width] 1000)
+           (assoc-in [:layout :height] 600)
+           (assoc-in [:layout :grid] {:rows 2, :columns 2, :pattern "independent"})
+           (sp/set-subplot-order [0] 2)     ; iterating the function over n steps
+           (sp/set-subplot-order [1] 3)     ; the cumulative dist function
+           (sp/set-subplot-order [2] 4)     ; histogram
+           (sp/set-subplot-order (msc/irange 3 n-traces) 1) ; remaining traces are for cobweb plot
+           (assoc-in [:layout :xaxis]  {:domain [0, 0.25]})
+           (assoc-in [:layout :xaxis3] {:domain [0, 0.25]})
+           (assoc-in [:layout :xaxis2] {:domain [0.3, 1.0]}) ; why are axis bars shifted left?
+           (assoc-in [:layout :xaxis4] {:domain [0.3, 1.0]}))])))
 
