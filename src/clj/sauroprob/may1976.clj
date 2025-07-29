@@ -14,99 +14,100 @@
 ;; Make LaTeX work in Plotly labels:
 (kind/hiccup [:script {:src "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"}])
 
-um/ricker-chaos-min
+^:kindly/hide-code
+;(def n-cob 8)
 
 (def n-dist-iters 10000)
-(def n-seq-iters 200)
-(def n-cob 10)
+(def n-seq-iters 100)
+(def x-max 1.0)
+(def init-x 0.91)
 
-;; This is below the chaos min:
-(let [f (um/normalized-ricker 2.6)
+
+^:kindly/hide-code
+(kind/md "$aN(1-N)$")
+
+
+^:kindly/hide-code
+(kind/md "$a=2.0$")
+^:kindly/hide-code
+(let [a 2.0
+      f (um/logistic a)
       comps [1]]
-  (fns/plots-grid {:x-max 4
+  (fns/plots-grid {:x-max x-max
                    :fs (map (partial msc/n-comp f) comps)
                    :labels (map (fn [n] (str "$f^" n "$")) comps)
-                   :init-x 0.901
-                   :n-cobweb n-cob
+                   :init-x init-x
+                   :n-cobweb 8
                    :n-seq-iterates n-seq-iters
                    :n-dist-iterates n-dist-iters}))
 
-;; Well, this seems pretty periodic, though it's (just above the chaos min):
-(let [f (um/normalized-ricker 2.6925)
+^:kindly/hide-code
+(kind/md "$a=3.0$")
+^:kindly/hide-code
+(let [a 3.0
+      f (um/logistic a)
       comps [1]]
-  (fns/plots-grid {:x-max 4
+  (fns/plots-grid {:x-max x-max
                    :fs (map (partial msc/n-comp f) comps)
                    :labels (map (fn [n] (str "$f^" n "$")) comps)
-                   :init-x 0.901
-                   :n-cobweb n-cob
+                   :init-x init-x
+                   :n-cobweb 12
                    :n-seq-iterates n-seq-iters
                    :n-dist-iterates n-dist-iters}))
 
-;; Still kinda periodic, but maybe with intervening noise:
-(let [f (um/normalized-ricker 2.7)
+^:kindly/hide-code
+(kind/md "$a=3.5$")
+^:kindly/hide-code
+(let [a 3.5
+      f (um/logistic a)
       comps [1]]
-  (fns/plots-grid {:x-max 4
+  (fns/plots-grid {:x-max x-max
                    :fs (map (partial msc/n-comp f) comps)
                    :labels (map (fn [n] (str "$f^" n "$")) comps)
-                   :init-x 0.901
-                   :n-cobweb n-cob
+                   :init-x init-x
+                   :n-cobweb 20
                    :n-seq-iterates n-seq-iters
                    :n-dist-iterates n-dist-iters}))
 
-;; Better:
-(let [f (um/normalized-ricker 3.0)
+^:kindly/hide-code
+(kind/md "$a=3.55$")
+^:kindly/hide-code
+(let [a 3.55
+      f (um/logistic a)
       comps [1]]
-  (fns/plots-grid {:x-max 4
+
+  (fns/plots-grid {:x-max x-max
                    :fs (map (partial msc/n-comp f) comps)
                    :labels (map (fn [n] (str "$f^" n "$")) comps)
-                   :init-x 0.901
-                   :n-cobweb n-cob
+                   :init-x init-x
+                   :n-cobweb 15
                    :n-seq-iterates n-seq-iters
                    :n-dist-iterates n-dist-iters}))
 
-;; Let's try a different init x:
-(let [f (um/normalized-ricker 3.0)
+^:kindly/hide-code
+(kind/md "$a=3.8$")
+^:kindly/hide-code
+(let [a 3.8
+      f (um/logistic a)
       comps [1]]
-  (fns/plots-grid {:x-max 4
+  (fns/plots-grid {:x-max x-max
                    :fs (map (partial msc/n-comp f) comps)
                    :labels (map (fn [n] (str "$f^" n "$")) comps)
-                   :init-x 0.4
-                   :n-cobweb n-cob
+                   :init-x init-x
+                   :n-cobweb 20
                    :n-seq-iterates n-seq-iters
                    :n-dist-iterates n-dist-iters}))
 
-
-
-;; Again:
-(let [f (um/normalized-ricker 3.0)
+^:kindly/hide-code
+(kind/md "$a=4.0$")
+^:kindly/hide-code
+(let [a 4.0
+      f (um/logistic a)
       comps [1]]
-  (fns/plots-grid {:x-max 4
+  (fns/plots-grid {:x-max x-max
                    :fs (map (partial msc/n-comp f) comps)
                    :labels (map (fn [n] (str "$f^" n "$")) comps)
-                   :init-x 0.35
-                   :n-cobweb n-cob
+                   :init-x init-x
+                   :n-cobweb 20
                    :n-seq-iterates n-seq-iters
                    :n-dist-iterates n-dist-iters}))
-
-;; Again again:
-(let [f (um/normalized-ricker 3.0)
-      comps [1]]
-  (fns/plots-grid {:x-max 4
-                   :fs (map (partial msc/n-comp f) comps)
-                   :labels (map (fn [n] (str "$f^" n "$")) comps)
-                   :init-x 0.75
-                   :n-cobweb n-cob
-                   :n-seq-iterates n-seq-iters
-                   :n-dist-iterates n-dist-iters}))
-
-;; This init is the fixed point:
-(let [f (um/normalized-ricker 3.0)
-      comps [1]]
-  (fns/plots-grid {:x-max 4
-                   :fs (map (partial msc/n-comp f) comps)
-                   :labels (map (fn [n] (str "$f^" n "$")) comps)
-                   :init-x 1
-                   :n-cobweb n-cob
-                   :n-seq-iterates n-seq-iters
-                   :n-dist-iterates n-dist-iters}))
-
