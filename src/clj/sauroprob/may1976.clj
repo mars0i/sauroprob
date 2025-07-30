@@ -1,5 +1,5 @@
 ^:kindly/hide-code
-(ns iterfreqs
+(ns sauroprob.may1976
   (:require ;[clojure.math :as m]
             [scicloj.tableplot.v1.plotly :as plotly]
             [scicloj.kindly.v4.kind :as kind]

@@ -1,5 +1,5 @@
 ^:kindly/hide-code
-(ns iterfreqs
+(ns saurprob.iterfreqs
   (:require ;[clojure.math :as m]
             [scicloj.tableplot.v1.plotly :as plotly]
             [scicloj.kindly.v4.kind :as kind]
