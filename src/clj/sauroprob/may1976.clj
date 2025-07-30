@@ -73,7 +73,6 @@
 (let [a 3.55
       f (um/logistic a)
       comps [1]]
-
   (fns/plots-grid {:x-max x-max
                    :fs (map (partial msc/n-comp f) comps)
                    :labels (map (fn [n] (str "$f^" n "$")) comps)
