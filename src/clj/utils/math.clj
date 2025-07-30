@@ -1,20 +1,6 @@
 (ns utils.math
   (:require [clojure.math :as m])) ; new in Clojure 1.11 
 
-;; There are two kinds of plots supported below.
-;;
-;; One kind of plot is simply a plot of a function in the normal sense, but
-;; you can lot the original logistic function, or n compositions of it with itself.
-;;
-;; The other kind of plot gives a "path" starting from an initial value
-;; through iterations of the function on the value, the result of
-;; application of that function, another application, etc. This is one
-;; by showing a line from x at y=0 up to f(x), then right or left to y=x
-;; [so that the x value there is the same as the old f(x)], and then 
-;; up, or down, to the f curve [since that shows how x=f(x) is mapped
-;; by f to f(f(x))], and so on.
-
-
 ;; Note that to apply these, f should be a single-arg fn, where the
 ;; arg is a current pop size.  i.e. the parameters baked should be already
 ;; backed in e.g. by partial.
