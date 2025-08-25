@@ -24,12 +24,12 @@
 ;; Experiments with effects of integer pop sizes:
 (kind/vega-lite (sh/vl-plot-seq "normal" (take 100 (iterate (um/normalized-ricker 3.0) 0.1))))
 ;; FIXME There's a syntax issue involving ricker and normalize:
-(kind/vega-lite (sh/vl-plot-seq "normal" (take 100 (iterate (um/normalize um/ricker 100 3.0) 0.1))))
-;(kind/vega-lite (sh/vl-plot-seq "100" (take 100 (iterate (um/normalize um/floored-ricker 100 3.0) 0.1))))
-;(kind/vega-lite (sh/vl-plot-seq "1K" (take 100 (iterate (um/normalize um/floored-ricker 1000 3.0) 0.1))))
-;(kind/vega-lite (sh/vl-plot-seq "10K" (take 100 (iterate (um/normalize um/floored-ricker 10000 3.0) 0.1))))
-;(kind/vega-lite (sh/vl-plot-seq "100K" (take 100 (iterate (um/normalize um/floored-ricker 100000 3.0) 0.1))))
-;(kind/vega-lite (sh/vl-plot-seq "1M" (take 100 (iterate (um/normalize um/floored-ricker 1000000 3.0) 0.1))))
+(kind/vega-lite (sh/vl-plot-seq "normal" (take 100 (iterate (um/normalize-with-params um/ricker 100 3.0) 0.1))))
+;(kind/vega-lite (sh/vl-plot-seq "100" (take 100 (iterate (um/normalize-with-params um/floored-ricker 100 3.0) 0.1))))
+;(kind/vega-lite (sh/vl-plot-seq "1K" (take 100 (iterate (um/normalize-with-params um/floored-ricker 1000 3.0) 0.1))))
+;(kind/vega-lite (sh/vl-plot-seq "10K" (take 100 (iterate (um/normalize-with-params um/floored-ricker 10000 3.0) 0.1))))
+;(kind/vega-lite (sh/vl-plot-seq "100K" (take 100 (iterate (um/normalize-with-params um/floored-ricker 100000 3.0) 0.1))))
+;(kind/vega-lite (sh/vl-plot-seq "1M" (take 100 (iterate (um/normalize-with-params um/floored-ricker 1000000 3.0) 0.1))))
 
 
 ;; Illustration of methods.  Note that for this family of functions, the
@@ -74,7 +74,7 @@
 ;(clojure.repl/pst)
 
 ;; This puts the result of the floored function back on the x in [0,1] scale:
-;(def floor-normal (sh/make-vl-spec [0 4500] (um/normalize um/floored-ricker 1000 3.5) [1] [500] 10))
+;(def floor-normal (sh/make-vl-spec [0 4500] (um/normalize-with-params um/floored-ricker 1000 3.5) [1] [500] 10))
 ;(kind/vega-lite floor-normal)
 
 
