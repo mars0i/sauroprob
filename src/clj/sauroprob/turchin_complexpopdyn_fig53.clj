@@ -1,13 +1,15 @@
-;; Turchin, _Complex Population Dynamics_, 2003, cf. figure 5.3, p. 149.
-;; See p. 148 for partial description of function and parameters.
+;; Code inspired by Turchin, _Complex Population Dynamics_, 2003,
+;; figure 5.3, p. 149. See p. 148 for partial description of function, parameters.
 
 ^:kindly/hide-code
 (ns turchin-complexpopdyn-fig53
   (:require ;[clojure.math :as m]
             [scicloj.tableplot.v1.plotly :as plotly]
             [scicloj.kindly.v4.kind :as kind]
-            [scicloj.kindly.v4.api :as kindly]
+            [scicloj.kindly.v4.api :as kindly] ; :refer [hide-code] not working with ^:
             [tablecloth.api :as tc]
+            [fastmath.random :as fr]
+            ;[fastmath.stats :as fs]
             [utils.misc :as msc]
             [utils.math :as um]
             [sauroprob.plotly :as sp]
@@ -19,8 +21,33 @@
 ;(kind/hiccup [:script {:src "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"}])
 
 ^:kindly/hide-code
-(declare turchin53)
-;; turchin53 is defined below
+;; I tried to move this later and forward declare it, but that doesn't seem to work.
+(defn turchin53
+  "Returns a version of the function like the one that Turchin 2003 uses to
+  generate figure 5.3.  jog-slope should usually be a small negative
+  number.  This will be the slope of the 'jog', the region in which the
+  Ricker function is replaced with a linear function.  jog-min and jog-max
+  should be numbers near 1 s.t. 1 falls within (jog-min, jog-max). This is
+  the interval in which the Ricker function will be replaced by the linear
+  'jog' function. r is the parameter of a normalized Ricker map."
+  [jog-min jog-max jog-slope r x]
+  (if (and (> x jog-min)
+           (< x jog-max))
+    (+ (* jog-slope x) (+ 1 (- jog-slope))) ; alter the intercept so line goes through (1,1)
+    (um/normalized-ricker r x)))
+
+(def jog-width 0.1)
+(def half-width (/ jog-width 2))
+(def jog-min (- 1 half-width))
+(def jog-max (+ 1 half-width))
+
+(def rng (fr/rng :well1024a 778914531))
+
+(defn noisy-fn
+  [rng jog-min jog-max f x]
+  (+ (f x) 
+     (fr/drandom rng jog-min jog-max)))
+
 
 ;; Different init-x's allow the chaos end sooner, or later.  It just
 ;; depends how soon a value gets trapped in the basin of attraction
@@ -33,9 +60,21 @@
                    })
 
 
-;; This is like a Ricker function with r=3.5, but near 1, it's
-;; linear with a slope in (-1, 0).
-(let [f (partial turchin53 0.1 -0.5 3.5)
+;; This is a Ricker function with a "jog" near (1,1).  It's like a Ricker 
+;; function with r=3.5, but near 1, it's linear with a small negative slope.
+(let [f (partial turchin53 jog-min jog-max -0.5 3.5)
+      comps [1]]
+  (fns/plots-grid (merge 
+                    {:fs (map (partial msc/n-comp f) comps)
+                     :labels (map (fn [n] (str "$f^" n "$")) comps)
+                     :n-dist-iterates 280}
+                    common-params)))
+
+;; This is a Ricker function with a "jog" near (1,1) and added noise.
+;; Without noise, it would be like a Ricker function with r=3.5, but near 1, 
+;; linear with a small negative slope.
+(let [f (partial noisy-fn rng (- jog-min 0.01) (+ jog-max 0.01)
+                 (partial turchin53 jog-min jog-max -0.5 3.5))
       comps [1]]
   (fns/plots-grid (merge 
                     {:fs (map (partial msc/n-comp f) comps)
@@ -51,15 +90,3 @@
                      :labels (map (fn [n] (str "$f^" n "$")) comps)
                      :n-dist-iterates 5000}
                     common-params)))
-
-(defn turchin53
-  "Returns a version of the function like the one that Turchin 2003 uses to
-  generate figure 5.3.  jog-slope should usually be a small negative
-  number.  jog-width should be positive, and usually should be small.  r is
-  the parameter of a normalized Ricker map."
-  [jog-width jog-slope r x]
-  (let [half-width (/ jog-width 2)]
-    (if (and (> x (- 1 half-width))
-             (< x (+ 1 half-width)))
-      (+ (* jog-slope x) (+ 1 (- jog-slope))) ; alter the intercept so line goes through (1,1)
-      (um/normalized-ricker r x))))
