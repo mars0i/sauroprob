@@ -1,6 +1,5 @@
-;; Turchin, _Complex Population Dynamics_, 2003, figure 5.3, p. 149.
-;; See p. 148 for partial description of function and paramters.
-;; I had to fill in the rest.
+;; Turchin, _Complex Population Dynamics_, 2003, cf. figure 5.3, p. 149.
+;; See p. 148 for partial description of function and parameters.
 
 ^:kindly/hide-code
 (ns turchin-complexpopdyn-fig53
@@ -15,12 +14,44 @@
             [sauroprob.iterfreqs-fns :as fns]))
 
 ^:kindly/hide-code
-;; Make LaTeX work in Plotly labels:
-(kind/hiccup [:script {:src "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"}])
+;; Make LaTeX work in Plotly labels.
+;; Side effects: Shifts labels in plotly, makes Clay not return to same position.
+;(kind/hiccup [:script {:src "https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML"}])
+
+^:kindly/hide-code
+(declare turchin53)
+;; turchin53 is defined below
+
+;; Different init-x's allow the chaos end sooner, or later.  It just
+;; depends how soon a value gets trapped in the basin of attraction
+;; where the abs val of the slope is < 1..
+(def common-params {:x-max 4.0
+                    :init-x 1.8075 ; 1.8075 causes chaos to persist well past 200
+                    :n-cobweb 30
+                    :n-seq-iterates 280
+                    ;:intro-label-md (str "$r=" 3.5 ":$") 
+                   })
 
 
+;; This is like a Ricker function with r=3.5, but near 1, it's
+;; linear with a slope in (-1, 0).
+(let [f (partial turchin53 0.1 -0.5 3.5)
+      comps [1]]
+  (fns/plots-grid (merge 
+                    {:fs (map (partial msc/n-comp f) comps)
+                     :labels (map (fn [n] (str "$f^" n "$")) comps)
+                     :n-dist-iterates 280}
+                    common-params)))
 
-;; NOT RIGHT based on how the plot is coming out
+;; This is the original Ricker function without the modification near 1.
+(let [f (partial um/normalized-ricker 3.5)
+      comps [1]]
+  (fns/plots-grid (merge 
+                    {:fs (map (partial msc/n-comp f) comps)
+                     :labels (map (fn [n] (str "$f^" n "$")) comps)
+                     :n-dist-iterates 5000}
+                    common-params)))
+
 (defn turchin53
   "Returns a version of the function like the one that Turchin 2003 uses to
   generate figure 5.3.  jog-slope should usually be a small negative
@@ -30,27 +61,5 @@
   (let [half-width (/ jog-width 2)]
     (if (and (> x (- 1 half-width))
              (< x (+ 1 half-width)))
-      (+ (* jog-slope x) (+ 1 jog-slope)) ; alter the intercept so line goes through (1,1)
+      (+ (* jog-slope x) (+ 1 (- jog-slope))) ; alter the intercept so line goes through (1,1)
       (um/normalized-ricker r x))))
-
-
-^:kindly/hide-code
-;(def n-cob 8)
-
-(def n-dist-iters 10000)
-(def n-seq-iters 100)
-(def x-max 4.0)
-(def init-x 0.91)
-
-
-(let [f (partial turchin53 0.25 -0.2 3.5)
-      comps [1]]
-  (fns/plots-grid {:x-max x-max
-                   :fs (map (partial msc/n-comp f) comps)
-                   :labels (map (fn [n] (str "$f^" n "$")) comps)
-                   :init-x init-x
-                   :n-cobweb 8
-                   :n-seq-iterates n-seq-iters
-                   :n-dist-iterates n-dist-iters
-                   :intro-label-md (str "$r=" 4 ":$") 
-                  }))
