@@ -53,7 +53,8 @@
 ;; depends how soon a value gets trapped in the basin of attraction
 ;; where the abs val of the slope is < 1..
 (def common-params {:x-max 4.0
-                    :init-x 1.8075 ; 1.8075 causes chaos to persist well past 200
+                    ;:init-x 1.01 ; works well for jog-width 0.01
+                    :init-x 1.8075 ; works well for jog-width 0.1
                     :n-cobweb 30
                     :n-seq-iterates 280
                     ;:intro-label-md (str "$r=" 3.5 ":$") 
@@ -73,7 +74,7 @@
 ;; This is a Ricker function with a "jog" near (1,1) and added noise.
 ;; Without noise, it would be like a Ricker function with r=3.5, but near 1, 
 ;; linear with a small negative slope.
-(let [f (partial noisy-fn rng (- jog-min 0.01) (+ jog-max 0.01)
+(let [f (partial noisy-fn rng 0.89 1.11 ; (- 1 (* 1.5 half-width)) (+ 1 (* 1.5 half-width))
                  (partial turchin53 jog-min jog-max -0.5 3.5))
       comps [1]]
   (fns/plots-grid (merge 
