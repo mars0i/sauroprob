@@ -15,6 +15,8 @@
             [sauroprob.plotly :as sp]
             [sauroprob.iterfreqs-fns :as fns]))
 
+(def $$ partial)
+
 ^:kindly/hide-code
 ;; Make LaTeX work in Plotly labels.
 ;; Side effects: Shifts labels in plotly, makes Clay not return to same position.
@@ -68,19 +70,22 @@
 (def jog-min (- 1 half-width))
 (def jog-max (+ 1 half-width))
 
-(def rng (fr/rng :well1024a 778914531))
-
-;; If you set the multipliers in the next function to make the min and max
-;; small, it has a weird effect of making it quasi-cyclic.  Maybe because
-;; you destroy sensitive dependence by making a point "regional"?
+(defn intermittent-drand
+  "Returns a random number between noise-min and noise-max using rand-fn
+  and rng only when a random number in [0,1) is less than threshold."
+  [threshold rand-fn rng noise-min noise-max]
+  (if (< (fr/drandom rng) threshold)
+    (rand-fn rng noise-min noise-max)
+    0))
 
 (defn noisy-fn
-  [rng jog-min jog-max f x]
+  [rand-fn rng jog-min jog-max f x]
   (let [noise-min (* jog-min 1.1)
         noise-max (* jog-max 1.1)]
   (+ (f x) 
-     (fr/drandom rng noise-min noise-max))))
+     (rand-fn rng noise-min noise-max))))
 
+;;---
 
 ;; Different init-x's allow the chaos end sooner, or later.  It just
 ;; depends how soon a value gets trapped in the basin of attraction
@@ -89,62 +94,133 @@
                     ;:init-x 1.01 ; works well for jog-width 0.01
                     :init-x 1.8075 ; works well for jog-width 0.1
                     :n-cobweb 30
+                    ;; SOMETHING WEIRD GOING ON: When I change
+                    ;; n-dist-iterates, it changes the sequence plot,
+                    ;; apparently changing the evolution of the population.
                     :n-dist-iterates 280
-                    :n-seq-iterates 280
+                    :n-seq-iterates 380
                     ;:intro-label-md (str "$r=" 3.5 ":$") 
                    })
 
-(let [f (partial turchin53-cubical jog-min jog-max 3.5)
+(def rng (fr/rng :well1024a 778914531))
+
+;;---
+
+;; This is an original normalized Ricker function without any modifications.
+(let [f ($$ um/normalized-ricker 3.5)
       comps [1]]
   (fns/plots-grid (merge 
                     common-params
-                    {:fs (map (partial msc/n-comp f) comps)
+                    {:fs (map ($$ msc/n-comp f) comps)
+                     :labels (map (fn [n] (str "$f^" n "$")) comps)
+                     :n-dist-iterates 5000})))
+
+;; This is uses `turchin53-cubical`, a Ricker function with a "jog" 
+;; near (1,1). It's like a Ricker function with r=3.5, but near 1,
+;; it's got a small negative slope based on a negative cubical function.
+;; Because of this, the chaotic evolution eventually wanders into the
+;; basin of (1,1) and stays there forever.
+(let [f ($$ turchin53-cubical jog-min jog-max 3.5)
+      comps [1]]
+  (fns/plots-grid (merge 
+                    common-params
+                    {:fs (map ($$ msc/n-comp f) comps)
                      :labels (map (fn [n] (str "$f^" n "$")) comps)
                     })))
 
-;; turchin53-cubical with noise.
-;; WHY ARE THE FLUCTUATIONS SO NARROW EVEN WHEN ESCAPING THE TRAP?
+;; If you set the multipliers in the next function to make the min and max
+;; small, it has a weird effect of making it quasi-cyclic.  Maybe because
+;; you destroy sensitive dependence by making a point "regional"?
+
+;; `turchin53-cubical` with noise.
 ;; Maybe the noise is kicking it back to the trap some of the time, and
 ;; then it has to restart the escape again?
-(let [f (partial noisy-fn rng jog-min jog-max ; (- 1 (* 1.5 half-width)) (+ 1 (* 1.5 half-width))
-                 (partial turchin53-cubical jog-min jog-max 3.5))
+(let [f ($$ noisy-fn fr/drandom rng jog-min jog-max ; (- 1 (* 1.5 half-width)) (+ 1 (* 1.5 half-width))
+                 ($$ turchin53-cubical jog-min jog-max 3.5))
       comps [1]]
   (fns/plots-grid (merge 
                     common-params
-                    {:fs (map (partial msc/n-comp f) comps)
+                    {:fs (map ($$ msc/n-comp f) comps)
                      :labels (map (fn [n] (str "$f^" n "$")) comps)
                      :n-cobweb 40
                     })))
 
-;; This is a Ricker function with a "jog" near (1,1).  It's like a Ricker 
-;; function with r=3.5, but near 1, it's linear with a small negative slope.
-(let [f (partial turchin53-linear -0.5 jog-min jog-max 3.5)
+;; **QUESTION: Why do the fluctuations above have such a narrow range 
+;; even when escaping the basin of (1,1)?**
+;; See below for possible answers.
+
+;; This is a uses `turchin53-linear`, a Ricker function with a "jog" near (1,1).
+;; It's like a Ricker function with r=3.5, but near 1, it's linear with a small
+;; negative slope. Note that the result is essentially the same as using
+;; `turchin53-cubical`.
+(let [f ($$ turchin53-linear -0.5 jog-min jog-max 3.5)
       comps [1]]
   (fns/plots-grid (merge 
                     common-params
-                    {:fs (map (partial msc/n-comp f) comps)
+                    {:fs (map ($$ msc/n-comp f) comps)
                      :labels (map (fn [n] (str "$f^" n "$")) comps)
                     })))
 
 ;; turchin53-linear with noise
-(let [f (partial noisy-fn rng jog-min jog-max ; (- 1 (* 1.5 half-width)) (+ 1 (* 1.5 half-width))
-                 (partial turchin53-linear -0.5 jog-min jog-max 3.5))
+(let [f ($$ noisy-fn fr/drandom rng jog-min jog-max ; (- 1 (* 1.5 half-width)) (+ 1 (* 1.5 half-width))
+                 ($$ turchin53-linear -0.5 jog-min jog-max 3.5))
       comps [1]]
   (fns/plots-grid (merge 
                     common-params
-                    {:fs (map (partial msc/n-comp f) comps)
+                    {:fs (map ($$ msc/n-comp f) comps)
                      :labels (map (fn [n] (str "$f^" n "$")) comps)
                      :n-cobweb 40
                     })))
 
+;; **Again, why do the fluctuations above have such a narrow range 
+;; even when escaping the basin of (1,1)?**
+;; See below for possible answers.
 
 
-;; This is the original Ricker function without the modification near 1.
-(let [f (partial um/normalized-ricker 3.5)
+;; This one is like the random-enhanced turchin-cubical (or turchin-linear)
+;; version above, but using intermittent random shocks rather than a random 
+;; shock on each iteration. Seems like e.g. a Lévy distribution with the right
+;; a μ value would work, too.
+(let [f ($$ noisy-fn 
+                 ($$ intermittent-drand 0.04 fr/drandom) rng jog-min jog-max
+                 ($$ turchin53-cubical jog-min jog-max 3.5))
       comps [1]]
   (fns/plots-grid (merge 
                     common-params
-                    {:fs (map (partial msc/n-comp f) comps)
+                    {:fs (map ($$ msc/n-comp f) comps)
                      :labels (map (fn [n] (str "$f^" n "$")) comps)
-                     :init-x 1.001
-                     :n-dist-iterates 5000})))
+                     :n-cobweb 40
+                    })))
+
+;; Comments on preceding experiment using `turchin53-cubical`:
+;;
+;; - I'm a little bit confused still about why the curve in the cobweb
+;;   plot looks like it does.
+;;
+;; - Compared to the random-shocks-on-every-iteration examples,
+;;   the preceding allows chaos to explore a wider range of x values.
+;;
+;; - On the other hand, the wide range is *sometimes* less wide than
+;;   a system without random shocks.
+;;
+;; - Depending on the threshold value, random seed, and init-x, this
+;;   setup both allows stability to persist for a long time before
+;;   escape into chaos (as you'd expect) *and also* can send the system
+;;   into stability before it would have without the random shocks.
+;;
+;;   This is illustrated by, for example, using these parameters:
+
+(comment
+  (def rng (fr/rng :well1024a 778914531))
+  {:init-x 1.8075}
+  ($$ intermittent-drand 0.04 "...")
+)
+
+;; - These points are compatible with my guess that the reason that
+;;   constant noise doesn't allow wide variation in chaos is that the
+;;   system keeps wandering back into the stable fixed point, and
+;;   during chaotic periods is always in the process of climbing away
+;;   from the fixed point before it gets sent back.  Not sure about that.
+;;
+;; - Seems like it should also work to use e.g. a Lévy distribution with
+;;   a μ value that makes large hits rare.
