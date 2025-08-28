@@ -47,10 +47,12 @@
         ;(plotly/base {:=width 550})
         (plotly/layer-line {:=x :x, :=y, :y :=color :fun})
         (sp/equalize-display-units) ; runs plotly/plot, which is needed for next lines
-        (sp/set-line-width 0 1.5)
+        (sp/set-line-width 0 0.5)  ; the cobwebs
         (sp/set-line-dash 0 "dot")
-        (sp/set-line-width 1 1.0)
-        (sp/set-line-dash 1 "dash"))))
+        (sp/set-line-width 1 1.0)  ; y=x
+        (sp/set-line-dash 1 "dash")
+        (sp/set-line-width 2 0.5)  ; the x_1 = f(x) curve
+        )))
 
 
 ;; TIP:
