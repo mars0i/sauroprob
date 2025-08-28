@@ -3,7 +3,7 @@
 
 ^:kindly/hide-code
 (ns turchin-complexpopdyn-fig53
-  (:require ;[clojure.math :as m]
+  (:require [clojure.math :as m]
             [scicloj.tableplot.v1.plotly :as plotly]
             [scicloj.kindly.v4.kind :as kind]
             [scicloj.kindly.v4.api :as kindly] ; :refer [hide-code] not working with ^:
@@ -40,6 +40,13 @@
     (+ (* jog-slope x)
        (- 1 jog-slope))))
 
+(defn cube-jog
+  [x]
+  (- 1.25
+     (m/pow (* 10 (- x 1))
+            3)
+     (/ x 4)))
+
 ;; I tried to move this later and forward declare it, but that doesn't seem to work.
 (defn turchin53-linear
   "A modified Ricker function like the one that Turchin 2003 uses
@@ -52,6 +59,10 @@
   [jog-slope jog-min jog-max r x]
   (turchin53 (linear-jog jog-slope) jog-min jog-max r x))
 
+(defn turchin53-cubical
+  [jog-min jog-max r x]
+  (turchin53 cube-jog jog-min jog-max r x))
+
 (def jog-width 0.1)
 (def half-width (/ jog-width 2))
 (def jog-min (- 1 half-width))
@@ -59,10 +70,16 @@
 
 (def rng (fr/rng :well1024a 778914531))
 
+;; If you set the multipliers in the next function to make the min and max
+;; small, it has a weird effect of making it quasi-cyclic.  Maybe because
+;; you destroy sensitive dependence by making a point "regional"?
+
 (defn noisy-fn
   [rng jog-min jog-max f x]
+  (let [noise-min (* jog-min 1.1)
+        noise-max (* jog-max 1.1)]
   (+ (f x) 
-     (fr/drandom rng jog-min jog-max)))
+     (fr/drandom rng noise-min noise-max))))
 
 
 ;; Different init-x's allow the chaos end sooner, or later.  It just
@@ -77,6 +94,27 @@
                     ;:intro-label-md (str "$r=" 3.5 ":$") 
                    })
 
+(let [f (partial turchin53-cubical jog-min jog-max 3.5)
+      comps [1]]
+  (fns/plots-grid (merge 
+                    common-params
+                    {:fs (map (partial msc/n-comp f) comps)
+                     :labels (map (fn [n] (str "$f^" n "$")) comps)
+                    })))
+
+;; turchin53-cubical with noise.
+;; WHY ARE THE FLUCTUATIONS SO NARROW EVEN WHEN ESCAPING THE TRAP?
+;; Maybe the noise is kicking it back to the trap some of the time, and
+;; then it has to restart the escape again?
+(let [f (partial noisy-fn rng jog-min jog-max ; (- 1 (* 1.5 half-width)) (+ 1 (* 1.5 half-width))
+                 (partial turchin53-cubical jog-min jog-max 3.5))
+      comps [1]]
+  (fns/plots-grid (merge 
+                    common-params
+                    {:fs (map (partial msc/n-comp f) comps)
+                     :labels (map (fn [n] (str "$f^" n "$")) comps)
+                     :n-cobweb 40
+                    })))
 
 ;; This is a Ricker function with a "jog" near (1,1).  It's like a Ricker 
 ;; function with r=3.5, but near 1, it's linear with a small negative slope.
@@ -88,27 +126,25 @@
                      :labels (map (fn [n] (str "$f^" n "$")) comps)
                     })))
 
-;; This is a Ricker function with a "jog" near (1,1) and added noise.
-;; Without noise, it would be like a Ricker function with r=3.5, but near 1, 
-;; linear with a small negative slope.
-(let [f (partial noisy-fn rng 0.89 1.11 ; (- 1 (* 1.5 half-width)) (+ 1 (* 1.5 half-width))
-                 (partial turchin53-linear -0.5 jog-min jog-max 3.5)
-                 )
+;; turchin53-linear with noise
+(let [f (partial noisy-fn rng jog-min jog-max ; (- 1 (* 1.5 half-width)) (+ 1 (* 1.5 half-width))
+                 (partial turchin53-linear -0.5 jog-min jog-max 3.5))
       comps [1]]
   (fns/plots-grid (merge 
                     common-params
                     {:fs (map (partial msc/n-comp f) comps)
                      :labels (map (fn [n] (str "$f^" n "$")) comps)
-                     :n-cobweb 100
+                     :n-cobweb 40
                     })))
 
 
 
 ;; This is the original Ricker function without the modification near 1.
-(let [f (partial um/normalized-ricker 1.25)
+(let [f (partial um/normalized-ricker 3.5)
       comps [1]]
   (fns/plots-grid (merge 
                     common-params
                     {:fs (map (partial msc/n-comp f) comps)
                      :labels (map (fn [n] (str "$f^" n "$")) comps)
+                     :init-x 1.001
                      :n-dist-iterates 5000})))
