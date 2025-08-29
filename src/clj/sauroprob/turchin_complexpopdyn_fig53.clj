@@ -71,8 +71,9 @@
 (def jog-max (+ 1 half-width))
 
 (defn intermittent-drand
-  "Returns a random number between noise-min and noise-max using rand-fn
-  and rng only when a random number in [0,1) is less than threshold."
+  "Returns a uniform random number between noise-min and noise-max using
+  rand-fn and rng only when a random number in [0,1) is less than
+  threshold."
   [threshold rand-fn rng noise-min noise-max]
   (if (< (fr/drandom rng) threshold)
     (rand-fn rng noise-min noise-max)
