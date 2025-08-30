@@ -182,6 +182,18 @@
 ;; version above, but using intermittent random shocks rather than a random 
 ;; shock on each iteration. Seems like e.g. a Lévy distribution with the right
 ;; a μ value would work, too.
+
+;; (Note that in the sequence diagram, if you look very closely at the
+;; regions in which the system is stable, you can see little wiggles on the
+;; left as it walks down the basin.  You can see that in the no-noise
+;; examples above, too, but it's more subtle.)
+
+
+;; Wait, but look at the cobweb plot.  **Why are the shocks so large?**
+;; Compare the cobweb plots with noise above, where there are lots of little
+;; jiggles.  Remember that these are the only shocks in forty iterations,
+;; but still it's weird that they're so large.  And only positive.
+
 (let [f ($$ noisy-fn 
                  ($$ intermittent-drand 0.04 fr/drandom) rng jog-min jog-max
                  ($$ turchin53-cubical jog-min jog-max 3.5))
