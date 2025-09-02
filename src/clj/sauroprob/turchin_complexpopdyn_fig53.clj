@@ -69,6 +69,15 @@
 (def half-width (/ jog-width 2))
 (def jog-min (- 1 half-width))
 (def jog-max (+ 1 half-width))
+(def noise-min (- half-width))
+(def noise-max half-width)
+
+^:kindly/hide-code
+(defn DEBUG
+  "print's its arg followed by \"|\" and then returns the arg."
+  [x]
+  (print x "| ")
+  x)
 
 (defn intermittent-drand
   "Returns a uniform random number between noise-min and noise-max using
@@ -79,12 +88,25 @@
     (rand-fn rng noise-min noise-max)
     0))
 
+;; FIXME THIS IS GENERATING ##-Inf some of the time.
+;; Why?
+;; It didn't before I allowed noise-min and noise-max to straddle zero.
 (defn noisy-fn
-  [rand-fn rng jog-min jog-max f x]
-  (let [noise-min (* jog-min 1.1)
-        noise-max (* jog-max 1.1)]
-  (+ (f x) 
-     (rand-fn rng noise-min noise-max))))
+  [rand-fn rng noise-min noise-max f x]
+  (let [randnum (rand-fn rng noise-min noise-max)]
+    ;(prn "noisy-fn jog-min/max:" jog-min jog-max) ; DEBUG
+    ;(prn "noisy-fn noise-min/max:" noise-min noise-max) ; DEBUG
+    (+ (f x) randnum)))
+
+;(defn old-noisy-fn
+;  [rand-fn rng jog-min jog-max f x]
+;  (let [noise-min (* jog-min -1.1)
+;        noise-max (* jog-max 1.1)
+;        randnum (rand-fn rng noise-min noise-max)]
+;    (prn "noisy-fn jog-min/max:" jog-min jog-max) ; DEBUG
+;    (prn "noisy-fn noise-min/max:" noise-min noise-max) ; DEBUG
+;    (+ (f x) randnum)))
+
 
 ;;---
 
@@ -136,15 +158,19 @@
 ;; `turchin53-cubical` with noise.
 ;; Maybe the noise is kicking it back to the trap some of the time, and
 ;; then it has to restart the escape again?
-(let [f ($$ noisy-fn fr/drandom rng jog-min jog-max ; (- 1 (* 1.5 half-width)) (+ 1 (* 1.5 half-width))
-                 ($$ turchin53-cubical jog-min jog-max 3.5))
+(let [f ($$ noisy-fn fr/drandom rng noise-min noise-max
+            ($$ turchin53-cubical jog-min jog-max 3.5))
       comps [1]]
   (fns/plots-grid (merge 
                     common-params
                     {:fs (map ($$ msc/n-comp f) comps)
                      :labels (map (fn [n] (str "$f^" n "$")) comps)
                      :n-cobweb 40
-                    })))
+                     })))
+
+(comment
+  (filter zero? (take 10000 (repeatedly (fn [] (fr/drandom rng -0.05 0.05)))))
+)
 
 ;; **QUESTION: Why do the fluctuations above have such a narrow range 
 ;; even when escaping the basin of (1,1)?**
@@ -163,7 +189,7 @@
                     })))
 
 ;; turchin53-linear with noise
-(let [f ($$ noisy-fn fr/drandom rng jog-min jog-max ; (- 1 (* 1.5 half-width)) (+ 1 (* 1.5 half-width))
+(let [f ($$ noisy-fn fr/drandom rng noise-min noise-max
                  ($$ turchin53-linear -0.5 jog-min jog-max 3.5))
       comps [1]]
   (fns/plots-grid (merge 
@@ -195,7 +221,7 @@
 ;; but still it's weird that they're so large.  And only positive.
 
 (let [f ($$ noisy-fn 
-                 ($$ intermittent-drand 0.04 fr/drandom) rng jog-min jog-max
+                 ($$ intermittent-drand 0.04 fr/drandom) rng noise-min noise-max
                  ($$ turchin53-cubical jog-min jog-max 3.5))
       comps [1]]
   (fns/plots-grid (merge 
@@ -204,6 +230,7 @@
                      :labels (map (fn [n] (str "$f^" n "$")) comps)
                      :n-cobweb 40
                     })))
+
 
 ;; Comments on preceding experiment using `turchin53-cubical`:
 ;;
@@ -237,31 +264,3 @@
 ;;
 ;; - Seems like it should also work to use e.g. a Lévy distribution with
 ;;   a μ value that makes large hits rare.
-
-;; -------------------------------------------
-
-;; A related exploration:
-
-;; Second term in first equation in equation (1) in Turchin and Hanski 1997:
-;; $\frac{GN^2}{N^2 + H^2}$
-(defn turchin-hanski-generalist
-  "Second term in first equation in equation (1) in Turchin and Hanski 1997."
-  [G H N]
-  (let [nsq (* N N)
-        hsq (* H H)]
-    (double
-      (/ (* G nsq)
-         (+ nsq hsq)))))
-
-(def thg turchin-hanski-generalist)
-
-;; It appears that when N = H, the value of the expression is always half
-;; of G, which is what the authors' remark near the end of p. 845 suggests:
-(thg 5000 700 700)
-
-;; Well take a way the *G*.  Then we have $\frac{N^2}{N^2 + H^2}$
-
-;; Forget about the squares for the moment.  When $x = y$
-;; so 
-;; $x/(x+y) = x/(2x) = 1/2$
-;; Then $G\frac{x}{x+y} = \frac{G}{2}$
