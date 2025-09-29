@@ -1,5 +1,5 @@
 {:paths ["src/clj"] 
- :deps {org.clojure/clojure {:mvn/version "1.12.1"}
+ :deps {org.clojure/clojure {:mvn/version "1.12.3"}
 
         org.scicloj/noj {:mvn/version "2-beta18"} ; includes fastmath, Hanami, Clay, clojisr
 

@@ -35,52 +35,58 @@
   (m/pow (* 1 0.6) 1/2) ; geometric
   )
 
-(def wet-in-wet-fit 1)
-(def wet-in-dry-fit 0.58)
 (def dry-in-wet-fit 0.6)
 (def dry-in-dry-fit 1)
+(def wet-in-wet-fit 1)
+(def wet-in-dry-fit 0.58)
+(def dry-specialist-fits {:wet dry-in-wet-fit, :dry dry-in-dry-fit})
+(def wet-specialist-fits {:wet wet-in-wet-fit, :dry wet-in-wet-fit})
 
 (def wet-env-relf 1/2)
 (def dry-env-relf (- 1 wet-env-relf))
 
-(defn wetdry-pop-summary
-  [summary-fn dry-specialist-relf]
-  (let [wet-specialist-relf (- 1 dry-specialist-relf)
+
+(defn pop-summary
+  "t1-fits is a map of fitnesses for trait t1, with keys :wet and :dry
+  representing fitnesses in the wet and dry envs, respectively.  summary-fn
+  is a function such as arithmetic mean or geometric mean.  t1-relf is the
+  relative frequency of trait t1 in a population with two traits present
+  (so the relative frequency of t2 is (1 - relf of t1)."
+  [t1-fits t2-fits summary-fn t1-relf]
+  (let [t2-relf (- 1 t1-relf)
         ;; pop means:
-        wet-in-wet (* wet-specialist-relf wet-in-wet-fit)
-        wet-in-dry (* wet-specialist-relf wet-in-dry-fit)
-        dry-in-dry (* dry-specialist-relf dry-in-dry-fit)
-        dry-in-wet (* dry-specialist-relf dry-in-wet-fit)
-        wet-env-sum (+ dry-in-wet wet-in-wet)
-        dry-env-sum (+ wet-in-dry dry-in-dry)]
+        t1-in-wet (* t1-relf (:wet t1-fits))
+        t1-in-dry (* t1-relf (:dry t1-fits))
+        t2-in-wet (* t2-relf (:wet t2-fits))
+        t2-in-dry (* t2-relf (:dry t2-fits))
+        wet-env-sum (+ t1-in-wet t2-in-wet)
+        dry-env-sum (+ t2-in-dry t1-in-dry)]
     (summary-fn dry-env-relf dry-env-sum wet-env-sum)))
 
 (defn pop-arith-mean
-  [dry-env-relf dry-env-sum wet-env-sum]
-  (let [wet-env-relf (- 1 dry-env-relf)]
-    (+ (* dry-env-sum dry-env-relf)
-       (* wet-env-sum wet-env-relf))))
+  [t1-env-relf t1-env-sum t2-env-sum]
+  (let [t2-env-relf (- 1 t1-env-relf)]
+    (+ (* t1-env-sum t1-env-relf)
+       (* t2-env-sum t2-env-relf))))
+
+(defn pop-geom-mean
+  [t1-env-relf t1-env-sum t2-env-sum]
+  (let [t2-env-relf (- 1 t1-env-relf)]
+    (* (m/pow t1-env-sum t1-env-relf)
+       (m/pow t2-env-sum t2-env-relf))))
 
 (defn wetdry-pop-arith-mean
   [dry-specialist-relf]
-  (wetdry-pop-summary pop-arith-mean dry-specialist-relf))
-
-(defn pop-geom-mean
-  [dry-env-relf dry-env-sum wet-env-sum]
-  (let [wet-env-relf (- 1 dry-env-relf)]
-    (* (m/pow dry-env-sum dry-env-relf)
-       (m/pow wet-env-sum wet-env-relf))))
+  (pop-summary wet-specialist-fits dry-specialist-fits 
+               pop-arith-mean dry-specialist-relf))
 
 (defn wetdry-pop-geom-mean
   [dry-specialist-relf]
-  (wetdry-pop-summary pop-geom-mean dry-specialist-relf))
+  (pop-summary wet-specialist-fits dry-specialist-fits 
+               pop-geom-mean dry-specialist-relf))
 
 
-(comment
-  [(wetdry-pop-arith-mean 0.5) (wetdry-pop-arith-mean' 0.5)]
-)
-
-;; Wet specialist vs dry specialist--population arithmetic means rel to
+;; Wet specialist vs dry specialist population arithmetic means rel to
 ;; dry-specialist relf:
 (let [step 0.01
       xs (range 0 (+ 1 step) step)
@@ -91,6 +97,8 @@
       ;(assoc-in [:data 0 :line :width] 1)
       ))
 
+;; FIXME This should be a smooth curve with a peak at around 0.56.
+;;
 ;; Wet specialist vs dry specialist--population geometric means rel to
 ;; dry-specialist relf:
 (let [step 0.01
