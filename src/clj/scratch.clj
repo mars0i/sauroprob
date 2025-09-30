@@ -41,11 +41,16 @@
 (defn wetdry-pop-summary
   [summary-fn dry-specialist-relf]
   (let [wet-specialist-relf (- 1 dry-specialist-relf)
+        _ (prn "scratch"  ; DEBUG
+               "didf" dry-in-dry-fit
+               "diwf" dry-in-wet-fit
+               "wiwf" wet-in-wet-fit
+               "widf" wet-in-dry-fit)
         ;; pop means:
-        wet-in-wet (* wet-specialist-relf wet-in-wet-fit)
-        wet-in-dry (* wet-specialist-relf wet-in-dry-fit)
         dry-in-dry (* dry-specialist-relf dry-in-dry-fit)
         dry-in-wet (* dry-specialist-relf dry-in-wet-fit)
+        wet-in-dry (* wet-specialist-relf wet-in-dry-fit)
+        wet-in-wet (* wet-specialist-relf wet-in-wet-fit)
         wet-env-sum (+ dry-in-wet wet-in-wet)
         dry-env-sum (+ wet-in-dry dry-in-dry)]
     (summary-fn dry-env-relf dry-env-sum wet-env-sum)))
@@ -56,15 +61,15 @@
     (+ (* dry-env-sum dry-env-relf)
        (* wet-env-sum wet-env-relf))))
 
-(defn wetdry-pop-arith-mean
-  [dry-specialist-relf]
-  (wetdry-pop-summary pop-arith-mean dry-specialist-relf))
-
 (defn pop-geom-mean
   [dry-env-relf dry-env-sum wet-env-sum]
   (let [wet-env-relf (- 1 dry-env-relf)]
     (* (m/pow dry-env-sum dry-env-relf)
        (m/pow wet-env-sum wet-env-relf))))
+
+(defn wetdry-pop-arith-mean
+  [dry-specialist-relf]
+  (wetdry-pop-summary pop-arith-mean dry-specialist-relf))
 
 (defn wetdry-pop-geom-mean
   [dry-specialist-relf]
@@ -98,4 +103,4 @@
       ;(assoc-in [:data 0 :line :width] 1)
       ))
 
-
+nil
