@@ -8,7 +8,7 @@
   (:require [clojure.math :as m]
             [scicloj.kindly.v4.kind :as kind]
             [scicloj.tableplot.v1.plotly :as plotly]
-            ;[fastmath.random :as fr]
+            [fastmath.random :as fr]
             ;[fastmath.stats :as fs]
             [tablecloth.api :as tc]
             ;[clojisr.v1.r :as R]
@@ -26,33 +26,34 @@
 
 ;(clojure.repl/dir clojure.math)
 
-(comment
-  ;; wet specialist:
-  (/ (+ 1 0.58) 2) ; arithmetic 
-  (m/pow (* 1 0.58) 1/2) ; geometric
-  ;; dry specialist:
-  (/ (+ 1 0.6) 2) ; arithmetic
-  (m/pow (* 1 0.6) 1/2) ; geometric
-  )
+(def wet-env-relf 1/2)
+(def dry-env-relf (- 1 wet-env-relf))
 
-;(def dry-in-wet-fit 0.6)
-;(def dry-in-dry-fit 1)
-;(def wet-in-wet-fit 1)
-;(def wet-in-dry-fit 0.58)
 (def dry-specialist-fits "A_2 in S&B p. 192" {:wet-env 0.6, :dry-env 1})
 (def wet-specialist-fits "A_1 in S&B p. 192" {:wet-env 1, :dry-env 0.58})
 (def generalist-fits "A_3, jack-of-all-trades in S&B p. 192" {:wet-env 0.785 :dry-env 0.785})
 
-(def wet-env-relf 1/2)
-(def dry-env-relf (- 1 wet-env-relf))
+(defn polymorphic-fits
+  "A_4, 'the phenotypically polymorphic allele', S&B p. 192.  env should be
+  :dry-env or :wet-env.  Returns a fitness value for the organism in that
+  environment.  The dry-specialist or wet-specialist phenotypes are chosen
+  randomly with probability 0.56 for the dry-specialist phenotype, and 0.44
+  for the wet-specialist phenotype."
+  [rng env]
+  (if "random (0,1] is > 0.56" ; FIXME
+    (dry-specialist-fits env)
+    (wet-specialist-fits env)))
 
 
 (defn pop-summary
-  "t1-fits is a map of fitnesses for trait t1, with keys :wet-env and :dry-env
-  representing fitnesses in the wet and dry envs, respectively.  summary-fn
-  is a function such as arithmetic mean or geometric mean.  t1-relf is the
-  relative frequency of trait t1 in a population with two traits present
-  (so the relative frequency of t2 is (1 - relf of t1)."
+  "t1-fits is a map of fitnesses for trait t1, with keys :wet-env and
+  :dry-env representing fitnesses in the wet and dry envs, respectively.
+  Mutatis mutandis for t2-fits. Alternatively, t<n>-fits could be a
+  function expects :wet-env or :dry-env as argument, and returns a fitness
+  value (perhaps somewhat randomly). summary-fn is a function such as
+  arithmetic mean or geometric mean.  t1-relf is the relative frequency of
+  trait t1 in a population with two traits present (so the relative
+  frequency of t2 is (1 - relf of t1)."
   [t1-fits t2-fits summary-fn t1-relf]
   (let [t2-relf (- 1 t1-relf)
         ;_ (prn "segerbrockmann" ; DEBUG
