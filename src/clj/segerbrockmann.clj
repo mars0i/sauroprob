@@ -61,10 +61,10 @@
         ;       "t2wf" (:wet-env t2-fits)
         ;       "t2df" (:dry-env t2-fits))
         ;; pop means:
-        t1-in-wet (* t1-relf (:wet-env t1-fits))
-        t1-in-dry (* t1-relf (:dry-env t1-fits))
-        t2-in-wet (* t2-relf (:wet-env t2-fits))
-        t2-in-dry (* t2-relf (:dry-env t2-fits))
+        t1-in-wet (* t1-relf (t1-fits :wet-env))
+        t1-in-dry (* t1-relf (t1-fits :dry-env))
+        t2-in-wet (* t2-relf (t2-fits :wet-env))
+        t2-in-dry (* t2-relf (t2-fits :dry-env))
         wet-env-sum (+ t1-in-wet t2-in-wet)
         dry-env-sum (+ t2-in-dry t1-in-dry)]
     (summary-fn dry-env-relf dry-env-sum wet-env-sum)))
