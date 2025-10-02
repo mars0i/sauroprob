@@ -22,7 +22,6 @@
 ;; From Seger and Brockman 1987 p. 192 on bet hedging
 ;; Maybe should go in a different repo.
 
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Random numbers
 
@@ -74,8 +73,26 @@
 (def wet-specialist-fits "A_1 in S&B p. 192" {:wet-env 1, :dry-env 0.58})
 (def generalist-fits "A_3, jack-of-all-trades in S&B p. 192" {:wet-env 0.785 :dry-env 0.785})
 
-;; A probabilistic strategy has to be defined by an actual function.
+;; Probabilistic polymorphic phenotype A_4:
+
 (def poly-fits-dry-spec-prob 0.56)
+(def poly-fits-wet-spec-prob (- 1 poly-fits-dry-spec-prob))
+
+(comment
+  ;; Arithmetic mean fitness of probabilistic polymorphic strategy in wet years:
+  (+ 0.44 (* 0.56 0.6))    ; = 0.776
+  ;i.e.:
+  (+ (* poly-fits-dry-spec-prob (dry-specialist-fits :wet-env))
+     (* poly-fits-wet-spec-prob (dry-specialist-fits :dry-env))
+
+  ;; Arithmetic mean fitness of probabilistic polymorphic strategy in dry years:
+  (+ (* 0.44 0.58)  0.56)  ; = 0.8152
+  ; i.e.:
+  (+ (* poly-fits-dry-spec-prob (wet-specialist-fits :wet-env))
+     (* poly-fits-wet-spec-prob (wet-specialist-fits :dry-env))
+)
+
+;; A truly probabilistic strategy has to be defined by an actual function.
 (defn poly-fits
   "A_4, 'the phenotypically polymorphic allele', S&B p. 192.  env should be
   :dry-env or :wet-env.  Returns a fitness value for the organism in that
