@@ -120,11 +120,13 @@
   Mutatis mutandis for t2-fits. Alternatively, t<n>-fits could be a
   function expects :wet-env or :dry-env as argument, and returns a fitness
   value (perhaps somewhat randomly). summary-fn is a function such as
-  arithmetic mean or geometric mean.  t1-relf is the relative frequency of
-  trait t1 in a population with two traits present (so the relative
-  frequency of t2 is (1 - relf of t1)."
-  [summary-fn t1-fits t2-fits t1-relf]
-  (let [t2-relf (- 1 t1-relf)
+  arithmetic mean or geometric mean.  t2-relf is the relative frequency of
+  trait t2 in a population with two traits present (so the relative
+  frequency of t1 is (1 - relf of t2). [e.g. if you're plotting the
+  frequency of an invader from left to right, it starts with relf near
+  zero. So the invader's fitnesse should be in t2-fits.]"
+  [summary-fn t1-fits t2-fits t2-relf]
+  (let [t1-relf (- 1 t2-relf)
         ;; pop means:
         t1-in-wet (* t1-relf (t1-fits :wet-env))
         t1-in-dry (* t1-relf (t1-fits :dry-env))
@@ -146,48 +148,36 @@
     (* (m/pow t1-env-sum t1-env-relf)
        (m/pow t2-env-sum t2-env-relf))))
 
-;; Some special case summary stats:
-
-(defn wetdry-pop-arith-mean
-  [dry-specialist-relf]
-  (pop-summary pop-arith-mean 
-               dry-specialist-fits wet-specialist-fits 
-               dry-specialist-relf))
-
-(defn wetdry-pop-geom-mean
-  [dry-specialist-relf]
-  (pop-summary pop-geom-mean 
-               dry-specialist-fits wet-specialist-fits 
-               dry-specialist-relf))
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Plots
 
-;; Wet specialist vs dry specialist population arithmetic means rel to
-;; dry-specialist relf:
+;; pop arith mean: wet specialist vs invading dry specialist:
 (let [step 0.01
       xs (range 0 (+ 1 step) step)
-      ys (map wetdry-pop-arith-mean xs)]
+      ys (map (partial pop-summary pop-arith-mean wet-specialist-fits dry-specialist-fits)
+              xs)]
   (-> (tc/dataset {:x xs :y ys})
       (plotly/layer-line {:=x :x, :=y, :y})
-      plotly/plot
-      ;(assoc-in [:data 0 :line :width] 1)
-      ))
+      plotly/plot))
 
-;; Wet specialist vs dry specialist--population geometric means rel to
-;; dry-specialist relf:
+;; pop geom mean: wet specialist vs invading dry specialist:
 (let [step 0.01
       xs (range 0 (+ 1 step) step)
-      ys (map wetdry-pop-geom-mean xs)]
-  (-> (tc/dataset {:x xs :y ys :x-vert [0.56 0.56] :y-vert [0.76 0.796]})
+      ys (map (partial pop-summary pop-geom-mean wet-specialist-fits dry-specialist-fits)
+              xs)]
+  (-> (tc/dataset {:x xs :y ys :x-vert [0.56 0.56] :y-vert [0.76 0.796]}) ; add vert line at max
       (plotly/layer-line {:=x :x, :=y, :y})
       (plotly/layer-line {:=x :x-vert, :=y, :y-vert})
       plotly/plot
+      (sp/set-line-width 1 1.0)  ; y=x
+      (sp/set-line-dash 1 "dot")
       ;(assoc-in [:data 0 :line :width] 1)
       ))
 
-;; dry specialist vs invading generalist
+;; pop arith mean: dry specialist vs invading generalist:    
+;; Q: Why is this curve going down?    
+;; A: Because generalist's arith mean fitness less than dry specalist's.    
+;; Nevertheless the generalist invades since its geom mean fitness is greater.
 (let [step 0.01
       xs (range 0 (+ 1 step) step)
       ys (map (partial pop-summary pop-arith-mean dry-specialist-fits generalist-fits)
@@ -198,7 +188,7 @@
       ;(assoc-in [:data 0 :line :width] 1)
       ))
 
-;; dry specialist vs invading generalist
+;; pop geom mean: dry specialist vs invading generalist:
 (let [step 0.01
       xs (range 0 (+ 1 step) step)
       ys (map (partial pop-summary pop-geom-mean dry-specialist-fits generalist-fits)
@@ -213,7 +203,7 @@
       ))
 
 
-;; generalist vs invading probabilistic polymorphic
+;; pop arith mean: generalist vs invading probabilistic polymorphic
 (let [step 0.01
       xs (range 0 (+ 1 step) step)
       ys (map (partial pop-summary pop-arith-mean generalist-fits poly-avg-fits)
@@ -224,7 +214,8 @@
       ;(assoc-in [:data 0 :line :width] 1)
       ))
 
-;; generalist vs invading probabilistic polymorphic
+;; pop geom mean: generalist vs invading probabilistic polymorphic    
+;; Q: Is this right? Does the pop geom mean simply increase with invasion?
 (let [step 0.01
       xs (range 0 (+ 1 step) step)
       ys (map (partial pop-summary pop-geom-mean generalist-fits poly-avg-fits)
