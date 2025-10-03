@@ -75,24 +75,23 @@
 
 ;; Probabilistic polymorphic phenotype A_4:
 
-(def poly-fits-dry-spec-prob 0.56)
-(def poly-fits-wet-spec-prob (- 1 poly-fits-dry-spec-prob))
+(def poly-fits-dry-spec-prob 0.56)  ; prob of emulating the dry specialist phenotype
+(def poly-fits-wet-spec-prob (- 1 poly-fits-dry-spec-prob)) ; prob of emulating wet specialist
 
-(comment
-  ;; Arithmetic mean fitness of probabilistic polymorphic strategy in wet years:
-  (+ 0.44 (* 0.56 0.6))    ; = 0.776
-  ;i.e.:
-  (+ (* poly-fits-dry-spec-prob (dry-specialist-fits :wet-env))
-     (* poly-fits-wet-spec-prob (dry-specialist-fits :dry-env))
+;; Seger & Brockmann just assume that the probabilistic polymorphic 
+;; genotype subpop is large, so that the fitness of the genotype 
+;; in each generation in each environment is its arithmetic mean fitness.
+;; So for their modeling, we can define a map, just as for the specialists
+;; and generalist:
 
-  ;; Arithmetic mean fitness of probabilistic polymorphic strategy in dry years:
-  (+ (* 0.44 0.58)  0.56)  ; = 0.8152
-  ; i.e.:
-  (+ (* poly-fits-dry-spec-prob (wet-specialist-fits :wet-env))
-     (* poly-fits-wet-spec-prob (wet-specialist-fits :dry-env))
-)
+(def poly-avg-fits "A_4, probabilistic polymorphic, S&B p. 192"
+  {:wet-env (+ (* poly-fits-dry-spec-prob (dry-specialist-fits :wet-env))  ; 0.776
+               (* poly-fits-wet-spec-prob (wet-specialist-fits :wet-env)))
+   :dry-env (+ (* poly-fits-dry-spec-prob (dry-specialist-fits :dry-env))  ; 0.8152
+               (* poly-fits-wet-spec-prob (wet-specialist-fits :dry-env)))})
 
-;; A truly probabilistic strategy has to be defined by an actual function.
+;; However, a truly probabilistic strategy that exhibits stochastic
+;; behaviore has to be defined by an actual function:
 (defn poly-fits
   "A_4, 'the phenotypically polymorphic allele', S&B p. 192.  env should be
   :dry-env or :wet-env.  Returns a fitness value for the organism in that
@@ -111,6 +110,7 @@
   (take 15 (repeatedly (fn [] (poly-fits rng :dry-env))))
 )
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Functions for calculating summary statistics
 
@@ -123,7 +123,7 @@
   arithmetic mean or geometric mean.  t1-relf is the relative frequency of
   trait t1 in a population with two traits present (so the relative
   frequency of t2 is (1 - relf of t1)."
-  [t1-fits t2-fits summary-fn t1-relf]
+  [summary-fn t1-fits t2-fits t1-relf]
   (let [t2-relf (- 1 t1-relf)
         ;; pop means:
         t1-in-wet (* t1-relf (t1-fits :wet-env))
@@ -150,13 +150,15 @@
 
 (defn wetdry-pop-arith-mean
   [dry-specialist-relf]
-  (pop-summary wet-specialist-fits dry-specialist-fits 
-               pop-arith-mean dry-specialist-relf))
+  (pop-summary pop-arith-mean 
+               dry-specialist-fits wet-specialist-fits 
+               dry-specialist-relf))
 
 (defn wetdry-pop-geom-mean
   [dry-specialist-relf]
-  (pop-summary dry-specialist-fits wet-specialist-fits 
-               pop-geom-mean dry-specialist-relf))
+  (pop-summary pop-geom-mean 
+               dry-specialist-fits wet-specialist-fits 
+               dry-specialist-relf))
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -173,8 +175,6 @@
       ;(assoc-in [:data 0 :line :width] 1)
       ))
 
-;; FIXME This should be a smooth curve with a peak at around 0.56.
-;;
 ;; Wet specialist vs dry specialist--population geometric means rel to
 ;; dry-specialist relf:
 (let [step 0.01
@@ -187,9 +187,10 @@
       ;(assoc-in [:data 0 :line :width] 1)
       ))
 
+;; dry specialist vs invading generalist
 (let [step 0.01
       xs (range 0 (+ 1 step) step)
-      ys (map (partial pop-summary dry-specialist-fits generalist-fits pop-arith-mean)
+      ys (map (partial pop-summary pop-arith-mean dry-specialist-fits generalist-fits)
               xs)]
   (-> (tc/dataset {:x xs :y ys})
       (plotly/layer-line {:=x :x, :=y, :y})
@@ -197,9 +198,10 @@
       ;(assoc-in [:data 0 :line :width] 1)
       ))
 
+;; dry specialist vs invading generalist
 (let [step 0.01
       xs (range 0 (+ 1 step) step)
-      ys (map (partial pop-summary dry-specialist-fits generalist-fits pop-geom-mean)
+      ys (map (partial pop-summary pop-geom-mean dry-specialist-fits generalist-fits)
               xs)]
   (-> (tc/dataset {:x xs :y ys 
                    ;:x-vert [0.56 0.56] :y-vert [0.76 0.796]
@@ -210,4 +212,29 @@
       ;(assoc-in [:data 0 :line :width] 1)
       ))
 
+
+;; generalist vs invading probabilistic polymorphic
+(let [step 0.01
+      xs (range 0 (+ 1 step) step)
+      ys (map (partial pop-summary pop-arith-mean generalist-fits poly-avg-fits)
+              xs)]
+  (-> (tc/dataset {:x xs :y ys})
+      (plotly/layer-line {:=x :x, :=y, :y})
+      plotly/plot
+      ;(assoc-in [:data 0 :line :width] 1)
+      ))
+
+;; generalist vs invading probabilistic polymorphic
+(let [step 0.01
+      xs (range 0 (+ 1 step) step)
+      ys (map (partial pop-summary pop-geom-mean generalist-fits poly-avg-fits)
+              xs)]
+  (-> (tc/dataset {:x xs :y ys 
+                   ;:x-vert [0.56 0.56] :y-vert [0.76 0.796]
+                  })
+      (plotly/layer-line {:=x :x, :=y, :y})
+      ;(plotly/layer-line {:=x :x-vert, :=y, :y-vert})
+      plotly/plot
+      ;(assoc-in [:data 0 :line :width] 1)
+      ))
 nil
